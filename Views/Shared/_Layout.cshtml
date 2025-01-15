@@ -1,50 +1,177 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SchoolSystem</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SchoolSystem.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        function toggleDropdown() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SchoolSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="/api/placeholder/40/40" alt="School Logo" class="h-10 w-10 rounded-full bg-white p-1 mr-3">
+                    <h1 class="text-2xl font-bold text-white">โรงเรียนมัธยมตัวอย่าง</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative hidden md:block">
+                        <button class="text-white hover:bg-blue-700 p-2 rounded-full">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="hidden md:block relative">
+                        <button onclick="toggleDropdown()" class="flex items-center space-x-3 text-white hover:bg-blue-700 p-2 rounded-lg">
+                            <img src="/api/placeholder/32/32" alt="User Avatar" class="h-8 w-8 rounded-full">
+                            <span>นักเรียน ใจดี</span>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>โปรไฟล์
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>ตั้งค่า
+                            </a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button class="md:hidden text-white hover:bg-blue-700 p-2 rounded-lg" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+                        ☰ Menu
+                    </button>
                 </div>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-grow">
+        <div class="container mx-auto">
+            <div class="flex">
+                <!-- Sidebar -->
+                <nav id="sidebar" class="fixed md:static top-0 left-0 h-full md:h-auto w-64 md:w-1/4 bg-white shadow-lg md:shadow-none transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-30 md:z-0">
+                    <div class="p-4">
+                        <div class="md:hidden mb-4 p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <img src="/api/placeholder/40/40" alt="User Avatar" class="h-10 w-10 rounded-full">
+                                <div>
+                                    <div class="font-medium">นักเรียน ใจดี</div>
+                                    <div class="text-sm text-gray-500">ชั้น ม.6/1</div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600">
+                                    <i class="fas fa-home w-6"></i>
+                                    <span class="font-medium">หน้าแรก</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-book w-6"></i>
+                                    <span class="font-medium">หลักสูตร</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-calendar w-6"></i>
+                                    <span class="font-medium">ตารางเรียน</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-chart-bar w-6"></i>
+                                    <span class="font-medium">ผลการเรียน</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-tasks w-6"></i>
+                                    <span class="font-medium">การบ้าน</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-users w-6"></i>
+                                    <span class="font-medium">ชมรม</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+                                    <i class="fas fa-cog w-6"></i>
+                                    <span class="font-medium">ตั้งค่า</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="md:hidden mt-auto p-4 border-t">
+                        <button class="flex items-center space-x-3 px-4 py-3 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200">
+                            <i class="fas fa-sign-out-alt w-6"></i>
+                            <span class="font-medium">ออกจากระบบ</span>
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="flex-1 p-6">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2568 - SchoolSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">ติดต่อเรา</h4>
+                    <p class="text-gray-400">123 ถนนตัวอย่าง เขตทดสอบ</p>
+                    <p class="text-gray-400">กรุงเทพฯ 10xxx</p>
+                    <p class="text-gray-400">โทร: 02-xxx-xxxx</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">ลิงก์ด่วน</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">เกี่ยวกับเรา</a></li>
+                        <li><a href="#" class="hover:text-white">ติดต่อเรา</a></li>
+                        <li><a href="#" class="hover:text-white">นโยบายความเป็นส่วนตัว</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-3">ติดตามเรา</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-line"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 border-t border-gray-700 pt-6 text-center text-gray-400">
+                <p>&copy; 2025 โรงเรียนมัธยมตัวอย่าง. All rights reserved.</p>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
