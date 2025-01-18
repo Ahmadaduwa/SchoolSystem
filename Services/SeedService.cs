@@ -59,7 +59,7 @@ namespace SchoolSystem.Services
             }
             catch(Exception ex)
             {
-                logger.LogError("An error occurred while creating the database.");
+                logger.LogError(ex, "An error occurred while creating the database.");
             }
         }
         private static async Task AddRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)

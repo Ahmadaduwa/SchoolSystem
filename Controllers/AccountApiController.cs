@@ -28,7 +28,7 @@ namespace SchoolSystem.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("register")] //api/Account/registerapi
+        [HttpPost] //api/Account/registerapi
         public async Task<IActionResult> RegisterApi([FromBody] Register model)
         {
             var user = new IdentityUser { UserName = model.Username };
@@ -50,7 +50,7 @@ namespace SchoolSystem.Controllers
         }
 
 
-        [HttpPost("login")] //api/Account/loginapi
+        [HttpPost] //api/Account/loginapi
         public async Task<IActionResult> LoginApi([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -81,7 +81,7 @@ namespace SchoolSystem.Controllers
             return Unauthorized();
         }
 
-        [HttpPost("add-role")] //api/Account/add-role
+        [HttpPost] //api/Account/add-role
         public async Task<IActionResult> AddRole([FromBody] string role)
         {
             if (!await _roleManager.RoleExistsAsync(role))
@@ -96,7 +96,7 @@ namespace SchoolSystem.Controllers
             return BadRequest("Role already exists");
         }
 
-        [HttpPost("assign-role")] //api/Account/assign-role
+        [HttpPost] //api/Account/assign-role
         public async Task<IActionResult> AssignRole([FromBody] UserRole model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
