@@ -1,8 +1,5 @@
 ﻿@using SchoolSystem.ViewModels;
 @model LoginViewModel;
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<Users> signInManager
-
 
 @{
     ViewData["Title"] = "Login";
@@ -12,21 +9,29 @@
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <h2 class="text-center text-2xl font-bold text-gray-700 mb-6">Login</h2>
-        <form action="Login" method="post" class="space-y-4">
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="text-red-500 text-center mb-4">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form asp-action="Login" method="post" class="space-y-4">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-red-500"></div>
 
             <!-- Email Field -->
             <div>
                 <label asp-for="Email" class="block text-sm font-medium text-gray-700"></label>
-                <input asp-for="Email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <input asp-for="Email" placeholder="Enter your email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                 <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
             </div>
 
             <!-- Password Field -->
             <div>
                 <label asp-for="Password" class="block text-sm font-medium text-gray-700"></label>
-                <input asp-for="Password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <input asp-for="Password" placeholder="Enter your password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                 <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
             </div>
 
@@ -40,7 +45,9 @@
 
             <!-- Submit Button -->
             <div>
-                <input type="submit" value="Login" class="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" />
+                <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Login
+                </button>
             </div>
 
             <!-- Register and Back Links -->

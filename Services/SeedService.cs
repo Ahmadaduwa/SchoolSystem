@@ -12,7 +12,7 @@ namespace SchoolSystem.Services
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Users>>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<SeedService>>();
 
             try

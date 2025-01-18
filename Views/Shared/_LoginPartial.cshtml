@@ -2,7 +2,7 @@
 @inject SignInManager<Users> signInManager
 
 <ul class="flex items-center space-x-4">
-    @if (signInManager.IsSignedIn(User))
+    @if (User.Identity.IsAuthenticated)
     {
         <li>
             Welcome, @User.Identity.Name!
@@ -17,7 +17,7 @@
     else
     {
         <li>
-            <a asp-controller="Account" asp-action="Login" class="text-blue-500 hover:underline">
+            <a href="account/login" class="text-blue-500 hover:underline">
                 Login
             </a>
         </li>
