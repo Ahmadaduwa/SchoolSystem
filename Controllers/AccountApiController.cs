@@ -10,6 +10,7 @@ using SchoolSystem.Models;
 namespace SchoolSystem.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AccountApiController : ControllerBase
     {
