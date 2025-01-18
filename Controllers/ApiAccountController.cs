@@ -7,18 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SchoolSystem.Models;
 
+
 namespace SchoolSystem.Controllers
 {
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountApiController : ControllerBase
+    public class ApiAccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AccountApiController(
+        public ApiAccountController(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration)
@@ -29,7 +30,7 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpPost] //api/Account/registerapi
-        public async Task<IActionResult> RegisterApi([FromBody] Register model)
+        public async Task<IActionResult> Register([FromBody] Register model)
         {
             var user = new IdentityUser { UserName = model.Username };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -51,7 +52,7 @@ namespace SchoolSystem.Controllers
 
 
         [HttpPost] //api/Account/loginapi
-        public async Task<IActionResult> LoginApi([FromBody] Login model)
+        public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))

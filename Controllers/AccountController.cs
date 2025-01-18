@@ -45,7 +45,7 @@ namespace SchoolSystem.Controllers
                 return View(model);
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 var authClaims = new List<Claim>
@@ -74,7 +74,7 @@ namespace SchoolSystem.Controllers
             }
 
             TempData["ErrorMessage"] = "Invalid login attempt.";
-            return RedirectToAction("Login", "Account");
+            return View(model);
         }
 
         [HttpPost("logout")]
@@ -110,7 +110,6 @@ namespace SchoolSystem.Controllers
                 return View(model);
             }
 
-            // Create a new user
             var user = new Users
             {
                 UserName = model.Username,
@@ -131,8 +130,8 @@ namespace SchoolSystem.Controllers
 
                 await _userManager.AddToRoleAsync(user, "User");
 
-                TempData["SuccessMessage"] = "Registration successful. Please log in.";
-                return RedirectToAction("Login", "Account");
+                TempData["SuccessMessage"] = "Registration successful!";
+                return View(model);
             }
 
             // Add errors to ModelState to display in the view

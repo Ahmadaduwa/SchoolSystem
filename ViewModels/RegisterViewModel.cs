@@ -5,7 +5,7 @@ namespace SchoolSystem.ViewModels
     public class RegisterViewModel
     {
         [Required(ErrorMessage = "Username is required.")]
-        [StringLength(20, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 20 characters.")]
+        [StringLength(30, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 20 characters.")]
         [RegularExpression(@"^\S+$", ErrorMessage = "Username cannot contain spaces.")]
         public string Username { get; set; }
 
@@ -22,7 +22,7 @@ namespace SchoolSystem.ViewModels
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]
-        [StringLength(40, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 40 characters.")]
+        [StringLength(50, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 40 characters.")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
