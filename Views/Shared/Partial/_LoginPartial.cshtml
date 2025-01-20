@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Users> signInManager
+
+<ul class="flex items-center space-x-4">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <button class="bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <a href="home">เข้าสู่ระบบ</a>
+        </button>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                ออกจากระบบ
+            </button>
+        </form>
+    }
+    else
+    {
+        <button class="bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <a href="account/login">เข้าสู่ระบบ</a>
+        </button>   
+    }
+</ul>

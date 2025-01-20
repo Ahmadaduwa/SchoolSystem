@@ -14,13 +14,14 @@ namespace SchoolSystem.Controllers
             _logger = logger;
         }
 
+        [Route("")]
         public IActionResult Index()
         {
-       
             return View();
         }
 
         [Authorize]
+        [Route("Home")]
         public IActionResult Home()
         {
             return View();

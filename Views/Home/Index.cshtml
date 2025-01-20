@@ -1,9 +1,225 @@
 ﻿@{
-    ViewData["Title"] = "ลงทะเบียน";
-    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+
+    Layout = "";
 }
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <partial name="_LoginPartial" />
-</div>
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โรงเรียนมัธยม - หน้าแรก</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg fixed w-full z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <img class="h-16 w-16 animate-float" src="/api/placeholder/64/64" alt="โลโก้โรงเรียน">
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-6">
+                            <a href="#" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">หน้าแรก</a>
+                            <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">เกี่ยวกับเรา</a>
+                            <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">หลักสูตร</a>
+                            <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">ข่าวสาร</a>
+                            <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">ติดต่อ</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <partial name="Partial/_LoginPartial" />
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative bg-blue-600 min-h-screen flex items-center">
+        <div class="absolute inset-0">
+            <img src="/api/placeholder/1920/1080" alt="ภาพโรงเรียน" class="w-full h-full object-cover">
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+            <h1 class="text-5xl font-bold text-white sm:text-6xl md:text-7xl leading-tight">
+                โรงเรียนมัธยม<br />แห่งการเรียนรู้
+            </h1>
+            <p class="mt-8 max-w-3xl text-xl text-gray-100 leading-relaxed">
+                มุ่งมั่นพัฒนาการศึกษา สร้างอนาคตที่สดใส<br />เพื่อเยาวชนไทยก้าวไกลสู่สากล
+            </p>
+            <div class="mt-10 flex space-x-4">
+                <button class="bg-white text-blue-600 px-8 py-4 rounded-full text-lg font-medium hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl hover-scale">
+                    <a href="/account/register">สมัครเรียน</a>
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-white hover:text-blue-600 transition-all duration-200 hover-scale">
+                    ดูหลักสูตร
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">จุดเด่นของเรา</h2>
+            <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
+                <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
+                    <img src="/api/placeholder/64/64" alt="หลักสูตร" class="w-20 h-20 mb-6 animate-float">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">หลักสูตรที่ทันสมัย</h3>
+                    <p class="text-gray-600 leading-relaxed">พัฒนาหลักสูตรการเรียนการสอนที่ทันสมัย ตอบโจทย์การเรียนรู้ในศตวรรษที่ 21 พร้อมก้าวสู่โลกอนาคต</p>
+                </div>
+                <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
+                    <img src="/api/placeholder/64/64" alt="ครู" class="w-20 h-20 mb-6 animate-float">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">ครูผู้เชี่ยวชาญ</h3>
+                    <p class="text-gray-600 leading-relaxed">คณาจารย์ที่มีความเชี่ยวชาญและประสบการณ์ในการสอน พร้อมดูแลนักเรียนอย่างใกล้ชิด</p>
+                </div>
+                <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
+                    <img src="/api/placeholder/64/64" alt="สิ่งอำนวยความสะดวก" class="w-20 h-20 mb-6 animate-float">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">สิ่งอำนวยความสะดวกครบครัน</h3>
+                    <p class="text-gray-600 leading-relaxed">อาคารเรียน ห้องปฏิบัติการ และสิ่งอำนวยความสะดวกที่ทันสมัย เพื่อการเรียนรู้อย่างมีประสิทธิภาพ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Section -->
+    <div class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">ข่าวสารและกิจกรรม</h2>
+            <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
+                <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <img src="/api/placeholder/400/300" alt="ข่าว 1" class="w-full h-56 object-cover">
+                    <div class="p-8">
+                        <span class="text-blue-600 text-sm font-medium">15 มกราคม 2567</span>
+                        <h3 class="text-xl font-semibold text-gray-900 mt-2">การแข่งขันวิชาการประจำปี</h3>
+                        <p class="mt-4 text-gray-600 leading-relaxed">นักเรียนของเราได้รับรางวัลชนะเลิศการแข่งขันวิชาการระดับประเทศ สร้างชื่อเสียงให้โรงเรียน</p>
+                        <a href="#" class="inline-block mt-6 text-blue-600 font-medium hover:text-blue-700">อ่านเพิ่มเติม →</a>
+                    </div>
+                </div>
+                <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <img src="/api/placeholder/400/300" alt="ข่าว 2" class="w-full h-56 object-cover">
+                    <div class="p-8">
+                        <span class="text-blue-600 text-sm font-medium">10 มกราคม 2567</span>
+                        <h3 class="text-xl font-semibold text-gray-900 mt-2">กิจกรรมจิตอาสา</h3>
+                        <p class="mt-4 text-gray-600 leading-relaxed">นักเรียนร่วมกิจกรรมจิตอาสาพัฒนาชุมชน สร้างจิตสำนึกที่ดีในการช่วยเหลือสังคม</p>
+                        <a href="#" class="inline-block mt-6 text-blue-600 font-medium hover:text-blue-700">อ่านเพิ่มเติม →</a>
+                    </div>
+                </div>
+                <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <img src="/api/placeholder/400/300" alt="ข่าว 3" class="w-full h-56 object-cover">
+                    <div class="p-8">
+                        <span class="text-blue-600 text-sm font-medium">5 มกราคม 2567</span>
+                        <h3 class="text-xl font-semibold text-gray-900 mt-2">การอบรมพัฒนาครู</h3>
+                        <p class="mt-4 text-gray-600 leading-relaxed">คณะครูเข้าร่วมการอบรมพัฒนาศักยภาพการสอนแนวใหม่ เพื่อยกระดับการศึกษา</p>
+                        <a href="#" class="inline-block mt-6 text-blue-600 font-medium hover:text-blue-700">อ่านเพิ่มเติม →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="col-span-1 md:col-span-2">
+                    <img src="/api/placeholder/64/64" alt="โลโก้" class="h-16 w-16 mb-6">
+                    <h3 class="text-2xl font-semibold mb-4">โรงเรียนมัธยม</h3>
+                    <p class="text-blue-100 leading-relaxed">
+                        สถาบันการศึกษาที่มุ่งมั่นพัฒนาผู้เรียนสู่ความเป็นเลิศ<br />
+                        ด้วยหลักสูตรที่ทันสมัยและการดูแลอย่างใกล้ชิด
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-6">ติดต่อเรา</h3>
+                    <div class="space-y-3">
+                        <p class="flex items-center text-blue-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            123 ถนนตัวอย่าง แขวงตัวอย่าง
+                        </p>
+                        <p class="flex items-center text-blue-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            02-xxx-xxxx
+                        </p>
+                        <p class="flex items-center text-blue-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            info@school.ac.th
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-6">ลิงก์ด่วน</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-blue-100 hover:text-white transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                เกี่ยวกับเรา
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-blue-100 hover:text-white transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                หลักสูตร
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-blue-100 hover:text-white transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                ข่าวสาร
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-blue-100 hover:text-white transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                ติดต่อ
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-blue-800">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-blue-100">&copy; 2025 โรงเรียนมัธยม. สงวนลิขสิทธิ์.</p>
+                    <div class="flex space-x-6 mt-4 md:mt-0">
+                        <a href="#" class="social-link">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
