@@ -76,7 +76,7 @@ builder.Services.AddAuthorization(Options =>
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/css/tailwind.min.css")
+    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/lib/tailwindCSS/tailwind.min.css")
         .UseContentRoot()
         .MinifyCss(); 
 
