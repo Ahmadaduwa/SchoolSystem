@@ -76,15 +76,14 @@ builder.Services.AddAuthorization(Options =>
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "text/css", "css/tailwind.css")
+    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/css/tailwind.min.css")
         .UseContentRoot()
-        .MinifyCss();
+        .MinifyCss(); 
 
-    ((IAssetPipeline)pipeline).AddJavaScriptBundle("/js/bundle.js", "text/javascript", "js/app.js")
+    pipeline.AddJavaScriptBundle("/js/bundle.js", "wwwroot/js/*.js")
         .UseContentRoot()
-        .MinifyJavaScript();
+        .MinifyJavaScript(); 
 });
-
 
 var app = builder.Build();
 await SeedService.SeedDatabase(app.Services);

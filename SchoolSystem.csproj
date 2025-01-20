@@ -29,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\input.css" />
-    <None Include="wwwroot\css\tailwind.min.css" />
+    <None Include="wwwroot\css\tailwind.css" />
   </ItemGroup>
 
 </Project>
