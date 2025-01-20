@@ -70,7 +70,7 @@ namespace SchoolSystem.Controllers
 
                 HttpContext.Response.Cookies.Append("AuthToken", new JwtSecurityTokenHandler().WriteToken(token));
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Home", "Home");
             }
 
             TempData["ErrorMessage"] = "Invalid login attempt.";

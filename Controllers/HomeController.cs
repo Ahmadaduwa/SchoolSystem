@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolSystem.Models;
 
@@ -15,15 +16,12 @@ namespace SchoolSystem.Controllers
 
         public IActionResult Index()
         {
+       
             return View();
         }
 
-        public IActionResult Login()
-        {
-            return RedirectToAction("Index", "Home");
-        }
-
-        public IActionResult Privacy()
+        [Authorize]
+        public IActionResult Home()
         {
             return View();
         }
