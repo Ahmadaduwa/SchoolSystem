@@ -6,8 +6,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SchoolSystem.Services;
 using SchoolSystem.Models;
+using Microsoft.Extensions.DependencyInjection;
+using WebOptimizer;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -59,6 +63,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Add services to the container.
 builder.Services.AddAuthorization(Options =>
 {
     Options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
@@ -67,6 +72,17 @@ builder.Services.AddAuthorization(Options =>
     Options.AddPolicy("AcademicPolicy", policy => policy.RequireRole("Academic"));
     Options.AddPolicy("DirectorPolicy", policy => policy.RequireRole("Director"));
 
+});
+
+builder.Services.AddWebOptimizer(pipeline =>
+{
+    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/css/tailwind.min.css")
+        .UseContentRoot()
+        .MinifyCss(); 
+
+    pipeline.AddJavaScriptBundle("/js/bundle.js", "wwwroot/js/*.js")
+        .UseContentRoot()
+        .MinifyJavaScript(); 
 });
 
 var app = builder.Build();
@@ -85,6 +101,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseWebOptimizer(); 
 
 app.UseHttpsRedirection();
 app.UseRouting();
