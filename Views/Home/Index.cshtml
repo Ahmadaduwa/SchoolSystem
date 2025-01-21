@@ -1,17 +1,18 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Users> signInManager
+@{
 
     Layout = "";
 }
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>โรงเรียนมัธยม - หน้าแรก</title>
-    <link href="~/css/bundle.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/css/indexBundle.css" rel="stylesheet" asp-append-version="true">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-    
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
@@ -20,37 +21,75 @@
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-16 w-16 animate-float" src="/api/placeholder/64/64" alt="โลโก้โรงเรียน">
+                        <img class="h-16 w-16 animate-float" src="/images/logo.jpg" alt="โลโก้โรงเรียน" asp-append-version="true">
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-6">
                             <a href="#" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">หน้าแรก</a>
                             <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">เกี่ยวกับเรา</a>
                             <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">หลักสูตร</a>
-                            <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">ข่าวสาร</a>
                             <a href="#" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-blue-600 transition-all duration-200">ติดต่อ</a>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 hidden md:block">
                     <partial name="Partial/_LoginPartial" />
                 </div>
+
+                <!-- Hamburger Button for Mobile -->
+                <div class="flex md:hidden">
+                    <button id="menu-toggle" class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
+                <a href="#" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">หน้าแรก</a>
+                <a href="#" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">เกี่ยวกับเรา</a>
+                <a href="#" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">หลักสูตร</a>
+                <a href="#" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">ข่าวสาร</a>
+                <a href="#" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">ติดต่อ</a>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="space-y-2">
+                        <a href="/home" class="block text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium">
+                            เข้าสู่ระบบ
+                        </a>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="inline-block w-full">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="w-full text-left block text-red-600 hover:text-red-700 px-3 py-2 text-sm font-medium">
+                                ออกจากระบบ
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a href="/account/login" class="block text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                        เข้าสู่ระบบ
+                    </a>
+                }
+            </div>
+
         </div>
     </nav>
 
     <!-- Hero Section -->
     <div class="relative bg-blue-600 min-h-screen flex items-center">
         <div class="absolute inset-0">
-            <img src="/api/placeholder/1920/1080" alt="ภาพโรงเรียน" class="w-full h-full object-cover">
+            <img src="/images/background.jpg" alt="ภาพโรงเรียน" class="w-full h-full object-cover">
             <div class="absolute inset-0 hero-gradient"></div>
         </div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
             <h1 class="text-5xl font-bold text-white sm:text-6xl md:text-7xl leading-tight">
-                โรงเรียนมัธยม<br />แห่งการเรียนรู้
+                โรงเรียนมัธยม แห่งการเรียนรู้
             </h1>
             <p class="mt-8 max-w-3xl text-xl text-gray-100 leading-relaxed">
-                มุ่งมั่นพัฒนาการศึกษา สร้างอนาคตที่สดใส<br />เพื่อเยาวชนไทยก้าวไกลสู่สากล
+                มุ่งมั่นพัฒนาการศึกษา สร้างอนาคตที่สดใสเพื่อเยาวชนไทยก้าวไกลสู่สากล
             </p>
             <div class="mt-10 flex space-x-4">
                 <a href="/account/register" class="bg-white text-blue-600 px-8 py-4 rounded-full text-lg font-medium hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl hover-scale">
@@ -69,17 +108,17 @@
             <h2 class="text-4xl font-bold text-center mb-16 gradient-text">จุดเด่นของเรา</h2>
             <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
                 <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
-                    <img src="/api/placeholder/64/64" alt="หลักสูตร" class="w-20 h-20 mb-6 animate-float">
+                    <i class="fas fa-graduation-cap text-5xl text-blue-500 mb-6"></i>
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">หลักสูตรที่ทันสมัย</h3>
                     <p class="text-gray-600 leading-relaxed">พัฒนาหลักสูตรการเรียนการสอนที่ทันสมัย ตอบโจทย์การเรียนรู้ในศตวรรษที่ 21 พร้อมก้าวสู่โลกอนาคต</p>
                 </div>
                 <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
-                    <img src="/api/placeholder/64/64" alt="ครู" class="w-20 h-20 mb-6 animate-float">
+                    <i class="fas fa-chalkboard-teacher text-5xl text-green-500 mb-6"></i>
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">ครูผู้เชี่ยวชาญ</h3>
                     <p class="text-gray-600 leading-relaxed">คณาจารย์ที่มีความเชี่ยวชาญและประสบการณ์ในการสอน พร้อมดูแลนักเรียนอย่างใกล้ชิด</p>
                 </div>
                 <div class="feature-card p-8 bg-white rounded-2xl shadow-lg">
-                    <img src="/api/placeholder/64/64" alt="สิ่งอำนวยความสะดวก" class="w-20 h-20 mb-6 animate-float">
+                    <i class="fas fa-school text-5xl text-yellow-500 mb-6"></i>
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">สิ่งอำนวยความสะดวกครบครัน</h3>
                     <p class="text-gray-600 leading-relaxed">อาคารเรียน ห้องปฏิบัติการ และสิ่งอำนวยความสะดวกที่ทันสมัย เพื่อการเรียนรู้อย่างมีประสิทธิภาพ</p>
                 </div>
@@ -87,13 +126,14 @@
         </div>
     </div>
 
+
     <!-- News Section -->
     <div class="py-24 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-bold text-center mb-16 gradient-text">ข่าวสารและกิจกรรม</h2>
             <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
                 <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <img src="/api/placeholder/400/300" alt="ข่าว 1" class="w-full h-56 object-cover">
+                    <img src="images/ophtalmologists.jpg" alt="ข่าว 1" class="w-full h-56 object-cover">
                     <div class="p-8">
                         <span class="text-blue-600 text-sm font-medium">15 มกราคม 2567</span>
                         <h3 class="text-xl font-semibold text-gray-900 mt-2">การแข่งขันวิชาการประจำปี</h3>
@@ -102,7 +142,7 @@
                     </div>
                 </div>
                 <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <img src="/api/placeholder/400/300" alt="ข่าว 2" class="w-full h-56 object-cover">
+                    <img src="/images/happiness.jpg" alt="ข่าว 2" class="w-full h-56 object-cover">
                     <div class="p-8">
                         <span class="text-blue-600 text-sm font-medium">10 มกราคม 2567</span>
                         <h3 class="text-xl font-semibold text-gray-900 mt-2">กิจกรรมจิตอาสา</h3>
@@ -111,7 +151,7 @@
                     </div>
                 </div>
                 <div class="news-card bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <img src="/api/placeholder/400/300" alt="ข่าว 3" class="w-full h-56 object-cover">
+                    <img src="/images/teaching.jpg" alt="ข่าว 3" class="w-full h-56 object-cover">
                     <div class="p-8">
                         <span class="text-blue-600 text-sm font-medium">5 มกราคม 2567</span>
                         <h3 class="text-xl font-semibold text-gray-900 mt-2">การอบรมพัฒนาครู</h3>
@@ -223,6 +263,6 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
-    <script src="~/js/bundle.js" asp-append-version="true"></script>
+    <script src="~/js/indexBundle.js" asp-append-version="true"></script>
 </body>
 </html>

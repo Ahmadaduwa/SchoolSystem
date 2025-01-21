@@ -76,11 +76,11 @@ builder.Services.AddAuthorization(Options =>
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/lib/tailwindCSS/tailwind.min.css")
+    pipeline.AddCssBundle("/css/indexBundle.css", "wwwroot/lib/tailwindCSS/tailwind.min.css", "wwwroot/css/index.css")
         .UseContentRoot()
         .MinifyCss(); 
 
-    pipeline.AddJavaScriptBundle("/js/bundle.js", "wwwroot/js/*.js")
+    pipeline.AddJavaScriptBundle("/js/indexBundle.js", "wwwroot/js/index.js")
         .UseContentRoot()
         .MinifyJavaScript(); 
 });
