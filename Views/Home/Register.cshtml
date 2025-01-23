@@ -1,8 +1,8 @@
 ﻿@model SchoolSystem.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "ลงทะเบียน";
-    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/Layout/_AccountLayout.cshtml";
 }
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -15,7 +15,7 @@
 
             <!-- Form -->
             <div class="px-6 py-8">
-                <form asp-action="Register" method="post">
+                <form asp-controller="Home" asp-action="Register" method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="mb-6 bg-red-50 text-red-600 px-4 py-3 rounded-lg"></div>
 
@@ -80,7 +80,7 @@
 
                     <p class="text-center mt-4 text-sm text-gray-600">
                         มีบัญชีผู้ใช้แล้ว?
-                        <a href="/account/login" class="text-blue-600 hover:text-blue-700 font-medium">เข้าสู่ระบบ</a>
+                        <a href="/login" class="text-blue-600 hover:text-blue-700 font-medium">เข้าสู่ระบบ</a>
                     </p>
                     <div class="text-center">
                         <a asp-controller="Home" asp-action="Index" class="text-gray-600 hover:underline mt-3 inline-block">Back</a>

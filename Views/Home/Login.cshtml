@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Login";
-    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    Layout = "~/Views/Shared/Layout/_AccountLayout.cshtml";
 }
 
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
@@ -17,7 +17,7 @@
             </div>
         }
 
-        <form asp-action="Login" method="post" class="space-y-4">
+        <form asp-controller="Home" asp-action="Login" method="post" class="space-y-4">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-red-500"></div>
 
@@ -53,7 +53,7 @@
             <!-- Register and Back Links -->
             <p class="text-center text-sm text-gray-600">
                 Don't have an account?
-                <a href="/account/register" class="text-blue-600 hover:underline">Register</a>
+                <a href="/register" class="text-blue-600 hover:underline">Register</a>
             </p>
             <div class="text-center">
                 <a asp-controller="Home" asp-action="Index" class="text-gray-600 hover:underline mt-3 inline-block">Back</a>

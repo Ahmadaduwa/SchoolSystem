@@ -70,6 +70,7 @@ builder.Services.AddAuthorization(Options =>
     Options.AddPolicy("StudentPolicy", policy => policy.RequireRole("Student"));
     Options.AddPolicy("TeacherPolicy", policy => policy.RequireRole("Teacher"));
     Options.AddPolicy("AcademicPolicy", policy => policy.RequireRole("Academic"));
+    Options.AddPolicy("StudentCouncil", policy => policy.RequireRole("StudentCouncil"));
     Options.AddPolicy("DirectorPolicy", policy => policy.RequireRole("Director"));
 
 });

@@ -1,128 +1,44 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.NetworkInformation;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SchoolSystem.Models;
-using SchoolSystem.ViewModels;
+
 
 namespace SchoolSystem.Controllers
 {
-    public class AccountController : Controller
+  
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AccountController : ControllerBase
     {
-        private readonly UserManager<Users> _userManager;
-        private readonly SignInManager<Users> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AccountController(
-            UserManager<Users> userManager,
+            UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            SignInManager<Users> signInManager,
             IConfiguration configuration)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
         }
-        [HttpGet]
-        public IActionResult Login()
+
+        [HttpPost] //api/Account/registerapi
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Register([FromBody] Register model)
         {
-            return View();
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromForm] LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                TempData["ErrorMessage"] = "Please fill in all required fields.";
-                return View(model);
-            }
-
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-                var userRoles = await _userManager.GetRolesAsync(user);
-                authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-                        SecurityAlgorithms.HmacSha256
-                    )
-                );
-
-                HttpContext.Response.Cookies.Append("AuthToken", new JwtSecurityTokenHandler().WriteToken(token));
-
-                return RedirectToAction("Home", "Home");
-            }
-
-            TempData["ErrorMessage"] = "Invalid login attempt.";
-            return View(model);
-        }
-
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
-            HttpContext.Response.Cookies.Delete("AuthToken");
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                TempData["ErrorMessage"] = "Please fill in all required fields correctly.";
-                return View(model);
-            }
-
-            // Check if the email or username is already in use
-            var existingUser = await _userManager.FindByEmailAsync(model.Email)
-                               ?? await _userManager.FindByNameAsync(model.Username);
-
-            if (existingUser != null)
-            {
-                TempData["ErrorMessage"] = "The email or username is already in use.";
-                return View(model);
-            }
-
-            var user = new Users
-            {
-                UserName = model.Username,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
-
+            var user = new IdentityUser { UserName = model.Username };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                // Assign default role (if required)
                 if (!await _roleManager.RoleExistsAsync("User"))
                 {
                     await _roleManager.CreateAsync(new IdentityRole("User"));
@@ -130,19 +46,80 @@ namespace SchoolSystem.Controllers
 
                 await _userManager.AddToRoleAsync(user, "User");
 
-                TempData["SuccessMessage"] = "Registration successful!";
-                return View(model);
+                return Ok(new { message = "User registered successfully and assigned to 'User' role" });
             }
 
-            // Add errors to ModelState to display in the view
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            TempData["ErrorMessage"] = "Registration failed. Please try again.";
-            return View(model);
+            return BadRequest(result.Errors);
         }
 
+
+        [HttpPost] //api/Account/login
+        public async Task<IActionResult> Login([FromBody] Login model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                var authClaims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+                authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    expires: DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
+                        SecurityAlgorithms.HmacSha256)
+                );
+
+                return Ok(new { Token = new JwtSecurityTokenHandler().WriteToken(token) });
+            }
+
+            return Unauthorized();
+        }
+
+        [HttpPost] //api/Account/add-role
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddRole([FromBody] string role)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                var result = await _roleManager.CreateAsync(new IdentityRole(role));
+                if (result.Succeeded)
+                {
+                    return Ok(new { message = "Role added successfully" });
+                }
+                return BadRequest(result.Errors);
+            }
+            return BadRequest("Role already exists");
+        }
+
+        [HttpPost] //api/Account/assign-role
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignRole([FromBody] UserRole model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Username);
+
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            // เพิ่ม Role ใหม่ที่ต้องการ
+            var addResult = await _userManager.AddToRoleAsync(user, model.Role);
+
+            if (addResult.Succeeded)
+            {
+                return Ok(new { message = "Role changed successfully" });
+            }
+
+            return BadRequest(addResult.Errors);
+        }
     }
 }

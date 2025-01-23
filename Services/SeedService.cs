@@ -25,19 +25,21 @@ namespace SchoolSystem.Services
                 await AddRoleAsync(roleManager, "Student");
                 await AddRoleAsync(roleManager, "Teacher");
                 await AddRoleAsync(roleManager, "Academic");
+                await AddRoleAsync(roleManager, "StudentCouncil");
                 await AddRoleAsync(roleManager, "Director");
 
 
                 logger.LogInformation("Seeding admin user");
                 var adminEmail = "admin@admin.com";
+                var Username = "Admin123456";
                 if (await userManager.FindByEmailAsync(adminEmail) == null)
                 {
                     var adminUser = new Users
                     {
                         FirstName = "Admin",
                         LastName = "No.1",
-                        UserName = adminEmail,
-                        NormalizedUserName = adminEmail.ToUpper(),
+                        UserName = Username,
+                        NormalizedUserName = Username.ToUpper(),
                         Email = adminEmail,
                         NormalizedEmail = adminEmail.ToUpper(),
                         EmailConfirmed = true,
@@ -45,7 +47,7 @@ namespace SchoolSystem.Services
 
                     };
 
-                    var result = await userManager.CreateAsync(adminUser, "Admin@123");
+                    var result = await userManager.CreateAsync(adminUser, "Admin123456");
                     if (result.Succeeded)
                     {
                         logger.LogInformation("Admin user created successfully.");

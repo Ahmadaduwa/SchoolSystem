@@ -25,11 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Shared\Layout\" />
+    <None Include="wwwroot\css\tailwind.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\tailwind.css" />
+    <Content Update="Views\Home\Login.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Teacher\" />
   </ItemGroup>
 
 </Project>
