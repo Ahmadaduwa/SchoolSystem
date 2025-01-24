@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿    using System.ComponentModel.DataAnnotations;
 
 namespace SchoolSystem.Models.CouseManagement
 {
@@ -13,7 +13,7 @@ namespace SchoolSystem.Models.CouseManagement
         [Required]
         public int CourseId { get; set; } // Foreign Key ไปยังตาราง Courses
 
-        public Activities? Activity { get; set; }
-        public Courses? Course { get; set; }
+        public ICollection<Activities>? Activity { get; set; }
+        public ICollection<Courses>? Course { get; set; }
     }
 }

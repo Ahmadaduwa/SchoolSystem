@@ -13,7 +13,7 @@ namespace SchoolSystem.Models.CouseManagement
         [Required]
         public int ObjectiveID { get; set; } // Foreign Key ไปยังตาราง Objectives
 
-        public Subjects? Subject { get; set; }
-        public Objectives? Objective { get; set; }
+        public ICollection<Subjects>? Subject { get; set; }
+        public ICollection<Objectives>? Objective { get; set; }
     }
 }

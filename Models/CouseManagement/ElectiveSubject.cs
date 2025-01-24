@@ -16,8 +16,8 @@ namespace SchoolSystem.Models.CouseManagement
         [Required]
         public int SubjectId { get; set; } // Foreign Key ไปยัง Subjects
 
-        public GradeLevels GradeLevel { get; set; }
-        public Courses Course { get; set; }
-        public Subjects Subject { get; set; }
+        public ICollection<GradeLevels>? GradeLevel { get; set; }
+        public ICollection<Courses>? Course { get; set; }
+        public ICollection<Subjects>? Subject { get; set; }
     }
 }

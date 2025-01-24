@@ -9,6 +9,6 @@ namespace SchoolSystem.Models.CouseManagement
 
         [Required]
         [StringLength(100)] // กำหนดความยาวสูงสุดของ ActivityName
-        public required string ActivityName { get; set; }
+        public string? ActivityName { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace SchoolSystem.Models.CouseManagement
         [Required]
         public int BeforeSubjectId { get; set; } // รหัสวิชาที่เกิดขึ้นก่อน
 
-        public Subjects? AfterSubject { get; set; }
-        public Subjects? BeforeSubject { get; set; }
+        public ICollection<Subjects>? AfterSubject { get; set; }
+        public ICollection<Subjects>? BeforeSubject { get; set; }
     }
 }

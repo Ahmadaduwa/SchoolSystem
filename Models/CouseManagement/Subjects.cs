@@ -22,11 +22,6 @@ namespace SchoolSystem.Models.CouseManagement
         [Required]
         public int Unit { get; set; } // จำนวนหน่วยกิต
 
-        // Foreign Key เชื่อมกับตาราง Courses
-        [ForeignKey("Courses")]
-        public int CourseId { get; set; }
-        public required Courses Course { get; set; } // Navigation Property
-
         // Foreign Key เชื่อมกับตาราง SubjectCategory
         [ForeignKey("SubjectCategory")]
         public int SubjectCategoryId { get; set; }
