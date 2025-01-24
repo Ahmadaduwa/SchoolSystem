@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.CouseManagement
+namespace SchoolSystem.Models.ClassManagement
 {
     public class GradeLevels
     {

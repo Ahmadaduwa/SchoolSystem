@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.CouseManagement
+namespace SchoolSystem.Models.SubjectManagement
 {
     public class Subjects
     {
