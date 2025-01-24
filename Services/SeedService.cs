@@ -47,7 +47,7 @@ namespace SchoolSystem.Services
 
                     };
 
-                    var result = await userManager.CreateAsync(adminUser, "Admin123456");
+                    var result = await userManager.CreateAsync(adminUser, "Admin@123");
                     if (result.Succeeded)
                     {
                         logger.LogInformation("Admin user created successfully.");

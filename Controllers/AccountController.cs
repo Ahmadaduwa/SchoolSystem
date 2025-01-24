@@ -12,16 +12,17 @@ namespace SchoolSystem.Controllers
 {
   
 
-    [ApiController]
+    
     [Route("api/[controller]")]
+    [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<Users> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AccountController(
-            UserManager<IdentityUser> userManager,
+            UserManager<Users> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration)
         {
@@ -30,11 +31,11 @@ namespace SchoolSystem.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost] //api/Account/registerapi
+        [HttpPost("register")] //api/Account/register
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] Register model)
         {
-            var user = new IdentityUser { UserName = model.Username };
+            var user = new Users { UserName = model.Username };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
@@ -53,9 +54,14 @@ namespace SchoolSystem.Controllers
         }
 
 
-        [HttpPost] //api/Account/login
+        [HttpPost("login")] //api/Account/login
         public async Task<IActionResult> Login([FromBody] Login model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {

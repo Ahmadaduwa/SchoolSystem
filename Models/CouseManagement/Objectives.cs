@@ -1,0 +1,17 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SchoolSystem.Models.CouseManagement
+{
+    public class Objectives
+    {
+        [Key]
+        public int ObjectiveID { get; set; } // Primary Key
+
+        [Required]
+        [StringLength(100)] // จำกัดความยาวสูงสุดของชื่อวัตถุประสงค์
+        public required string ObjectiveName { get; set; }
+
+        [StringLength(500)] // จำกัดความยาวสูงสุดของคำอธิบาย
+        public string? Description { get; set; }
+    }
+}

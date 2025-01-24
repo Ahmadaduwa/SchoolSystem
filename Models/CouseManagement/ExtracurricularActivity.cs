@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SchoolSystem.Models.CouseManagement
+{
+    public class ExtracurricularActivity
+    {
+        [Key]
+        public int EA_Id { get; set; } // Primary Key
+
+        [Required]
+        public int ActivityId { get; set; } // Foreign Key ไปยังตาราง Activities
+
+        [Required]
+        public int CourseId { get; set; } // Foreign Key ไปยังตาราง Courses
+
+        public Activities? Activity { get; set; }
+        public Courses? Course { get; set; }
+    }
+}

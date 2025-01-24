@@ -1,5 +1,5 @@
-﻿@using SchoolSystem.ViewModels;
-@model LoginViewModel;
+﻿@using SchoolSystem.Models.ViewModels
+@model SchoolSystem.Models.ViewModels.LoginViewModel
 
 @{
     ViewData["Title"] = "Login";
@@ -19,7 +19,6 @@
 
         <form asp-controller="Home" asp-action="Login" method="post" class="space-y-4">
             @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-red-500"></div>
 
             <!-- Email Field -->
             <div>
