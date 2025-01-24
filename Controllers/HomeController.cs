@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SchoolSystem.Models;
-using SchoolSystem.ViewModels;
+using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
 {
@@ -47,14 +47,15 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Register()
         {
             return View();
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Login()
         {
+            TempData["ErrorMessage"] = null;
             return View();
         }
 
@@ -67,38 +68,63 @@ namespace SchoolSystem.Controllers
                 TempData["ErrorMessage"] = "Please fill in all required fields.";
                 return View(model);
             }
-
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            if (!ModelState.IsValid)
             {
-                var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-                var userRoles = await _userManager.GetRolesAsync(user);
-                authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-                        SecurityAlgorithms.HmacSha256
-                    )
-                );
-
-                HttpContext.Response.Cookies.Append("AuthToken", new JwtSecurityTokenHandler().WriteToken(token));
-
-                return RedirectToAction("Home", "Home");
-                
+                TempData["ErrorMessage"] = "Please fill in all required fields.";
+                return View(model);
             }
 
-            TempData["ErrorMessage"] = "Invalid login attempt.";
-            return View(model);
+            try
+            {
+                var user = await _userManager.FindByNameAsync(model.Username);
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+                    var userRoles = await _userManager.GetRolesAsync(user);
+                    authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+                    var jwtKey = _configuration["Jwt:Key"];
+                    if (string.IsNullOrEmpty(jwtKey))
+                    {
+                        throw new InvalidOperationException("JWT key is not configured.");
+                    }
+
+                    var token = new JwtSecurityToken(
+                        issuer: _configuration["Jwt:Issuer"],
+                        expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
+                        claims: authClaims,
+                        signingCredentials: new SigningCredentials(
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                            SecurityAlgorithms.HmacSha256
+                        )
+                    );
+
+                    HttpContext.Response.Cookies.Append("AuthToken", new JwtSecurityTokenHandler().WriteToken(token), new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!))
+                    });
+
+                    return RedirectToAction("Home", "Home");
+                }
+
+                TempData["ErrorMessage"] = "Invalid login attempt.";
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during login.");
+                TempData["ErrorMessage"] = "An error occurred. Please try again later.";
+                return View(model); ;
+            }
         }
 
         [HttpPost("logout")]

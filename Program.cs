@@ -111,7 +111,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseWebOptimizer(); 
+app.UseWebOptimizer();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -120,11 +120,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapControllers();
 
 app.Run();
