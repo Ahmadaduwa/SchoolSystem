@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Models;
 using SchoolSystem.Models.ClassManagement;
-using SchoolSystem.Models.CouseManagement;
+using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.SubjectManagement;
 
 namespace SchoolSystem.Data

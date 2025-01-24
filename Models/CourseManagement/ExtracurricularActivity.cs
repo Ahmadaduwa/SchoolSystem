@@ -1,6 +1,6 @@
-﻿    using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.CouseManagement
+namespace SchoolSystem.Models.CourseManagement
 {
     public class ExtracurricularActivity
     {

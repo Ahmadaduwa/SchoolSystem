@@ -2,12 +2,12 @@
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.SubjectManagement;
 
-namespace SchoolSystem.Models.CouseManagement
+namespace SchoolSystem.Models.CourseManagement
 {
-    public class CompulsorySubject
+    public class CompulsoryElectiveSubject
     {
         [Key]
-        public int CS_Id { get; set; } // Primary Key
+        public int CES_Id { get; set; } // Primary Key
 
         [Required]
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
