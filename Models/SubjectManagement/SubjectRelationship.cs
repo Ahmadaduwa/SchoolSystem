@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.CouseManagement
+namespace SchoolSystem.Models.SubjectManagement
 {
     public class SubjectRelationship
     {

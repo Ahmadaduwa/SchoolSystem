@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.ClassManagement;
+using SchoolSystem.Models.SubjectManagement;
 
 namespace SchoolSystem.Models.CouseManagement
 {
