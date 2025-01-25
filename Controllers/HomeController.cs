@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using SchoolSystem.Models;
 using SchoolSystem.Models.ViewModels;
 
@@ -144,7 +145,7 @@ namespace SchoolSystem.Controllers
                 TempData["ErrorMessage"] = "Please fill in all required fields correctly.";
                 return View(model);
             }
-
+           
             // Check if the email or username is already in use
             var existingUser = await _userManager.FindByEmailAsync(model.Email)
                                ?? await _userManager.FindByNameAsync(model.Username);
@@ -159,8 +160,6 @@ namespace SchoolSystem.Controllers
             {
                 UserName = model.Username,
                 Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
