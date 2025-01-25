@@ -17,6 +17,7 @@ namespace SchoolSystem.Data
         }
 
         // DbSets สำหรับแต่ละโมเดล
+        public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Courses> Courses { get; set; }
         public DbSet<GradeLevels> GradeLevels { get; set; }
         public DbSet<Activities> Activities { get; set; }
@@ -32,11 +33,23 @@ namespace SchoolSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            ConfigureUserRelationship(modelBuilder);
             ConfigureSubjectRelationship(modelBuilder);
+            
 
 
         }
+        private void ConfigureUserRelationship(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<Profiles>()
+                .HasOne(p => p.User)
+                .WithOne(u => u.Profile)
+                .HasForeignKey<Profiles>(p => p.UserId);
 
+            modelBuilder.Entity<Profiles>()
+                .Property(p => p.Gender)
+                .HasDefaultValue("Not Specified");
+
+        }
         private void ConfigureSubjectRelationship(ModelBuilder modelBuilder)
         {
             // Subjects and SubjectCategory Relationship

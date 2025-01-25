@@ -32,12 +32,12 @@
                     logger.LogInformation("Seeding users for roles");
 
                     // Create users for each role
-                    await CreateUserWithRoleAsync(userManager, logger, "admin@admin.com", "Admin123456", "Admin", "No.1", "Admin@123", "Admin");
-                    await CreateUserWithRoleAsync(userManager, logger, "student@test.com", "StudentUser", "Student", "Test", "Student@123", "Student");
-                    await CreateUserWithRoleAsync(userManager, logger, "teacher@test.com", "TeacherUser", "Teacher", "Test", "Teacher@123", "Teacher");
-                    await CreateUserWithRoleAsync(userManager, logger, "academic@test.com", "AcademicUser", "Academic", "Test", "Academic@123", "Academic");
-                    await CreateUserWithRoleAsync(userManager, logger, "studentcouncil@test.com", "StudentCouncilUser", "StudentCouncil", "Test", "StudentCouncil@123", "StudentCouncil");
-                    await CreateUserWithRoleAsync(userManager, logger, "director@test.com", "DirectorUser", "Director", "Test", "Director@123", "Director");
+                    await CreateUserWithRoleAsync(userManager, logger, "admin@admin.com", "Admin123456", "Admin@123", "Admin");
+                    await CreateUserWithRoleAsync(userManager, logger, "student@test.com", "StudentUser", "Student@123", "Student");
+                    await CreateUserWithRoleAsync(userManager, logger, "teacher@test.com", "TeacherUser", "Teacher@123", "Teacher");
+                    await CreateUserWithRoleAsync(userManager, logger, "academic@test.com", "AcademicUser", "Academic@123", "Academic");
+                    await CreateUserWithRoleAsync(userManager, logger, "studentcouncil@test.com", "StudentCouncilUser", "StudentCouncil@123", "StudentCouncil");
+                    await CreateUserWithRoleAsync(userManager, logger, "director@test.com", "DirectorUser", "Director@123", "Director");
             
                 }
                 catch(Exception ex)
@@ -62,8 +62,6 @@
             ILogger logger,
             string email,
             string username,
-            string firstName,
-            string lastName,
             string password,
             string role)
         {
@@ -71,8 +69,6 @@
             {
                 var user = new Users
                 {
-                    FirstName = firstName,
-                    LastName = lastName,
                     UserName = username,
                     NormalizedUserName = username.ToUpper(),
                     Email = email,
