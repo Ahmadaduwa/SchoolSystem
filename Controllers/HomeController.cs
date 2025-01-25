@@ -10,7 +10,7 @@ using SchoolSystem.Models;
 using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
-{
+{   
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -142,6 +142,37 @@ namespace SchoolSystem.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Please fill in all required fields correctly.";
+                return View(model);
+            }
+
+            // Check if the email or username is already in use
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                TempData["ErrorMessage"] = "Email is required.";
+                return View(model);
+            }
+
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                TempData["ErrorMessage"] = "Username is required.";
+                return View(model);
+            }
+
+            if (string.IsNullOrEmpty(model.FirstName))
+            {
+                TempData["ErrorMessage"] = "FirstName is required.";
+                return View(model);
+            }
+
+            if(string.IsNullOrEmpty(model.LastName))
+            {
+                TempData["ErrorMessage"] = "LastName is required.";
+                return View(model);
+            }
+
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                TempData["ErrorMessage"] = "Password is required.";
                 return View(model);
             }
 
