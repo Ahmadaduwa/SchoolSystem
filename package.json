@@ -1,5 +1,16 @@
 {
-  "devDependencies": {
-    "eslint": "^9.18.0"
-  }
+    "devDependencies": {
+        "autoprefixer": "^10.4.20",
+        "eslint": "^9.18.0",
+        "postcss": "^8.5.1",
+        "tailwindcss": "^4.0.0"
+    },
+    "dependencies": {
+        "@tailwindcss/cli": "^4.0.0",
+        "@tailwindcss/postcss": "^4.0.0"
+    },
+    "scripts": {
+        "build:css": "tailwindcss -i wwwroot/css/tailwind.css -o wwwroot/css/output.css --minify",
+        "watch:css": "tailwindcss -i wwwroot/css/tailwind.css -o wwwroot/css/output.css --minify --watch"
+    }
 }
