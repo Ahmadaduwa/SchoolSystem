@@ -8,6 +8,7 @@ using SchoolSystem.Services;
 using Microsoft.Extensions.DependencyInjection;
 using WebOptimizer;
 using SchoolSystem.Models.UserManagement;
+using Microsoft.Extensions.FileProviders;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,7 +78,8 @@ builder.Services.AddAuthorization(Options =>
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-
+    pipeline.AddCssBundle("/css/bundle.css", "css/*.css");
+    pipeline.AddJavaScriptBundle("/js/bundle.js", "js/*.js");
 });
 
 var app = builder.Build();
@@ -97,13 +99,20 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseWebOptimizer();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = "/static"
+});
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseWebOptimizer();
 
 app.MapStaticAssets();
 app.MapControllerRoute(
