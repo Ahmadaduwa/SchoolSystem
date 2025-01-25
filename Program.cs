@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SchoolSystem.Services;
-using SchoolSystem.Models;
 using Microsoft.Extensions.DependencyInjection;
 using WebOptimizer;
+using SchoolSystem.Models.UserManagement;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,21 +77,7 @@ builder.Services.AddAuthorization(Options =>
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "wwwroot/lib/tailwindCSS/tailwind.min.css")
-        .UseContentRoot()
-        .MinifyCss();
 
-    pipeline.AddCssBundle("/css/indexBundle.css", "wwwroot/lib/tailwindCSS/tailwind.min.css", "wwwroot/css/index.css")
-        .UseContentRoot()
-        .MinifyCss(); 
-
-    pipeline.AddJavaScriptBundle("/js/indexBundle.js", "wwwroot/js/index.js")
-        .UseContentRoot()
-        .MinifyJavaScript();
-
-    pipeline.AddJavaScriptBundle("/js/LayoutBundle.js", "wwwroot/js/Layout.js")
-        .UseContentRoot()
-        .MinifyJavaScript();
 });
 
 var app = builder.Build();

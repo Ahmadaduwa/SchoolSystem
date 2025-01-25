@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SchoolSystem.Models.UserManagement
 @inject SignInManager<Users> signInManager
 @{
 
@@ -10,7 +11,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>โรงเรียนมัธยม - หน้าแรก</title>
-    <link href="~/css/indexBundle.css" rel="stylesheet" asp-append-version="true">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/css/index.css" rel="stylesheet" asp-append-version="true">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 </head>
@@ -263,6 +265,6 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
-    <script src="~/js/indexBundle.js" asp-append-version="true"></script>
+    <script src="/js/index.js" asp-append-version="true"></script>
 </body>
 </html>
