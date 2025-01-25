@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using SchoolSystem.Models;
+using SchoolSystem.Models.UserManagement;
 using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
@@ -145,7 +145,7 @@ namespace SchoolSystem.Controllers
                 TempData["ErrorMessage"] = "Please fill in all required fields correctly.";
                 return View(model);
             }
-           
+
             // Check if the email or username is already in use
             if (string.IsNullOrEmpty(model.Email))
             {
@@ -224,5 +224,7 @@ namespace SchoolSystem.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        // Add function here
     }
 }

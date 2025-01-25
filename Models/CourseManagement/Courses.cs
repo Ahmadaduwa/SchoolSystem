@@ -18,5 +18,9 @@ namespace SchoolSystem.Models.CourseManagement
         public DateTime CreateAt { get; set; } // วันที่สร้าง
 
         public DateTime? UpdateAt { get; set; } // วันที่อัปเดต (เป็นค่าว่างได้)
+
+        [Required]
+        [MaxLength(50)] // จำกัดความยาวของสถานะ
+        public string Status { get; set; } = "Active"; // ค่าเริ่มต้นเป็น "Active"
     }
 }

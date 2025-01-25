@@ -3,10 +3,10 @@ using System.Security.AccessControl;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SchoolSystem.Models;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.SubjectManagement;
+using SchoolSystem.Models.UserManagement;
 
 namespace SchoolSystem.Data
 {

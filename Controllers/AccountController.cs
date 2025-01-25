@@ -5,14 +5,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SchoolSystem.Models;
+using SchoolSystem.Models.Account;
+using SchoolSystem.Models.UserManagement;
 
 
 namespace SchoolSystem.Controllers
 {
-  
 
-    
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase

@@ -1,11 +1,11 @@
-﻿    using Microsoft.AspNetCore.Identity;
-    using Microsoft.EntityFrameworkCore.Metadata;
-    using SchoolSystem.Data;
-    using SchoolSystem.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata;
+using SchoolSystem.Data;
+using SchoolSystem.Models.UserManagement;
 
-    namespace SchoolSystem.Services
-    {
-        public class SeedService
+namespace SchoolSystem.Services
+{
+    public class SeedService
         {
             public static async Task SeedDatabase(IServiceProvider serviceProvider)
             {

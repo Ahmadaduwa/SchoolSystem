@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
-namespace SchoolSystem.Models
+namespace SchoolSystem.Models.UserManagement
 {
     public class Profiles
     {
