@@ -1,0 +1,96 @@
+﻿@model SchoolSystem.Models.Course
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Course Information Form</h2>
+
+    <!-- Begin Form -->
+    <form asp-controller="Teacher" asp-action="Create" method="post" class="space-y-4">
+        <!-- Course Information -->
+        <div class="grid grid-cols-2 gap-2">
+            <!-- Course Code -->
+            <div>
+                <label asp-for="CourseCode" class="block text-sm font-medium text-gray-700">Course Code</label>
+                <input asp-for="CourseCode" type="text" class="input-field border border-gray-300 rounded px-2 py-1 w-full" />
+                <span asp-validation-for="CourseCode" class="text-red-500 text-sm"></span>
+            </div>
+
+            <!-- Course Name -->
+            <div>
+                <label asp-for="CourseName" class="block text-sm font-medium text-gray-700">Course Name</label>
+                <input asp-for="CourseName" type="text" class="input-field border border-gray-300 rounded px-2 py-1 w-full" />
+                <span asp-validation-for="CourseName" class="text-red-500 text-sm"></span>
+            </div>
+        </div>
+
+        <!-- Learning Objective -->
+        <div>
+            <label asp-for="LearningObjective" class="block text-sm font-medium text-gray-700">Learning Objective</label>
+            <textarea asp-for="LearningObjective" class="textarea-field border border-gray-300 rounded px-2 py-1 w-full"></textarea>
+            <span asp-validation-for="LearningObjective" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Units -->
+        <div>
+            <label asp-for="Units" class="block text-sm font-medium text-gray-700">Units</label>
+            <input asp-for="Units" type="number" class="input-field border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="Units" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Category -->
+        <div>
+            <label asp-for="Category" class="block text-sm font-medium text-gray-700">Category</label>
+            <input asp-for="Category" type="text" class="input-field border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="Category" class="text-red-500 text-sm"></span>
+        </div>
+
+
+        <div>
+            <label for="prerequisites" class="block text-sm font-medium text-gray-700">Prerequisites</label>
+            <div class="flex items-center space-x-2">
+                <input id="prerequisites" name="Prerequisites" class="w-full border border-gray-300 rounded px-2 py-1" readonly />
+                <button type="button" onclick="searchPrerequisite()" class="px-4 py-2 bg-blue-500 text-white rounded shadow">Search</button>
+            </div>
+            <span class="text-gray-500 text-sm">This field will show the Course Code and Course Name of the prerequisite.</span>
+        </div>
+
+
+        <!-- Postrequisites -->
+        <div>
+            <label asp-for="Postrequisites" class="block text-sm font-medium text-gray-700">Postrequisites</label>
+            <input asp-for="Postrequisites" type="text" class="input-field border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="Postrequisites" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-4">
+            <a asp-action="Index" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+            <button type="submit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Submit</button>
+        </div>
+    </form>
+    <!-- End Form -->
+</div>
+
+<script>
+    function searchPrerequisite() {
+        const courseId = prompt("Enter the Course ID to search:");
+        if (courseId) {
+            fetch(`/Teacher/SearchPrerequisiteById?id=${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('prerequisites').value = `${data.courseName}`;
+                    } else {
+                        alert("Course not found!");
+                    }
+                })
+                .catch(error => console.error("Error fetching course:", error));
+        }
+    }
+</script>

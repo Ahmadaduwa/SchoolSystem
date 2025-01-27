@@ -1,0 +1,40 @@
+﻿<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-4">Course Details</h2>
+
+    <div class="bg-white p-6 rounded shadow">
+        <dl class="space-y-4">
+            <div class="flex flex-col pb-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">รหัสวิชา</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.CourseCode</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">คำอธิบายรายวิชา</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.CourseName</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">วัตถุประสงค์การเรียนรู้</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.LearningObjective</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">หน่วยการเรียน</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.Units</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">หมวดวิชา</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.Category</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">รายวิชาเรียนก่อน</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.Prerequisites</dd>
+            </div>
+            <div class="flex flex-col py-3">
+                <dt class="mb-1 text-gray-500 md:text-lg">รายวิชาเรียนหลัง</dt>
+                <dd class="text-gray-900 text-lg font-semibold">@Model.Postrequisites</dd>
+            </div>
+        </dl>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="px-4 py-2 bg-gray-300 text-gray-700 rounded shadow">Back to List</a>
+    </div>
+</div>

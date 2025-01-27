@@ -1,0 +1,78 @@
+﻿@model SchoolSystem.Models.Course
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+    <div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Edit Course Details</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="text-green-500 mb-4">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form asp-action="Edit" method="post" class="space-y-4">
+            <!-- Hidden field for CourseID -->
+            <input asp-for="CourseID" type="hidden" />
+
+            <div class="grid grid-cols-2 gap-2">
+                <!-- Course Code -->
+                <div>
+                    <label asp-for="CourseCode" class="block text-sm font-medium text-gray-700">รหัสวิชา</label>
+                    <input asp-for="CourseCode" class="w-full border border-gray-300 rounded px-2 py-1" />
+                    <span asp-validation-for="CourseCode" class="text-red-500"></span>
+                </div>
+
+                <!-- Course Name -->
+                <div>
+                    <label asp-for="CourseName" class="block text-sm font-medium text-gray-700">คำอธิบายรายวิชา</label>
+                    <input asp-for="CourseName" class="w-full border border-gray-300 rounded px-2 py-1" />
+                    <span asp-validation-for="CourseName" class="text-red-500"></span>
+                </div>
+            </div>
+
+            <!-- Learning Objective -->
+            <div>
+                <label asp-for="LearningObjective" class="block text-sm font-medium text-gray-700">วัตถุประสงค์การเรียนรู้</label>
+                <textarea asp-for="LearningObjective" class="w-full border border-gray-300 rounded px-2 py-1"></textarea>
+                <span asp-validation-for="LearningObjective" class="text-red-500"></span>
+            </div>
+
+            <!-- Units -->
+            <div>
+                <label asp-for="Units" class="block text-sm font-medium text-gray-700">หน่วยการเรียน</label>
+                <input asp-for="Units" type="number" class="w-full border border-gray-300 rounded px-2 py-1" />
+                <span asp-validation-for="Units" class="text-red-500"></span>
+            </div>
+
+            <!-- Category -->
+            <div>
+                <label asp-for="Category" class="block text-sm font-medium text-gray-700">หมวดวิชา</label>
+                <input asp-for="Category" class="w-full border border-gray-300 rounded px-2 py-1" />
+                <span asp-validation-for="Category" class="text-red-500"></span>
+            </div>
+
+            <!-- Prerequisites -->
+            <div>
+                <label asp-for="Prerequisites" class="block text-sm font-medium text-gray-700">รายวิชาเรียนก่อน</label>
+                <input asp-for="Prerequisites" class="w-full border border-gray-300 rounded px-2 py-1" />
+                <span asp-validation-for="Prerequisites" class="text-red-500"></span>
+            </div>
+
+            <!-- Postrequisites -->
+            <div>
+                <label asp-for="Postrequisites" class="block text-sm font-medium text-gray-700">รายวิชาเรียนหลัง</label>
+                <input asp-for="Postrequisites" class="w-full border border-gray-300 rounded px-2 py-1" />
+                <span asp-validation-for="Postrequisites" class="text-red-500"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded shadow">Save Changes</button>
+        </form>
+    </div>
