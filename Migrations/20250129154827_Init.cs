@@ -12,17 +12,20 @@ namespace SchoolSystem.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Activities",
+                name: "Activity",
                 columns: table => new
                 {
                     ActivityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Activities", x => x.ActivityId);
+                    table.PrimaryKey("PK_Activity", x => x.ActivityId);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,7 +71,7 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Courses",
+                name: "Course",
                 columns: table => new
                 {
                     CourseId = table.Column<int>(type: "int", nullable: false)
@@ -82,7 +85,7 @@ namespace SchoolSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
+                    table.PrimaryKey("PK_Course", x => x.CourseId);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,25 +95,14 @@ namespace SchoolSystem.Migrations
                     EA_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityId = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExtracurricularActivity", x => x.EA_Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SubjectCategory",
-                columns: table => new
-                {
-                    SubjectCategoryId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SubjectCategory", x => x.SubjectCategoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -256,9 +248,9 @@ namespace SchoolSystem.Migrations
                 {
                     table.PrimaryKey("PK_ActivitiesExtracurricularActivity", x => new { x.ActivityId, x.ExtracurricularActivitiesEA_Id });
                     table.ForeignKey(
-                        name: "FK_ActivitiesExtracurricularActivity_Activities_ActivityId",
+                        name: "FK_ActivitiesExtracurricularActivity_Activity_ActivityId",
                         column: x => x.ActivityId,
-                        principalTable: "Activities",
+                        principalTable: "Activity",
                         principalColumn: "ActivityId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -270,7 +262,7 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CoursesExtracurricularActivity",
+                name: "CourseExtracurricularActivity",
                 columns: table => new
                 {
                     CourseId = table.Column<int>(type: "int", nullable: false),
@@ -278,41 +270,18 @@ namespace SchoolSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CoursesExtracurricularActivity", x => new { x.CourseId, x.ExtracurricularActivitiesEA_Id });
+                    table.PrimaryKey("PK_CourseExtracurricularActivity", x => new { x.CourseId, x.ExtracurricularActivitiesEA_Id });
                     table.ForeignKey(
-                        name: "FK_CoursesExtracurricularActivity_Courses_CourseId",
+                        name: "FK_CourseExtracurricularActivity_Course_CourseId",
                         column: x => x.CourseId,
-                        principalTable: "Courses",
+                        principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CoursesExtracurricularActivity_ExtracurricularActivity_ExtracurricularActivitiesEA_Id",
+                        name: "FK_CourseExtracurricularActivity_ExtracurricularActivity_ExtracurricularActivitiesEA_Id",
                         column: x => x.ExtracurricularActivitiesEA_Id,
                         principalTable: "ExtracurricularActivity",
                         principalColumn: "EA_Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Activity",
-                columns: table => new
-                {
-                    SubjectId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Subject_Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SubjectName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Unit = table.Column<int>(type: "int", nullable: false),
-                    SubjectCategoryId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Activity", x => x.SubjectId);
-                    table.ForeignKey(
-                        name: "FK_Activity_SubjectCategory_SubjectCategoryId",
-                        column: x => x.SubjectCategoryId,
-                        principalTable: "SubjectCategory",
-                        principalColumn: "SubjectCategoryId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -320,11 +289,6 @@ namespace SchoolSystem.Migrations
                 name: "IX_ActivitiesExtracurricularActivity_ExtracurricularActivitiesEA_Id",
                 table: "ActivitiesExtracurricularActivity",
                 column: "ExtracurricularActivitiesEA_Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Activity_SubjectCategoryId",
-                table: "Activity",
-                column: "SubjectCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -366,8 +330,8 @@ namespace SchoolSystem.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CoursesExtracurricularActivity_ExtracurricularActivitiesEA_Id",
-                table: "CoursesExtracurricularActivity",
+                name: "IX_CourseExtracurricularActivity_ExtracurricularActivitiesEA_Id",
+                table: "CourseExtracurricularActivity",
                 column: "ExtracurricularActivitiesEA_Id");
 
             migrationBuilder.CreateIndex(
@@ -385,9 +349,6 @@ namespace SchoolSystem.Migrations
                 name: "ActivitiesExtracurricularActivity");
 
             migrationBuilder.DropTable(
-                name: "Activity");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -403,22 +364,19 @@ namespace SchoolSystem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CoursesExtracurricularActivity");
+                name: "CourseExtracurricularActivity");
 
             migrationBuilder.DropTable(
                 name: "Profiles");
 
             migrationBuilder.DropTable(
-                name: "Activities");
-
-            migrationBuilder.DropTable(
-                name: "SubjectCategory");
+                name: "Activity");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "Course");
 
             migrationBuilder.DropTable(
                 name: "ExtracurricularActivity");

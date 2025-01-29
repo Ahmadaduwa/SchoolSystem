@@ -18,7 +18,7 @@ namespace SchoolSystem.Models.CourseManagement
         public int SubjectId { get; set; } // Foreign Key ไปยัง Subjects
 
         public ICollection<GradeLevels>? GradeLevel { get; set; }
-        public ICollection<Courses>? Course { get; set; }
+        public ICollection<Course>? Course { get; set; }
         public ICollection<Subjects>? Subject { get; set; }
     }
 }

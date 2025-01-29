@@ -1,4 +1,4 @@
-﻿@model List<SchoolSystem.Models.CourseManagement.Courses>
+﻿@model List<SchoolSystem.Models.CourseManagement.Course>
 
 @{
     ViewData["Title"] = "Course Management";
@@ -76,6 +76,9 @@
                                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-cogs mr-2"></i> จัดการรายวิชา
                                             </button>
+                                            <a asp-action="CourseActivity" asp-controller="Academic" asp-route-id="@course.CourseId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                                <i class="fas fa-edit mr-2"></i> กิจกรรม
+                                            </a>
                                             <a asp-action="EditCourse" asp-controller="Academic" asp-route-id="@course.CourseId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-edit mr-2"></i> แก้ไข
                                             </a>
@@ -111,16 +114,20 @@
             </div>
             <div class="flex flex-col gap-4">
                 <div class="flex gap-4">
-                    <!-- ปุ่มจัดการรายวิชา -->
+
                     <button class="bg-blue-500 text-white text-xs px-6 py-3 rounded-lg hover:bg-blue-600 transition">
                         จัดการรายวิชา
                     </button>
-                    <!-- ปุ่มแก้ไข -->
+                    <a asp-action="CourseActivity" asp-controller="Academic" asp-route-id="@course.CourseId">
+                        <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                            กิจกรรม
+                        </button>
+                    </a>
                     <a asp-action="EditCourse" asp-controller="Academic" asp-route-id="@course.CourseId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             แก้ไข
                         </button>
-                    </a>    
+                    </a>
                 </div>
             </div>
         </div>

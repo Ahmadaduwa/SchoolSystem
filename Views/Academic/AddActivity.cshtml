@@ -1,0 +1,39 @@
+﻿@model SchoolSystem.Models.CourseManagement.ExtracurricularActivity
+
+@{
+    ViewData["Title"] = "เพิ่มกิจกรรม";
+}
+
+<div class="container mx-auto sm:px-6 lg:px-8 py-6">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-blue-600 text-white px-4 py-4">
+            <h1 class="text-xl sm:text-2xl font-bold mb-4">เพิ่มกิจกรรมในหลักสูตร</h1>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            <form method="post">
+                <div class="mb-4">
+                    <label for="ActivityId" class="block text-sm font-medium text-gray-700">กิจกรรม</label>
+                    <select id="ActivityId" name="ActivityId" class="form-select mt-1 block w-full" required>
+                        <option value="">เลือกกิจกรรม</option>
+                        @foreach (var activity in ViewBag.Activities as SelectList)
+                        {
+                            <option value="@activity.Value">@activity.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="StartDate" class="block text-sm font-medium text-gray-700">วันที่เริ่ม</label>
+                    <input type="date" id="StartDate" name="StartDate" class="form-input mt-1 block w-full" required />
+                </div>
+
+                <div class="mb-4">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        เพิ่มกิจกรรม
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

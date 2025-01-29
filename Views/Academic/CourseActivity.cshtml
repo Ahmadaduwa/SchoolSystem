@@ -1,0 +1,34 @@
+﻿@model SchoolSystem.Models.ViewModels.CourseActivityViewModel
+
+@{
+    ViewData["Title"] = "กิจกรรมของหลักสูตร";
+}
+
+<div class="container mx-auto sm:px-6 lg:px-8 py-6">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white px-4 py-4 flex flex-wrap items-center justify-between">
+            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">กิจกรรมของหลักสูตร @Model.CourseName</h1>
+            <a asp-action="CourseManagement" asp-controller="Academic" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
+                <i class="fas fa-arrow-left mr-2"></i> กลับสู่หน้าหลัก
+            </a>
+        </div>
+
+        <!-- Activities List -->
+        <div class="p-6">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var activity in Model.Activities)
+                {
+                    <div class="bg-white border p-6 rounded-lg shadow-lg">
+                        <h2 class="text-lg font-semibold mb-2">@activity.ActivityName</h2>
+                        <p class="text-sm text-gray-600 mb-4">@activity.Description</p>
+                        <div class="text-xs text-gray-500 mb-4">
+                            <span>สร้างเมื่อ: @activity.CreateAt.ToString("yyyy-MM-dd")</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -16,10 +16,9 @@ namespace SchoolSystem.Data
         {
         }
 
-        public DbSet<Courses> Courses { get; set; }
+        public DbSet<Course> Course { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
-
-        public DbSet<Subjects> Activity { get; set; }
+        public DbSet<Activities> Activity { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivity { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

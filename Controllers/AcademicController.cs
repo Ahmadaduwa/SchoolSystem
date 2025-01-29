@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
 using SchoolSystem.Models.CourseManagement;
+using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
 {
@@ -20,7 +24,7 @@ namespace SchoolSystem.Controllers
         public IActionResult CourseManagement(string sortOrder, string filterStatus)
         {
             // เริ่มต้น Query
-            var coursesQuery = _db.Courses.AsQueryable();
+            var coursesQuery = _db.Course.AsQueryable();
 
             // กรองสถานะ (Active/Inactive)
             if (!string.IsNullOrEmpty(filterStatus))
@@ -55,7 +59,7 @@ namespace SchoolSystem.Controllers
             {
                 return NotFound();
             }
-            var obj = _db.Courses.Find(id);
+            var obj = _db.Course.Find(id);
             if (obj == null)
             {
                 return NotFound(); // หากไม่พบ Course
@@ -67,13 +71,13 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [Route("Course/Edit/{id:int}")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditCourse(Courses course)
+        public IActionResult EditCourse(Course course)
         {
             try
             {
                 if (ModelState.IsValid)
                 { // ดึงข้อมูลเดิมจากฐานข้อมูล
-                    var existingCourse = _db.Courses.Find(course.CourseId);
+                    var existingCourse = _db.Course.Find(course.CourseId);
                     if (existingCourse == null)
                     {
                         return NotFound(); // หากไม่พบหลักสูตรในฐานข้อมูล
@@ -112,22 +116,20 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Course/Add")]
-        public IActionResult AddCourse(Courses course)
+        public IActionResult AddCourse(Course course)
         {
             if (ModelState.IsValid)
             {
-                // ตั้งค่าเวลาสร้าง
                 course.CreateAt = DateTime.UtcNow;
                 course.UpdateAt = DateTime.UtcNow;
 
-                // เพิ่มหลักสูตรใหม่ในฐานข้อมูล
-                _db.Courses.Add(course);
+                _db.Course.Add(course);
                 _db.SaveChanges();
 
                 return RedirectToAction("CourseManagement");
             }
 
-            return View(course); // หาก Validation ไม่ผ่าน
+            return View(course); 
         }
 
         [HttpPost]
@@ -135,17 +137,51 @@ namespace SchoolSystem.Controllers
         [Route("Course/Delete/{id:int}")]
         public IActionResult DeleteCourse(int id)
         {
-            var course = _db.Courses.Find(id);
+            var course = _db.Course.Find(id);
             if (course == null)
             {
-                return NotFound(); // หากไม่พบข้อมูล
+                return NotFound(); 
             }
 
-            _db.Courses.Remove(course); // ลบข้อมูล
-            _db.SaveChanges(); // บันทึกการเปลี่ยนแปลง
+            _db.Course.Remove(course);
+            _db.SaveChanges(); 
 
-            return RedirectToAction("CourseManagement"); // กลับไปที่หน้าจัดการหลักสูตร
+            return RedirectToAction("CourseManagement"); 
         }
+
+        [HttpGet]
+        [Route("Course/Activity/{id:int}")]
+        public IActionResult CourseActivity(int id)
+        {
+            var course = _db.Course
+                            .FirstOrDefault(c => c.CourseId == id);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            var extracurricularActivities = _db.ExtracurricularActivity
+                            .Where(ea => ea.CourseId == id)
+                            .Include(ea => ea.Activity)
+                            .ToList();
+
+            var activities = extracurricularActivities
+                    .SelectMany(ea => ea.Activity?.ToList() ?? new List<Activities>())
+                    .ToList();
+
+            var courseActivityViewModel = new CourseActivityViewModel
+            {
+                CourseId = course.CourseId,
+                Course_Code = course.Course_Code ?? string.Empty,
+                CourseName = course.CourseName ?? string.Empty,
+                Activities = activities  // Assign the Activities list
+            };
+
+            return View(courseActivityViewModel);
+        }
+
+
 
     }
 }
