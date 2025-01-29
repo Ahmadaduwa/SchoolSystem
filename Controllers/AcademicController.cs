@@ -28,21 +28,24 @@ namespace SchoolSystem.Controllers
                 coursesQuery = coursesQuery.Where(c => c.Status == filterStatus);
             }
 
-            // จัดเรียงลำดับ
             coursesQuery = sortOrder switch
             {
-                "UpdateAt" => coursesQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
-                "CreateAt" => coursesQuery.OrderBy(c => c.CreateAt),
-                "Name" => coursesQuery.OrderBy(c => c.CourseName),
+                "UpdateAtDesc" => coursesQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
+                "UpdateAtAsc" => coursesQuery.OrderBy(c => c.UpdateAt ?? DateTime.MaxValue),
+                "CreateAtDesc" => coursesQuery.OrderByDescending(c => c.CreateAt),
+                "CreateAtAsc" => coursesQuery.OrderBy(c => c.CreateAt),
+                "NameAsc" => coursesQuery.OrderBy(c => c.CourseName),
+                "NameDesc" => coursesQuery.OrderByDescending(c => c.CourseName),
                 _ => coursesQuery.OrderBy(c => c.Status == "Inactive").ThenByDescending(c => c.UpdateAt ?? DateTime.MaxValue)
             };
 
-            // ดึงข้อมูลไปเป็น List
+
             var courses = coursesQuery.ToList();
 
             // ส่งข้อมูลไปยัง View
             return View(courses);
         }
+
 
         [HttpGet]
         [Route("Course/Edit/{id:int}")] // เพิ่มการกำหนดประเภทพารามิเตอร์

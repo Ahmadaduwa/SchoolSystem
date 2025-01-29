@@ -22,9 +22,12 @@
                 <!-- Sort Order -->
                 <select name="sortOrder" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
                     <option value="">เรียงลำดับ...</option>
-                    <option value="UpdateAt">วันที่อัปเดตล่าสุด</option>
-                    <option value="CreateAt">วันที่สร้าง</option>
-                    <option value="Name">ชื่อหลักสูตร</option>
+                    <option value="UpdateAtDesc">วันที่อัปเดต (ใหม่ -> เก่า)</option>
+                    <option value="UpdateAtAsc">วันที่อัปเดต (เก่า -> ใหม่)</option>
+                    <option value="CreateAtDesc">วันที่สร้าง (ใหม่ -> เก่า)</option>
+                    <option value="CreateAtAsc">วันที่สร้าง (เก่า -> ใหม่)</option>
+                    <option value="NameAsc">ชื่อหลักสูตร (A-Z)</option>
+                    <option value="NameDesc">ชื่อหลักสูตร (Z-A)</option>
                 </select>
 
                 <!-- Submit Button -->
@@ -117,7 +120,7 @@
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             แก้ไข
                         </button>
-                    </a>
+                    </a>    
                 </div>
             </div>
         </div>
