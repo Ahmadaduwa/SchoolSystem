@@ -1,11 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolSystem.Models.CourseManagement
 {
     public class Courses
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Required]
         public int CourseId { get; set; } // Primary Key
+
+        [Required]
+        [MaxLength(50)] // กำหนดความยาวสูงสุดของ Subject Code
+        public string? Course_Code { get; set; }
 
         [Required]
         [MaxLength(200)] // จำกัดความยาวสูงสุดของชื่อวิชา

@@ -1,72 +1,129 @@
-﻿@{
-    ViewData["Title"] = "CourseManagement";
-    ViewData["UrlUserAvatar"] = "";
-    ViewData["Fullname"] = "นายโก โอโห้";
-    ViewData["Class"] = "ฝ่ายวิชาการ";
-}
+﻿@model List<SchoolSystem.Models.CourseManagement.Courses>
 
-<link href="./css/CourseManagement.css" rel="stylesheet" />
-<div class="container px-4 mx-auto sm:px-6 lg:px-8">
+@{
+    ViewData["Title"] = "Course Management";
+}
+@section Css {
+    <link href="./css/CourseManagement.css" rel="stylesheet" />
+}
+<div class="container mx-auto sm:px-6 lg:px-8 py-6">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-blue-600 text-white px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">จัดการหลักสูตร</h1>
-            <button class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition text-sm sm:text-base">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white px-4 py-4 flex flex-wrap items-center justify-between">
+            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">จัดการหลักสูตร</h1>
+            <form method="get" asp-action="CourseManagement" class="flex flex-wrap items-center gap-4">
+                <!-- Filter by Status -->
+                <select name="filterStatus" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
+                    <option value="">แสดงทั้งหมด</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+                <!-- Sort Order -->
+                <select name="sortOrder" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
+                    <option value="">เรียงลำดับ...</option>
+                    <option value="UpdateAt">วันที่อัปเดตล่าสุด</option>
+                    <option value="CreateAt">วันที่สร้าง</option>
+                    <option value="Name">ชื่อหลักสูตร</option>
+                </select>
+
+                <!-- Submit Button -->
+                <button type="submit" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto">
+                    ค้นหา
+                </button>
+            </form>
+            <button class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
                 <i class="fas fa-plus mr-2"></i> เพิ่มหลักสูตร
             </button>
         </div>
 
-        <div class="p-4 sm:p-6 text-xs sm:text-sm">
+
+        <!-- Desktop View (Original Table Layout) -->
+        <div class="hidden sm:block p-4 sm:p-6">
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="table-auto w-full text-left border-collapse border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm">รหัสวิชา</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm">ชื่อวิชา</th>
-                            <th class="p-2 sm:p-3 hidden sm:table-cell text-xs sm:text-sm">คำอธิบาย</th>
-                            <th class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm">วันที่สร้าง</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm">สถานะ</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm">การดำเนินการ</th>
+                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">รหัสหลักสูตร</th>
+                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">ชื่อหลักสูตร</th>
+                            <th class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">คำอธิบาย</th>
+                            <th class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">วันที่สร้าง</th>
+                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">สถานะ</th>
+                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">การดำเนินการ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-2 sm:p-3 text-xs sm:text-sm">MTH101</td>
-                            <td class="p-2 sm:p-3 text-xs sm:text-sm">คณิตศาสตร์พื้นฐาน</td>
-                            <td class="p-2 sm:p-3 hidden sm:table-cell text-xs sm:text-sm">การเรียนรู้เบื้องต้นเกี่ยวกับคณิตศาสตร์</td>
-                            <td class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm">2023-01-01</td>
-                            <td class="p-2 sm:p-3 text-xs sm:text-sm text-green-600">Active</td>
-                            <td class="p-2 sm:p-3 relative">
-                                <div class="dropdown">
-                                    <button class="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition text-xs sm:text-sm"
-                                            onclick="toggleTableDropdown(event, 'tableDropdown-MTH101')">
-                                        การดำเนินการ <i class="fas fa-chevron-down ml-1"></i>
-                                    </button>
-                                    <div id="tableDropdown-MTH101"
-                                         class="table-dropdown hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-50 text-xs sm:text-sm">
-                                        <button class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                                                onclick="manageCourse('MTH101')">
-                                            <i class="fas fa-cogs mr-2"></i> จัดการรายวิชา
+                        @foreach (var course in Model)
+                        {
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@course.Course_Code</td>
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@course.CourseName</td>
+                                <td class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">@course.Description</td>
+                                <td class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">@course.CreateAt.ToString("yyyy-MM-dd")</td>
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300 @((course.Status == "Inactive") ? "text-red-600" : "text-green-600")">
+                                    @course.Status
+                                </td>
+                                <td class="p-2 sm:p-3 relative border border-gray-300">
+                                    <div class="relative">
+                                        <button class="table-dropdown-toggle bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition text-xs sm:text-sm w-full"
+                                                data-dropdown="dropdown-@course.Course_Code">
+                                            ดำเนินการ <i class="fas fa-chevron-down ml-1"></i>
                                         </button>
-                                        <button class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                                                onclick="editCourse('MTH101')">
-                                            <i class="fas fa-edit mr-2"></i> แก้ไข
-                                        </button>
-                                        <button class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                                                onclick="cancelCourse('MTH101')">
-                                            <i class="fas fa-times mr-2"></i> ยกเลิก
-                                        </button>
-                                        <button class="block w-full text-left px-3 py-2 hover:bg-gray-100"
-                                                onclick="deleteCourse('MTH101')">
-                                            <i class="fas fa-trash mr-2"></i> ลบ
-                                        </button>
+                                        <div id="dropdown-@course.Course_Code" class="table-dropdown-menu hidden bg-white shadow-lg rounded-lg text-xs sm:text-sm">
+                                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                                <i class="fas fa-cogs mr-2"></i> จัดการรายวิชา
+                                            </button>
+                                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                                <i class="fas fa-edit mr-2"></i> แก้ไข
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
         </div>
+
+
     </div>
 </div>
-<script src="./js/CourseManagement.js"></script>
+
+
+<!-- Mobile View - แสดงในรูปแบบการ์ด -->
+<div class="block sm:hidden">
+    @foreach (var course in Model)
+    {
+        <div class="bg-white border-b p-6 mb-6 rounded-lg shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">@course.CourseName</h2>
+                <span class="text-sm @((course.Status == "Inactive") ? "text-red-600" : "text-green-600")">
+                    @course.Status
+                </span>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">@course.Description</p>
+            <div class="text-xs text-gray-500 mb-4">
+                <span>สร้างเมื่อ: @course.CreateAt.ToString("yyyy-MM-dd")</span>
+            </div>
+            <div class="flex flex-col gap-4">
+                <div class="flex gap-4">
+                    <!-- ปุ่มจัดการรายวิชา -->
+                    <button class="bg-blue-500 text-white text-xs px-6 py-3 rounded-lg hover:bg-blue-600 transition">
+                        จัดการรายวิชา
+                    </button>
+                    <!-- ปุ่มแก้ไข -->
+                    <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        แก้ไข
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+    <script src="./js/CourseManagement.js"></script>
+}
+
