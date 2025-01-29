@@ -13,5 +13,6 @@ namespace SchoolSystem.Models.ClassManagement
 
         [MaxLength(250)]
         public string? Description { get; set; }
+
     }
 }

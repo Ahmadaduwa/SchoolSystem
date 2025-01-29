@@ -8,26 +8,28 @@ namespace SchoolSystem.Models.CourseManagement
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
-        public int CourseId { get; set; } // Primary Key
+        public int CourseId { get; set; } 
 
         [Required]
-        [MaxLength(50)] // กำหนดความยาวสูงสุดของ Subject Code
+        [MaxLength(50)] 
         public string? Course_Code { get; set; }
 
         [Required]
-        [MaxLength(200)] // จำกัดความยาวสูงสุดของชื่อวิชา
+        [MaxLength(200)] 
         public string? CourseName { get; set; }
 
-        [MaxLength(500)] // จำกัดความยาวของคำอธิบาย
+        [MaxLength(500)] 
         public string? Description { get; set; }
 
         [Required]
-        public DateTime CreateAt { get; set; } // วันที่สร้าง
+        public DateTime CreateAt { get; set; } 
 
-        public DateTime? UpdateAt { get; set; } // วันที่อัปเดต (เป็นค่าว่างได้)
+        public DateTime? UpdateAt { get; set; } 
 
         [Required]
-        [MaxLength(50)] // จำกัดความยาวของสถานะ
-        public string Status { get; set; } = "Active"; // ค่าเริ่มต้นเป็น "Active"
+        [MaxLength(50)]
+        public string Status { get; set; } = "Active";
+
+        public ICollection<ExtracurricularActivity>? ExtracurricularActivities { get; set; }
     }
 }

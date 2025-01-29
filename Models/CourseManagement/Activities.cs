@@ -8,7 +8,12 @@ namespace SchoolSystem.Models.CourseManagement
         public int ActivityId { get; set; }
 
         [Required]
-        [StringLength(100)] // กำหนดความยาวสูงสุดของ ActivityName
+        [StringLength(100)]
         public string? ActivityName { get; set; }
+        [Required]
+        [StringLength(250)] 
+        public string? Description { get; set; }
+
+        public ICollection<ExtracurricularActivity>? ExtracurricularActivities { get; set; } 
     }
 }

@@ -9,7 +9,6 @@ namespace SchoolSystem.Models.CourseManagement
         [Key]
         public int CES_Id { get; set; } // Primary Key
 
-        [Required]
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
 
         [Required]

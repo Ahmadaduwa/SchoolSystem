@@ -14,36 +14,35 @@ namespace SchoolSystem.Controllers
         {
             _db = db;
         }
-[HttpGet]
-[Route("Course")]
-public IActionResult CourseManagement(string sortOrder, string filterStatus)
-{
-    // เริ่มต้น Query
-    var coursesQuery = _db.Courses.AsQueryable();
 
-    // กรองสถานะ (Active/Inactive)
-    if (!string.IsNullOrEmpty(filterStatus))
-    {
-        coursesQuery = coursesQuery.Where(c => c.Status == filterStatus);
-    }
+        [HttpGet]
+        [Route("Course")]
+        public IActionResult CourseManagement(string sortOrder, string filterStatus)
+        {
+            // เริ่มต้น Query
+            var coursesQuery = _db.Courses.AsQueryable();
 
-    // จัดเรียงลำดับ
-    coursesQuery = sortOrder switch
-    {
-        "UpdateAt" => coursesQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
-        "CreateAt" => coursesQuery.OrderBy(c => c.CreateAt),
-        "Name" => coursesQuery.OrderBy(c => c.CourseName),
-        _ => coursesQuery.OrderBy(c => c.Status == "Inactive").ThenByDescending(c => c.UpdateAt ?? DateTime.MaxValue)
-    };
+            // กรองสถานะ (Active/Inactive)
+            if (!string.IsNullOrEmpty(filterStatus))
+            {
+                coursesQuery = coursesQuery.Where(c => c.Status == filterStatus);
+            }
 
-    // ดึงข้อมูลไปเป็น List
-    var courses = coursesQuery.ToList();
+            // จัดเรียงลำดับ
+            coursesQuery = sortOrder switch
+            {
+                "UpdateAt" => coursesQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
+                "CreateAt" => coursesQuery.OrderBy(c => c.CreateAt),
+                "Name" => coursesQuery.OrderBy(c => c.CourseName),
+                _ => coursesQuery.OrderBy(c => c.Status == "Inactive").ThenByDescending(c => c.UpdateAt ?? DateTime.MaxValue)
+            };
 
-    // ส่งข้อมูลไปยัง View
-    return View(courses);
-}
+            // ดึงข้อมูลไปเป็น List
+            var courses = coursesQuery.ToList();
 
-
+            // ส่งข้อมูลไปยัง View
+            return View(courses);
+        }
 
         [HttpGet]
         [Route("Course/Edit/{id:int}")] // เพิ่มการกำหนดประเภทพารามิเตอร์
