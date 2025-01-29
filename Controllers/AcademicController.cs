@@ -7,6 +7,7 @@ using SchoolSystem.Data;
 using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.ViewModels;
 
+
 namespace SchoolSystem.Controllers
 {
     [Authorize(Policy = "AcademicPolicy")]
@@ -24,7 +25,7 @@ namespace SchoolSystem.Controllers
         public IActionResult CourseManagement(string sortOrder, string filterStatus)
         {
             // เริ่มต้น Query
-            var coursesQuery = _db.Course.AsQueryable();
+            var coursesQuery = _db.Courses.AsQueryable();
 
             // กรองสถานะ (Active/Inactive)
             if (!string.IsNullOrEmpty(filterStatus))
@@ -44,7 +45,7 @@ namespace SchoolSystem.Controllers
             };
 
 
-            var courses = coursesQuery.ToList();
+            List<Course> courses = coursesQuery.ToList();
 
             // ส่งข้อมูลไปยัง View
             return View(courses);
@@ -59,7 +60,7 @@ namespace SchoolSystem.Controllers
             {
                 return NotFound();
             }
-            var obj = _db.Course.Find(id);
+            var obj = _db.Courses.Find(id);
             if (obj == null)
             {
                 return NotFound(); // หากไม่พบ Course
@@ -77,7 +78,7 @@ namespace SchoolSystem.Controllers
             {
                 if (ModelState.IsValid)
                 { // ดึงข้อมูลเดิมจากฐานข้อมูล
-                    var existingCourse = _db.Course.Find(course.CourseId);
+                    var existingCourse = _db.Courses.Find(course.CourseId);
                     if (existingCourse == null)
                     {
                         return NotFound(); // หากไม่พบหลักสูตรในฐานข้อมูล
@@ -123,7 +124,7 @@ namespace SchoolSystem.Controllers
                 course.CreateAt = DateTime.UtcNow;
                 course.UpdateAt = DateTime.UtcNow;
 
-                _db.Course.Add(course);
+                _db.Courses.Add(course);
                 _db.SaveChanges();
 
                 return RedirectToAction("CourseManagement");
@@ -137,13 +138,13 @@ namespace SchoolSystem.Controllers
         [Route("Course/Delete/{id:int}")]
         public IActionResult DeleteCourse(int id)
         {
-            var course = _db.Course.Find(id);
+            var course = _db.Courses.Find(id);
             if (course == null)
             {
                 return NotFound(); 
             }
 
-            _db.Course.Remove(course);
+            _db.Courses.Remove(course);
             _db.SaveChanges(); 
 
             return RedirectToAction("CourseManagement"); 
@@ -153,33 +154,35 @@ namespace SchoolSystem.Controllers
         [Route("Course/Activity/{id:int}")]
         public IActionResult CourseActivity(int id)
         {
-            var course = _db.Course
-                            .FirstOrDefault(c => c.CourseId == id);
+            var course = _db.Courses.FirstOrDefault(c => c.CourseId == id);
 
             if (course == null)
             {
                 return NotFound();
             }
 
-            var extracurricularActivities = _db.ExtracurricularActivity
-                            .Where(ea => ea.CourseId == id)
-                            .Include(ea => ea.Activity)
-                            .ToList();
+            var extracurricularActivities = _db.ExtracurricularActivities
+                .Where(ea => ea.CourseId == id)
+                .Include(ea => ea.Activity) // โหลดข้อมูล Activity
+                .ToList(); // ดึงข้อมูลทั้งหมดก่อน
 
             var activities = extracurricularActivities
-                    .SelectMany(ea => ea.Activity?.ToList() ?? new List<Activities>())
-                    .ToList();
+                .Select(ea => ea.Activity)
+                .Where(a => a != null)
+                .ToList(); // แปลงเป็น List<Activity> และป้องกัน null
 
             var courseActivityViewModel = new CourseActivityViewModel
             {
                 CourseId = course.CourseId,
-                Course_Code = course.Course_Code ?? string.Empty,
-                CourseName = course.CourseName ?? string.Empty,
-                Activities = activities  // Assign the Activities list
+                Course_Code = course.Course_Code,
+                CourseName = course.CourseName,
+                Activities = activities // กำหนดให้ ViewModel
             };
 
+
+
             return View(courseActivityViewModel);
-        }
+        }   
 
 
 

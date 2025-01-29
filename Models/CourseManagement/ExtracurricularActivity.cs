@@ -19,9 +19,9 @@ namespace SchoolSystem.Models.CourseManagement
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active"; // กำหนดค่าเริ่มต้นเป็น Active
+        public string Status { get; set; } = "Active";
 
-        public ICollection<Activities>? Activity { get; set; }
-        public ICollection<Course>? Course { get; set; }
+        public virtual Activity Activity { get; set; }
+        public virtual Course Course { get; set; }
     }
 }

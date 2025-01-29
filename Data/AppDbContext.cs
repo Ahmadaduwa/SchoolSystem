@@ -16,10 +16,10 @@ namespace SchoolSystem.Data
         {
         }
 
-        public DbSet<Course> Course { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
-        public DbSet<Activities> Activity { get; set; }
-        public DbSet<ExtracurricularActivity> ExtracurricularActivity { get; set; }
+        public DbSet<Models.CourseManagement.Activity> Activities { get; set; }
+        public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,19 +28,23 @@ namespace SchoolSystem.Data
                 .HasOne(p => p.User)
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profiles>(p => p.UserId);
+
             ConfigureUserRelationship(modelBuilder);
         }
 
         private void ConfigureUserRelationship(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ExtracurricularActivity>()
+                .HasOne(ea => ea.Course)
+                .WithMany(c => c.ExtracurricularActivities)
+                .HasForeignKey(ea => ea.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ExtracurricularActivity>()
-                .HasMany(ea => ea.Activity)
-                .WithMany(a => a.ExtracurricularActivities);
-
-            modelBuilder.Entity<ExtracurricularActivity>()
-                .HasMany(ea => ea.Course)
-                .WithMany(c => c.ExtracurricularActivities);
+                .HasOne(ea => ea.Activity)
+                .WithMany(a => a.ExtracurricularActivities)
+                .HasForeignKey(ea => ea.ActivityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             Console.WriteLine("ConfigureUserRelationship");
         }

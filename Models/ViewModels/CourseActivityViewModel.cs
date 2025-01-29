@@ -1,6 +1,6 @@
-﻿using SchoolSystem.Models.CourseManagement;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.CourseManagement;
 
 namespace SchoolSystem.Models.ViewModels
 {
@@ -17,12 +17,6 @@ namespace SchoolSystem.Models.ViewModels
         [MaxLength(200)]
         public string CourseName { get; set; } = string.Empty;
 
-        public List<Activities> Activities { get; set; }  // Added a collection for Activities
-
-        // Constructor to initialize the Activities list
-        public CourseActivityViewModel()
-        {
-            Activities = new List<Activities>();
-        }
+        public List<Activity> Activities { get; set; } = new List<Activity>();
     }
 }

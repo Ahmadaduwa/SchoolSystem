@@ -2,18 +2,18 @@
 
 namespace SchoolSystem.Models.CourseManagement
 {
-    public class Activities
+    public class Activity
     {
         [Key]
         public int ActivityId { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string? ActivityName { get; set; }
+        public string ActivityName { get; set; } = string.Empty;
 
         [Required]
         [StringLength(250)]
-        public string? Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
@@ -21,8 +21,8 @@ namespace SchoolSystem.Models.CourseManagement
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active"; // กำหนดค่าเริ่มต้นเป็น Active
+        public string Status { get; set; } = "Active";
 
-        public ICollection<ExtracurricularActivity>? ExtracurricularActivities { get; set; }
+        public virtual ICollection<ExtracurricularActivity> ExtracurricularActivities { get; set; } = new List<ExtracurricularActivity>();
     }
 }
