@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using SchoolSystem.Models.CurriculumManagement;
+using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Models.ViewModels
 {

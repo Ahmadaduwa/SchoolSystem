@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -48,20 +48,15 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpGet]
+        [Route("login")]
         public IActionResult Login()
         {
             TempData["ErrorMessage"] = null;
             return View();
         }
-
-        [HttpPost("login")]
+        [HttpPost]
         [Route("login")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -136,8 +131,16 @@ namespace SchoolSystem.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpPost("register")]
+        [HttpGet]
         [Route("register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Route("register")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([FromForm] RegisterViewModel model)
         {
             if (!ModelState.IsValid)

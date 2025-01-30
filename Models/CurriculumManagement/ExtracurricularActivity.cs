@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Models.CurriculumManagement
 {

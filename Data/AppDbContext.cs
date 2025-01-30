@@ -16,7 +16,7 @@ namespace SchoolSystem.Data
 
         public DbSet<Curriculum> Curriculum { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
-        public DbSet<SchoolSystem.Models.CurriculumManagement.Activity> Activities { get; set; }
+        public DbSet<Models.ActivityManagement.Activity> Activities { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
         public DbSet<GradeLevels> GradeLevels { get; set; }
         public DbSet<ElectiveCourse> ElectiveCourses { get; set; }

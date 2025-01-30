@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.CurriculumManagement;
 
-namespace SchoolSystem.Models.CurriculumManagement
+namespace SchoolSystem.Models.ActivityManagement
 {
     public class Activity
     {

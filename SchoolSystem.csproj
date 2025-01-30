@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Teacher\**" />
+    <Content Remove="Views\Teacher\**" />
+    <EmbeddedResource Remove="Views\Teacher\**" />
+    <None Remove="Views\Teacher\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
@@ -37,7 +44,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Views\Teacher\" />
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 
