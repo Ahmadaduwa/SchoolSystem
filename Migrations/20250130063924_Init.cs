@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SchoolSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Update : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,13 +71,13 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Courses",
+                name: "Curriculum",
                 columns: table => new
                 {
-                    CourseId = table.Column<int>(type: "int", nullable: false)
+                    CurriculumId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Course_Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CourseName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Curriculum_Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CurriculumName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -85,7 +85,7 @@ namespace SchoolSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
+                    table.PrimaryKey("PK_Curriculum", x => x.CurriculumId);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,7 +227,7 @@ namespace SchoolSystem.Migrations
                     EA_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityId = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    CurriculumId = table.Column<int>(type: "int", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
@@ -242,10 +242,10 @@ namespace SchoolSystem.Migrations
                         principalColumn: "ActivityId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ExtracurricularActivities_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
+                        name: "FK_ExtracurricularActivities_Curriculum_CurriculumId",
+                        column: x => x.CurriculumId,
+                        principalTable: "Curriculum",
+                        principalColumn: "CurriculumId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -294,9 +294,9 @@ namespace SchoolSystem.Migrations
                 column: "ActivityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExtracurricularActivities_CourseId",
+                name: "IX_ExtracurricularActivities_CurriculumId",
                 table: "ExtracurricularActivities",
-                column: "CourseId");
+                column: "CurriculumId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Profiles_UserId",
@@ -337,7 +337,7 @@ namespace SchoolSystem.Migrations
                 name: "Activities");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "Curriculum");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

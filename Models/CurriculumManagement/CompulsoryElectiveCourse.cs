@@ -2,14 +2,13 @@
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.SubjectManagement;
 
-namespace SchoolSystem.Models.CourseManagement
+namespace SchoolSystem.Models.CurriculumManagement
 {
-    public class CompulsorySubject
+    public class CompulsoryElectiveCourse
     {
         [Key]
-        public int CS_Id { get; set; } // Primary Key
+        public int CES_Id { get; set; } // Primary Key
 
-        [Required]
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
 
         [Required]
@@ -19,7 +18,7 @@ namespace SchoolSystem.Models.CourseManagement
         public int SubjectId { get; set; } // Foreign Key ไปยัง Subjects
 
         public ICollection<GradeLevels>? GradeLevel { get; set; }
-        public ICollection<Course>? Course { get; set; }
-        public ICollection<Subjects>? Subject { get; set; }
+        public ICollection<Curriculum>? Course { get; set; }
+        public ICollection<Course>? Subject { get; set; }
     }
 }

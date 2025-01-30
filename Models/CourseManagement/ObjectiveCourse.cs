@@ -2,7 +2,7 @@
 
 namespace SchoolSystem.Models.SubjectManagement
 {
-    public class ObjectiveSubject
+    public class ObjectiveCourse
     {
         [Key]
         public int OS_ID { get; set; } // Primary Key
@@ -13,7 +13,7 @@ namespace SchoolSystem.Models.SubjectManagement
         [Required]
         public int ObjectiveID { get; set; } // Foreign Key ไปยังตาราง Objectives
 
-        public ICollection<Subjects>? Subject { get; set; }
+        public ICollection<Course>? Subject { get; set; }
         public ICollection<Objectives>? Objective { get; set; }
     }
 }

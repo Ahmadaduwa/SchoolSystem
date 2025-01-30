@@ -1,4 +1,4 @@
-﻿@model SchoolSystem.Models.CourseManagement.ExtracurricularActivity
+﻿@model SchoolSystem.Models.CurriculumManagement.ExtracurricularActivity
 
 @{
     ViewData["Title"] = "เพิ่มกิจกรรมให้หลักสูตร";
@@ -23,7 +23,7 @@
             </div>
         }
 
-        <form asp-action="AddActivity" asp-controller="Academic" asp-route-id="@Model.CourseId" method="post">
+        <form asp-action="AddActivity" asp-controller="Academic" asp-route-id="@Model.CurriculumId" method="post">
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-medium">กิจกรรม</label>
@@ -36,7 +36,7 @@
                 </select>
             </div>
 
-            <input type="hidden" asp-for="CourseId" />
+            <input type="hidden" asp-for="CurriculumId" />
 
             <div class="flex flex-wrap gap-4 mt-6">
                 <button type="submit"
@@ -44,7 +44,7 @@
                     <i class="fas fa-save mr-2"></i> บันทึกกิจกรรม
                 </button>
 
-                <a asp-action="CourseActivity" asp-controller="Academic" asp-route-id="@Model.CourseId"
+                <a asp-action="CurriculumActivity" asp-controller="Academic" asp-route-id="@Model.CurriculumId"
                    class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition w-full sm:w-auto shadow-md">
                     <i class="fas fa-arrow-left mr-2"></i> ย้อนกลับ
                 </a>

@@ -1,17 +1,17 @@
-﻿@model List<SchoolSystem.Models.CourseManagement.Course>
+﻿@model List<SchoolSystem.Models.CurriculumManagement.Curriculum>
 
 @{
-    ViewData["Title"] = "Course Management";
+    ViewData["Title"] = "Curriculum Management";
 }
 @section Css {
-    <link href="./css/CourseManagement.css" rel="stylesheet" />
+    <link href="./css/CurriculumManagement.css" rel="stylesheet" />
 }
 <div class="container mx-auto sm:px-6 lg:px-8 py-6">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-blue-600 text-white px-4 py-4 flex flex-wrap items-center justify-between">
             <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">จัดการหลักสูตร</h1>
-            <form method="get" asp-action="CourseManagement" class="flex flex-wrap items-center gap-4">
+            <form method="get" asp-controller="Academic" asp-action="CurriculumManagement" class="flex flex-wrap items-center gap-4">
                 <!-- Filter by Status -->
                 <select name="filterStatus" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
                     <option value="">แสดงทั้งหมด</option>
@@ -35,7 +35,7 @@
                     ค้นหา
                 </button>
             </form>
-            <a asp-action="AddCourse" asp-controller="Academic" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
+            <a asp-action="AddCurriculum" asp-controller="Academic" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
                 <i class="fas fa-plus mr-2"></i> เพิ่มหลักสูตร
             </a>
         </div>
@@ -56,30 +56,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var course in Model)
+                        @foreach (var curriculum in Model)
                         {
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@course.Course_Code</td>
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@course.CourseName</td>
-                                <td class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">@course.Description</td>
-                                <td class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">@course.CreateAt.ToString("yyyy-MM-dd")</td>
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300 @((course.Status == "Inactive") ? "text-red-600" : "text-green-600")">
-                                    @course.Status
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@curriculum.Curriculum_Code</td>
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@curriculum.CurriculumName</td>
+                                <td class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">@curriculum.Description</td>
+                                <td class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">@curriculum.CreateAt.ToString("yyyy-MM-dd")</td>
+                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300 @((curriculum.Status == "Inactive") ? "text-red-600" : "text-green-600")">
+                                    @curriculum.Status
                                 </td>
                                 <td class="p-2 sm:p-3 relative border border-gray-300">
                                     <div class="relative">
                                         <button class="table-dropdown-toggle bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition text-xs sm:text-sm w-full"
-                                                data-dropdown="dropdown-@course.Course_Code">
+                                                data-dropdown="dropdown-@curriculum.Curriculum_Code">
                                             ดำเนินการ <i class="fas fa-chevron-down ml-1"></i>
                                         </button>
-                                        <div id="dropdown-@course.Course_Code" class="table-dropdown-menu hidden bg-white shadow-lg rounded-lg text-xs sm:text-sm">
+                                        <div id="dropdown-@curriculum.Curriculum_Code" class="table-dropdown-menu hidden bg-white shadow-lg rounded-lg text-xs sm:text-sm">
                                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-cogs mr-2"></i> จัดการรายวิชา
                                             </button>
-                                            <a asp-action="CourseActivity" asp-controller="Academic" asp-route-id="@course.CourseId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="CurriculumActivity" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-edit mr-2"></i> กิจกรรม
                                             </a>
-                                            <a asp-action="EditCourse" asp-controller="Academic" asp-route-id="@course.CourseId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-edit mr-2"></i> แก้ไข
                                             </a>
                                         </div>
@@ -99,18 +99,18 @@
 
 <!-- Mobile View - แสดงในรูปแบบการ์ด -->
 <div class="block sm:hidden">
-    @foreach (var course in Model)
+    @foreach (var curriculum in Model)
     {
         <div class="bg-white border-b p-6 mb-6 rounded-lg shadow-lg">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">@course.CourseName</h2>
-                <span class="text-sm @((course.Status == "Inactive") ? "text-red-600" : "text-green-600")">
-                    @course.Status
+                <h2 class="text-lg font-semibold">@curriculum.CurriculumName</h2>
+                <span class="text-sm @((curriculum.Status == "Inactive") ? "text-red-600" : "text-green-600")">
+                    @curriculum.Status
                 </span>
             </div>
-            <p class="text-sm text-gray-600 mb-4">@course.Description</p>
+            <p class="text-sm text-gray-600 mb-4">@curriculum.Description</p>
             <div class="text-xs text-gray-500 mb-4">
-                <span>สร้างเมื่อ: @course.CreateAt.ToString("yyyy-MM-dd")</span>
+                <span>สร้างเมื่อ: @curriculum.CreateAt.ToString("yyyy-MM-dd")</span>
             </div>
             <div class="flex flex-col gap-4">
                 <div class="flex gap-4">
@@ -118,12 +118,12 @@
                     <button class="bg-blue-500 text-white text-xs px-6 py-3 rounded-lg hover:bg-blue-600 transition">
                         จัดการรายวิชา
                     </button>
-                    <a asp-action="CourseActivity" asp-controller="Academic" asp-route-id="@course.CourseId">
+                    <a asp-action="CurriculumActivity" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             กิจกรรม
                         </button>
                     </a>
-                    <a asp-action="EditCourse" asp-controller="Academic" asp-route-id="@course.CourseId">
+                    <a asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             แก้ไข
                         </button>
@@ -136,6 +136,6 @@
 
 
 @section Scripts {
-    <script src="./js/CourseManagement.js"></script>
+    <script src="./js/CurriculumManagement.js"></script>
 }
 

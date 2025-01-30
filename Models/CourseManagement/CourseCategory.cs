@@ -2,10 +2,10 @@
 
 namespace SchoolSystem.Models.SubjectManagement
 {
-    public class SubjectCategory
+    public class CourseCategory
     {
         [Key]
-        public int SubjectCategoryId { get; set; } // Primary Key
+        public int CourseCategoryId { get; set; } // Primary Key
 
         [Required]
         [MaxLength(100)] // กำหนดความยาวสูงสุดของชื่อหมวดหมู่

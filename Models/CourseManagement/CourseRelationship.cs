@@ -2,7 +2,7 @@
 
 namespace SchoolSystem.Models.SubjectManagement
 {
-    public class SubjectRelationship
+    public class CourseRelationship
     {
         [Key]
         public int RelationshipId { get; set; } // Primary Key
@@ -13,7 +13,7 @@ namespace SchoolSystem.Models.SubjectManagement
         [Required]
         public int BeforeSubjectId { get; set; } // รหัสวิชาที่เกิดขึ้นก่อน
 
-        public ICollection<Subjects>? AfterSubject { get; set; }
-        public ICollection<Subjects>? BeforeSubject { get; set; }
+        public ICollection<Course>? AfterSubject { get; set; }
+        public ICollection<Course>? BeforeSubject { get; set; }
     }
 }
