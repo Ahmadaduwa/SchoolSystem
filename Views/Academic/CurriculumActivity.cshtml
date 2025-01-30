@@ -72,7 +72,7 @@
                             <form asp-action="DeleteActivity" asp-controller="Academic" method="post"
                                   onsubmit="return showDeleteConfirmation(event);">
                                 <input type="hidden" name="activityId" value="@activity.ActivityId" />
-                                <input type="hidden" name="CurriculumeId" value="@Model.CurriculumId" />
+                                <input type="hidden" name="CurriculumId" value="@Model.CurriculumId" /> 
                                 <button type="submit" class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition shadow-md">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -103,7 +103,7 @@
         function showDeleteConfirmation(event) {
             event.preventDefault();
             if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?')) {
-                event.target.submit();
+                event.target.closest("form").submit();  
             }
         }
     </script>

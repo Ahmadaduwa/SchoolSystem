@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.CurriculumManagement;
 
 namespace SchoolSystem.Models.ClassManagement
 {
@@ -13,6 +14,10 @@ namespace SchoolSystem.Models.ClassManagement
 
         [MaxLength(250)]
         public string? Description { get; set; }
+
+        public virtual ICollection<ElectiveCourse> ElectiveCourses { get; set; } = new List<ElectiveCourse>();
+        public virtual ICollection<CompulsoryCourse> CompulsoryCourses { get; set; } = new List<CompulsoryCourse>();
+        public virtual ICollection<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; } = new List<CompulsoryElectiveCourse>();
 
     }
 }
