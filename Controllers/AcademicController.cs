@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
+using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.CurriculumManagement;
 using SchoolSystem.Models.ViewModels;
 
@@ -255,6 +256,110 @@ namespace SchoolSystem.Controllers
             _db.SaveChanges();
 
             return RedirectToAction("CurriculumActivity", new { id = CurriculumId });
+        }
+
+
+        [HttpGet]
+        [Route("Curriculum/Courses/{id:int}")]
+        public IActionResult ManageCourses(int id)
+        {
+            var curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
+            if (curriculum == null)
+            {
+                return NotFound();
+            }
+
+            // ดึงข้อมูล GradeLevels และ Courses จาก Database
+            ViewBag.GradeLevels = _db.GradeLevels.ToList();
+            ViewBag.Courses = _db.Courses.ToList();
+
+            var model = new ManageCoursesViewModel
+            {
+                CurriculumId = curriculum.CurriculumId,
+                CurriculumName = curriculum.CurriculumName,
+                ElectiveCourses = _db.ElectiveCourses
+                    .Where(ec => ec.CurriculumId == id)
+                    .Include(ec => ec.Course)
+                    .Include(ec => ec.GradeLevel)
+                    .ToList(),
+
+                CompulsoryCourses = _db.CompulsoryCourses
+                    .Where(cc => cc.CurriculumId == id)
+                    .Include(cc => cc.Course)
+                    .Include(cc => cc.GradeLevel)
+                    .ToList(),
+
+                CompulsoryElectiveCourses = _db.CompulsoryElectiveCourses
+                    .Where(cec => cec.CurriculumId == id)
+                    .Include(cec => cec.Course)
+                    .Include(cec => cec.GradeLevel)
+                    .ToList()
+            };
+
+            return View(model);
+        }
+
+        // เพิ่มรายวิชา
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Curriculum/Courses/Add")]
+        public IActionResult AddCourse(int curriculumId, string courseType, int gradeLevelId, int courseId)
+        {
+            if (string.IsNullOrEmpty(courseType) || curriculumId == 0 || gradeLevelId == 0 || courseId == 0)
+            {
+                TempData["ErrorMessage"] = "ข้อมูลไม่ถูกต้อง!";
+                return RedirectToAction("ManageCourses", new { id = curriculumId });
+            }
+
+            if (courseType == "Elective")
+            {
+                _db.ElectiveCourses.Add(new ElectiveCourse { CurriculumId = curriculumId, GradeLevelId = gradeLevelId, CourseId = courseId });
+            }
+            else if (courseType == "Compulsory")
+            {
+                _db.CompulsoryCourses.Add(new CompulsoryCourse { CurriculumId = curriculumId, GradeLevelId = gradeLevelId, CourseId = courseId });
+            }
+            else if (courseType == "CompulsoryElective")
+            {
+                _db.CompulsoryElectiveCourses.Add(new CompulsoryElectiveCourse { CurriculumId = curriculumId, GradeLevelId = gradeLevelId, CourseId = courseId });
+            }
+
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "เพิ่มรายวิชาสำเร็จ!";
+            return RedirectToAction("ManageCourses", new { id = curriculumId });
+        }
+
+        // ลบรายวิชา
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Curriculum/Courses/Delete")]
+        public IActionResult DeleteCourse(int courseId, int curriculumId, string courseType)
+        {
+            if (string.IsNullOrEmpty(courseType) || curriculumId == 0 || courseId == 0)
+            {
+                TempData["ErrorMessage"] = "ข้อมูลไม่ถูกต้อง!";
+                return RedirectToAction("ManageCourses", new { id = curriculumId });
+            }
+
+            if (courseType == "Elective")
+            {
+                var course = _db.ElectiveCourses.FirstOrDefault(ec => ec.CourseId == courseId && ec.CurriculumId == curriculumId);
+                if (course != null) _db.ElectiveCourses.Remove(course);
+            }
+            else if (courseType == "Compulsory")
+            {
+                var course = _db.CompulsoryCourses.FirstOrDefault(cc => cc.CourseId == courseId && cc.CurriculumId == curriculumId);
+                if (course != null) _db.CompulsoryCourses.Remove(course);
+            }
+            else if (courseType == "CompulsoryElective")
+            {
+                var course = _db.CompulsoryElectiveCourses.FirstOrDefault(cec => cec.CourseId == courseId && cec.CurriculumId == curriculumId);
+                if (course != null) _db.CompulsoryElectiveCourses.Remove(course);
+            }
+
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "ลบรายวิชาสำเร็จ!";
+            return RedirectToAction("ManageCourses", new { id = curriculumId });
         }
 
 
