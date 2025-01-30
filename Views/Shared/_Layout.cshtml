@@ -1,6 +1,31 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using SchoolSystem.Models.UserManagement;
+@using SchoolSystem.Models.UserManagement
+@inject UserManager<Users> UserManager
 @inject SignInManager<Users> SignInManager
+@inject SchoolSystem.Data.AppDbContext DbContext
+@{
+    ViewData["UrlUserAvatar"] = "./images/profiles/user.jpg";
+    ViewData["Fullname"] = "ไม่ทราบชื่อ";
+    ViewData["Class"] = "ไร้ตัวตน";
+    // ดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
+    if (SignInManager.IsSignedIn(User))
+    {
+        var userId = UserManager.GetUserId(User);
+        var profile = DbContext.Profiles.FirstOrDefault(p => p.UserId == userId);
+
+        if (profile != null)
+        {
+            ViewData["UrlUserAvatar"] = string.IsNullOrEmpty(profile.ProfilePictureUrl) ? "/default-avatar.jpg" : profile.ProfilePictureUrl;
+            ViewData["Fullname"] = $"{profile.FirstName} {profile.LastName}";
+        }
+    }
+    if (User.IsInRole("Academic"))
+    {
+        ViewData["Class"] = "ฝ่ายวิชาการ";
+    } else {
+		ViewData["Class"] = "ชั้น ม.2/1";
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +33,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - School</title>
     <link href="~/css/output.css" rel="stylesheet" asp-append-version="true">
+    @RenderSection("Css", required: false)
 </head>
 <body class="flex flex-col min-h-screen bg-gray-50">
     <!-- Header -->
@@ -68,7 +94,7 @@
             <div class="p-4">
                 <div class="md:hidden mb-4 p-4 bg-blue-50 rounded-lg">
                     <div class="flex items-center space-x-3">
-                        <img src="/api/placeholder/40/40" alt="User Avatar" class="h-10 w-10 rounded-full">
+                        <img src="@ViewData["UrlUserAvatar"]" alt="User Avatar" class="h-10 w-10 rounded-full">
                         <div>
                             <div class="font-medium">@ViewData["Fullname"]</div>
                             <div class="text-sm text-gray-500">@ViewData["Class"]</div>
@@ -91,7 +117,7 @@
         </nav>
 
                 <!-- Main Content -->
-        <main class="flex-1 p-5 bg-gray-50">
+        <main class="flex-1 pt-5 sm:p-5 lg:px-8 bg-gray-50">
                     @RenderBody()
                 </main>
             </div>
@@ -101,5 +127,7 @@
     <partial name="./Partial/_FooterPartial" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="/js/Layout.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
 </body>
 </html>

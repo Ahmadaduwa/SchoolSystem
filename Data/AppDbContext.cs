@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Security.AccessControl;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.CourseManagement;
-using SchoolSystem.Models.SubjectManagement;
+using SchoolSystem.Models.CurriculumManagement;
 using SchoolSystem.Models.UserManagement;
 
 namespace SchoolSystem.Data
@@ -16,138 +14,102 @@ namespace SchoolSystem.Data
         {
         }
 
-        // DbSets สำหรับแต่ละโมเดล
+        public DbSet<Curriculum> Curriculum { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
-        public DbSet<Courses> Courses { get; set; }
-        public DbSet<GradeLevels> GradeLevels { get; set; }
-        public DbSet<Activities> Activities { get; set; }
-        public DbSet<SubjectRelationship> SubjectRelationships { get; set; }
-        public DbSet<SubjectCategory> SubjectCategories { get; set; }
-        public DbSet<ObjectiveSubject> ObjectiveSubjects { get; set; }
-        public DbSet<Objectives> Objectives { get; set; }
+        public DbSet<SchoolSystem.Models.CurriculumManagement.Activity> Activities { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
-        public DbSet<ElectiveSubject> ElectiveSubjects { get; set; }
-        public DbSet<CompulsorySubject> CompulsorySubjects { get; set; }
-        public DbSet<CompulsoryElectiveSubject> CompulsoryElectiveSubjects { get; set; }
+        public DbSet<GradeLevels> GradeLevels { get; set; }
+        public DbSet<ElectiveCourse> ElectiveCourses { get; set; }
+        public DbSet<CompulsoryCourse> CompulsoryCourses { get; set; }
+        public DbSet<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<CourseCategory> CourseCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            ConfigureUserRelationship(modelBuilder);
-            ConfigureSubjectRelationship(modelBuilder);
-            
-
-
-        }
-        private void ConfigureUserRelationship(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Profiles>()
                 .HasOne(p => p.User)
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profiles>(p => p.UserId);
 
-            modelBuilder.Entity<Profiles>()
-                .Property(p => p.Gender)
-                .HasDefaultValue("Not Specified");
-
+            ConfigureUserRelationship(modelBuilder);
         }
-        private void ConfigureSubjectRelationship(ModelBuilder modelBuilder)
+
+        private void ConfigureUserRelationship(ModelBuilder modelBuilder)
         {
-            // Subjects and SubjectCategory Relationship
-            modelBuilder.Entity<Subjects>()
-                .HasOne(s => s.SubjectCategory)
-                .WithMany()
-                .HasForeignKey(s => s.SubjectCategoryId);
 
-            // SubjectRelationship: AfterSubjectId and BeforeSubjectId
-            modelBuilder.Entity<SubjectRelationship>()
-                .HasMany(sr => sr.AfterSubject)
-                .WithOne()
-                .HasForeignKey("AfterSubjectId");
-
-            modelBuilder.Entity<SubjectRelationship>()
-                .HasMany(sr => sr.BeforeSubject)
-                .WithOne()
-                .HasForeignKey("BeforeSubjectId");
-
-            // ObjectiveSubject: Relationships with Subjects and Objectives
-            modelBuilder.Entity<ObjectiveSubject>()
-                .HasMany(os => os.Subject)
-                .WithOne()
-                .HasForeignKey(os => os.SubjectId);
-
-            modelBuilder.Entity<ObjectiveSubject>()
-                .HasMany(os => os.Objective)
-                .WithOne()
-                .HasForeignKey(os => os.ObjectiveID);
-
-            // GradeLevels and Courses Relationships
-            modelBuilder.Entity<ElectiveSubject>()
-                .HasMany(es => es.Course)
-                .WithOne()
-                .HasForeignKey(es => es.CourseId);
-
-            modelBuilder.Entity<ElectiveSubject>()
-                .HasMany(es => es.GradeLevel)
-                .WithOne()
-                .HasForeignKey(es => es.GradeLevelId);
-            modelBuilder.Entity<ElectiveSubject>()
-                .HasMany(es => es.Subject)
-                .WithOne()
-                .HasForeignKey(es => es.SubjectId);
-
-            modelBuilder.Entity<CompulsorySubject>()
-                .HasMany(cs => cs.Course)
-                .WithOne()
-                .HasForeignKey(cs => cs.CourseId);
-
-            modelBuilder.Entity<CompulsorySubject>()
-                .HasMany(cs => cs.GradeLevel)
-                .WithOne()
-                .HasForeignKey(cs => cs.GradeLevelId);
-
-            modelBuilder.Entity<CompulsorySubject>()
-                .HasMany(cs => cs.Subject)
-                .WithOne()
-                .HasForeignKey(cs => cs.SubjectId);
-
-            // CompulsoryElectiveSubject Relationships
-            modelBuilder.Entity<CompulsoryElectiveSubject>()
-                .HasMany(ces => ces.Course)
-                .WithOne()
-                .HasForeignKey(ces => ces.CourseId);
-
-            modelBuilder.Entity<CompulsoryElectiveSubject>()
-                .HasMany(ces => ces.GradeLevel)
-                .WithOne()
-                .HasForeignKey(ces => ces.GradeLevelId);
-
-            modelBuilder.Entity<CompulsoryElectiveSubject>()
-                .HasMany(ces => ces.Subject)
-                .WithOne()
-                .HasForeignKey(ces => ces.SubjectId);
-
-            // ExtracurricularActivity Relationships
-            modelBuilder.Entity<ExtracurricularActivity>()
-                .HasMany(ea => ea.Activity)
-                .WithOne()
-                .HasForeignKey("ActivityId");
+            modelBuilder.Entity<Course>()
+                .HasOne(c => c.CourseCategory)
+                .WithMany(cc => cc.Courses)
+                .HasForeignKey(c => c.CourseCategoryId)
+                .OnDelete(DeleteBehavior.Restrict); // ป้องกันการลบ Category ที่มี Course อยู่
 
             modelBuilder.Entity<ExtracurricularActivity>()
-                .HasMany(ea => ea.Course)
-                .WithOne()
-                .HasForeignKey("CourseId");
+                .HasOne(ea => ea.Curriculum)
+                .WithMany(c => c.ExtracurricularActivities)
+                .HasForeignKey(ea => ea.CurriculumId)
+                .OnDelete(DeleteBehavior.Cascade); // ลบกิจกรรมทั้งหมดเมื่อหลักสูตรถูกลบ
 
+            modelBuilder.Entity<ExtracurricularActivity>()
+                .HasOne(ea => ea.Activity)
+                .WithMany(a => a.ExtracurricularActivities)
+                .HasForeignKey(ea => ea.ActivityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Additional Indexing (Optional)
-            modelBuilder.Entity<Subjects>()
-                .HasIndex(s => s.Subject_Code)
-                .IsUnique();
+            modelBuilder.Entity<ElectiveCourse>()
+                .HasOne(ec => ec.GradeLevel)
+                .WithMany(gl => gl.ElectiveCourses)
+                .HasForeignKey(ec => ec.GradeLevelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<GradeLevels>()
-                .HasIndex(gl => gl.Name);
+            modelBuilder.Entity<ElectiveCourse>()
+                .HasOne(ec => ec.Curriculum)
+                .WithMany(c => c.ElectiveCourses)
+                .HasForeignKey(ec => ec.CurriculumId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Courses>()
-                .HasIndex(c => c.CourseName);
+            modelBuilder.Entity<ElectiveCourse>()
+                .HasOne(ec => ec.Course)
+                .WithMany(c => c.ElectiveCourses)
+                .HasForeignKey(ec => ec.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryCourse>()
+                .HasOne(cc => cc.GradeLevel)
+                .WithMany(gl => gl.CompulsoryCourses)
+                .HasForeignKey(cc => cc.GradeLevelId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryCourse>()
+                .HasOne(cc => cc.Curriculum)
+                .WithMany(c => c.CompulsoryCourses)
+                .HasForeignKey(cc => cc.CurriculumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryCourse>()
+                .HasOne(cc => cc.Course)
+                .WithMany(c => c.CompulsoryCourses)
+                .HasForeignKey(cc => cc.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryElectiveCourse>()
+                .HasOne(cec => cec.GradeLevel)
+                .WithMany(gl => gl.CompulsoryElectiveCourses)
+                .HasForeignKey(cec => cec.GradeLevelId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryElectiveCourse>()
+                .HasOne(cec => cec.Curriculum)
+                .WithMany(c => c.CompulsoryElectiveCourses)
+                .HasForeignKey(cec => cec.CurriculumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompulsoryElectiveCourse>()
+                .HasOne(cec => cec.Course)
+                .WithMany(c => c.CompulsoryElectiveCourses)
+                .HasForeignKey(cec => cec.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.CurriculumManagement;
 
-namespace SchoolSystem.Models.SubjectManagement
+namespace SchoolSystem.Models.CourseManagement
 {
-    public class SubjectCategory
+    public class CourseCategory
     {
         [Key]
-        public int SubjectCategoryId { get; set; } // Primary Key
+        public int CourseCategoryId { get; set; } // Primary Key
 
         [Required]
         [MaxLength(100)] // กำหนดความยาวสูงสุดของชื่อหมวดหมู่
@@ -13,5 +14,7 @@ namespace SchoolSystem.Models.SubjectManagement
 
         [MaxLength(500)] // คำอธิบายหมวดหมู่
         public string? Description { get; set; }
+
+        public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
     }
 }

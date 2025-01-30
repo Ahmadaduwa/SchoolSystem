@@ -1,0 +1,156 @@
+﻿/* ปรับการแสดงผลเมนู Dropdown */
+.table-dropdown-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    min-width: 150px;
+    width: auto;
+    display: none;
+    z-index: 1000;
+}
+
+    /* เพิ่มการแสดงผลเมนูเมื่อถูกคลิก */
+    .table-dropdown-menu:not(.hidden) {
+        display: block;
+    }
+
+/* สำหรับเมนู dropdown บนมือถือ */
+@media (max-width: 768px) {
+    .table-dropdown-menu {
+        width: 100%;
+    }
+}
+    /* ปรับสไตล์ของปุ่มในเมนู Dropdown */
+    .table-dropdown-menu button {
+        width: 100%;
+        padding: 10px 14px;
+        text-align: left;
+        background: none;
+        border: none;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+        .table-dropdown-menu button:hover {
+            background-color: #f3f4f6;
+        }
+/* ปรับสไตล์ให้การ์ดดูห่างจากขอบ */
+.bg-white.border-b {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 24px; /* เพิ่มระยะห่างจากขอบการ์ด */
+    margin-bottom: 24px; /* เพิ่มระยะห่างระหว่างการ์ด */
+}
+
+/* ปรับขนาดของปุ่มในมือถือ */
+.bg-blue-500, .bg-green-500 {
+    padding: 12px 16px; /* เพิ่ม padding ในปุ่ม */
+    font-size: 16px; /* ปรับขนาดตัวอักษรให้ใหญ่ขึ้น */
+}
+
+/* ปรับระยะห่างระหว่างปุ่ม */
+.flex.flex-col.gap-4 button {
+    margin-bottom: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+}
+
+/* ปรับขนาดของข้อความ */
+.text-sm {
+    font-size: 16px;
+}
+
+/* ปรับสไตล์ของการแสดงผลให้สวยงาม */
+.shadow-lg {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* เพิ่มการแสดงผลเมื่อ hover */
+.bg-blue-500:hover, .bg-green-500:hover {
+    opacity: 0.9;
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .block.sm:hidden {
+        display: block;
+    }
+
+    .hidden.sm:block {
+        display: none;
+    }
+
+    /* ปรับให้การ์ดแสดงในมือถือ */
+    .bg-white.border-b {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    /* ปรับขนาดปุ่มและเพิ่มระยะห่าง */
+    .table-dropdown-toggle,
+    .bg-white.text-blue-600 {
+        width: 100%; /* ทำให้ปุ่มเต็มความกว้าง */
+        padding: 14px;
+        font-size: 16px;
+        margin-bottom: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    }
+
+    /* ปรับขนาดเมนู Dropdown ในมือถือให้เหมาะสม */
+    .table-dropdown-menu {
+        width: 100%;
+        min-width: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+        /* ปรับขนาดของปุ่มในเมนู Dropdown */
+        .table-dropdown-menu button {
+            padding: 12px;
+            font-size: 16px;
+        }
+
+    /* ปรับขนาดของข้อความ */
+    .text-sm {
+        font-size: 14px;
+    }
+}
+
+/* Desktop View */
+@media (min-width: 769px) {
+    .hidden.sm:block {
+        display: block;
+    }
+
+    .block.sm:hidden {
+        display: none;
+    }
+
+    /* ปรับการแสดงผลให้เหมาะสมกับขนาดหน้าจอใหญ่ */
+    .table-auto {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px 20px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolSystem.Data;
 
@@ -11,9 +12,11 @@ using SchoolSystem.Data;
 namespace SchoolSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250130133340_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,85 +158,6 @@ namespace SchoolSystem.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SchoolSystem.Models.ClassManagement.GradeLevels", b =>
-                {
-                    b.Property<int>("GradeLevelId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GradeLevelId"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("GradeLevelId");
-
-                    b.ToTable("GradeLevels");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CourseManagement.Course", b =>
-                {
-                    b.Property<int>("CourseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
-
-                    b.Property<int>("CourseCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Course_Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Unit")
-                        .HasColumnType("int");
-
-                    b.HasKey("CourseId");
-
-                    b.HasIndex("CourseCategoryId");
-
-                    b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CourseManagement.CourseCategory", b =>
-                {
-                    b.Property<int>("CourseCategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseCategoryId"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("CourseCategoryId");
-
-                    b.ToTable("CourseCategories");
-                });
-
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Activity", b =>
                 {
                     b.Property<int>("ActivityId")
@@ -266,62 +190,6 @@ namespace SchoolSystem.Migrations
                     b.HasKey("ActivityId");
 
                     b.ToTable("Activities");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.CompulsoryCourse", b =>
-                {
-                    b.Property<int>("CC_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CC_Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurriculumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GradeLevelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CC_Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.HasIndex("GradeLevelId");
-
-                    b.ToTable("CompulsoryCourses");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.CompulsoryElectiveCourse", b =>
-                {
-                    b.Property<int>("CEC_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CEC_Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurriculumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GradeLevelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CEC_Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.HasIndex("GradeLevelId");
-
-                    b.ToTable("CompulsoryElectiveCourses");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Curriculum", b =>
@@ -359,34 +227,6 @@ namespace SchoolSystem.Migrations
                     b.HasKey("CurriculumId");
 
                     b.ToTable("Curriculum");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.ElectiveCourse", b =>
-                {
-                    b.Property<int>("ES_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ES_Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurriculumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GradeLevelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ES_Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CurriculumId");
-
-                    b.HasIndex("GradeLevelId");
-
-                    b.ToTable("ElectiveCourses");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.ExtracurricularActivity", b =>
@@ -598,98 +438,6 @@ namespace SchoolSystem.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SchoolSystem.Models.CourseManagement.Course", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.CourseManagement.CourseCategory", "CourseCategory")
-                        .WithMany("Courses")
-                        .HasForeignKey("CourseCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CourseCategory");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.CompulsoryCourse", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.CourseManagement.Course", "Course")
-                        .WithMany("CompulsoryCourses")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.CurriculumManagement.Curriculum", "Curriculum")
-                        .WithMany("CompulsoryCourses")
-                        .HasForeignKey("CurriculumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.ClassManagement.GradeLevels", "GradeLevel")
-                        .WithMany("CompulsoryCourses")
-                        .HasForeignKey("GradeLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Curriculum");
-
-                    b.Navigation("GradeLevel");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.CompulsoryElectiveCourse", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.CourseManagement.Course", "Course")
-                        .WithMany("CompulsoryElectiveCourses")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.CurriculumManagement.Curriculum", "Curriculum")
-                        .WithMany("CompulsoryElectiveCourses")
-                        .HasForeignKey("CurriculumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.ClassManagement.GradeLevels", "GradeLevel")
-                        .WithMany("CompulsoryElectiveCourses")
-                        .HasForeignKey("GradeLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Curriculum");
-
-                    b.Navigation("GradeLevel");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.ElectiveCourse", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.CourseManagement.Course", "Course")
-                        .WithMany("ElectiveCourses")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.CurriculumManagement.Curriculum", "Curriculum")
-                        .WithMany("ElectiveCourses")
-                        .HasForeignKey("CurriculumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.ClassManagement.GradeLevels", "GradeLevel")
-                        .WithMany("ElectiveCourses")
-                        .HasForeignKey("GradeLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Curriculum");
-
-                    b.Navigation("GradeLevel");
-                });
-
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.ExtracurricularActivity", b =>
                 {
                     b.HasOne("SchoolSystem.Models.CurriculumManagement.Activity", "Activity")
@@ -718,29 +466,6 @@ namespace SchoolSystem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SchoolSystem.Models.ClassManagement.GradeLevels", b =>
-                {
-                    b.Navigation("CompulsoryCourses");
-
-                    b.Navigation("CompulsoryElectiveCourses");
-
-                    b.Navigation("ElectiveCourses");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CourseManagement.Course", b =>
-                {
-                    b.Navigation("CompulsoryCourses");
-
-                    b.Navigation("CompulsoryElectiveCourses");
-
-                    b.Navigation("ElectiveCourses");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CourseManagement.CourseCategory", b =>
-                {
-                    b.Navigation("Courses");
-                });
-
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Activity", b =>
                 {
                     b.Navigation("ExtracurricularActivities");
@@ -748,12 +473,6 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Curriculum", b =>
                 {
-                    b.Navigation("CompulsoryCourses");
-
-                    b.Navigation("CompulsoryElectiveCourses");
-
-                    b.Navigation("ElectiveCourses");
-
                     b.Navigation("ExtracurricularActivities");
                 });
 
