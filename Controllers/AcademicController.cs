@@ -257,13 +257,6 @@ namespace SchoolSystem.Controllers
             return RedirectToAction("CourseActivity", new { id = courseId });
         }
 
-       
-
-
-
-
-
-
         //funtion
         public IActionResult SearchActivities(string searchTerm)
         {
