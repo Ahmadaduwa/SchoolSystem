@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Models.CurriculumManagement;
-using SchoolSystem.Models.ClassManagement;
-using SchoolSystem.Models.CourseManagement;
-using SchoolSystem.Models.SubjectManagement;
 using SchoolSystem.Models.UserManagement;
 
 namespace SchoolSystem.Data
@@ -19,9 +16,6 @@ namespace SchoolSystem.Data
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<SchoolSystem.Models.CurriculumManagement.Activity> Activities { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
-        public DbSet<Course> Courses { get; set; }
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,11 +30,6 @@ namespace SchoolSystem.Data
 
         private void ConfigureUserRelationship(ModelBuilder modelBuilder)
         {
-
-            
-
-            ////////////////////////////
-
             modelBuilder.Entity<ExtracurricularActivity>()
                 .HasOne(ea => ea.Course)
                 .WithMany(c => c.ExtracurricularActivities)
