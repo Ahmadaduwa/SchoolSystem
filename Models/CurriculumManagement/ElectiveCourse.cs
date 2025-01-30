@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.SubjectManagement;
 
@@ -9,17 +10,21 @@ namespace SchoolSystem.Models.CurriculumManagement
         [Key]
         public int ES_Id { get; set; } // Primary Key
 
-        [Required]
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
 
         [Required]
-        public int CurriculumId { get; set; } // Foreign Key ไปยัง Courses
+        public int CurriculumId { get; set; } // Foreign Key ไปยัง Curriculum
 
         [Required]
-        public int CourseId { get; set; } // Foreign Key ไปยัง Subjects
+        public int CourseId { get; set; } // Foreign Key ไปยัง Courses
 
-        public ICollection<GradeLevels>? GradeLevel { get; set; }
-        public ICollection<Curriculum>? Curriculum { get; set; }
-        public ICollection<Course>? Course { get; set; }
+        [ForeignKey("GradeLevelId")]
+        public GradeLevels GradeLevel { get; set; }
+
+        [ForeignKey("CurriculumId")]
+        public Curriculum Curriculum { get; set; }
+
+        [ForeignKey("CourseId")]
+        public Course Course { get; set; }
     }
 }

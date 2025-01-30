@@ -23,8 +23,8 @@ namespace SchoolSystem.Models.SubjectManagement
         public int Unit { get; set; } // จำนวนหน่วยกิต
 
         // Foreign Key เชื่อมกับตาราง SubjectCategory
-        [ForeignKey("SubjectCategory")]
-        public int SubjectCategoryId { get; set; }
-        public required CourseCategory SubjectCategory { get; set; } // Navigation Property
+        [ForeignKey("CourseCategory")]
+        public int CourseCategoryId { get; set; }
+        public required CourseCategory CourseCategory { get; set; } // Navigation Property
     }
 }
