@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
-using SchoolSystem.Models.CurriculumManagement;
+using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.ViewModels;
 
 
@@ -24,71 +24,71 @@ namespace SchoolSystem.Controllers
 
         //หน้าจัดการหลักสูตร
         [HttpGet]
-        [Route("Curriculum")]
-        public IActionResult CurriculumManagement(string sortOrder, string filterStatus)
+        [Route("Course")]
+        public IActionResult CourseManagement(string sortOrder, string filterStatus)
         {
-            var CurriculumQuery = _db.Curriculum.AsQueryable();
+            var coursesQuery = _db.Courses.AsQueryable();
 
             if (!string.IsNullOrEmpty(filterStatus))
             {
-                CurriculumQuery = CurriculumQuery.Where(c => c.Status == filterStatus);
+                coursesQuery = coursesQuery.Where(c => c.Status == filterStatus);
             }
 
-            CurriculumQuery = sortOrder switch
+            coursesQuery = sortOrder switch
             {
-                "UpdateAtDesc" => CurriculumQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
-                "UpdateAtAsc" => CurriculumQuery.OrderBy(c => c.UpdateAt ?? DateTime.MaxValue),
-                "CreateAtDesc" => CurriculumQuery.OrderByDescending(c => c.CreateAt),
-                "CreateAtAsc" => CurriculumQuery.OrderBy(c => c.CreateAt),
-                "NameAsc" => CurriculumQuery.OrderBy(c => c.CurriculumName),
-                "NameDesc" => CurriculumQuery.OrderByDescending(c => c.CurriculumName),
-                _ => CurriculumQuery.OrderBy(c => c.Status == "Inactive").ThenByDescending(c => c.UpdateAt ?? DateTime.MaxValue)
+                "UpdateAtDesc" => coursesQuery.OrderByDescending(c => c.UpdateAt ?? DateTime.MaxValue),
+                "UpdateAtAsc" => coursesQuery.OrderBy(c => c.UpdateAt ?? DateTime.MaxValue),
+                "CreateAtDesc" => coursesQuery.OrderByDescending(c => c.CreateAt),
+                "CreateAtAsc" => coursesQuery.OrderBy(c => c.CreateAt),
+                "NameAsc" => coursesQuery.OrderBy(c => c.CourseName),
+                "NameDesc" => coursesQuery.OrderByDescending(c => c.CourseName),
+                _ => coursesQuery.OrderBy(c => c.Status == "Inactive").ThenByDescending(c => c.UpdateAt ?? DateTime.MaxValue)
             };
 
-            List<Curriculum> Curriculum = CurriculumQuery.ToList();
+            List<Course> courses = coursesQuery.ToList();
 
-            return View(Curriculum);
+            return View(courses);
         }
 
         [HttpGet]
-        [Route("Curriculum/Edit/{id:int}")] // เพิ่มการกำหนดประเภทพารามิเตอร์
-        public IActionResult EditCurriculum(int id)
+        [Route("Course/Edit/{id:int}")] // เพิ่มการกำหนดประเภทพารามิเตอร์
+        public IActionResult EditCourse(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
-            var obj = _db.Curriculum.Find(id);
+            var obj = _db.Courses.Find(id);
             if (obj == null)
             {
-                return NotFound(); // หากไม่พบ Curriculum
+                return NotFound(); // หากไม่พบ Course
             }
             return View(obj);
         }
 
         [HttpPost]
-        [Route("Curriculum/Edit/{id:int}")]
+        [Route("Course/Edit/{id:int}")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditCurriculum(Curriculum Curriculum)
+        public IActionResult EditCourse(Course course)
         {
             try
             {
                 if (ModelState.IsValid)
                 { 
-                    var existingCurriculum = _db.Curriculum.Find(Curriculum.CurriculumId);
-                    if (existingCurriculum == null)
+                    var existingCourse = _db.Courses.Find(course.CourseId);
+                    if (existingCourse == null)
                     {
                         return NotFound();
                     }
 
-                    Curriculum.CreateAt = existingCurriculum.CreateAt;
+                    course.CreateAt = existingCourse.CreateAt;
 
-                    Curriculum.UpdateAt = DateTime.UtcNow;
+                    course.UpdateAt = DateTime.UtcNow;
 
-                    _db.Entry(existingCurriculum).CurrentValues.SetValues(Curriculum);
+                    _db.Entry(existingCourse).CurrentValues.SetValues(course);
                     _db.SaveChanges();
 
-                    return RedirectToAction("CurriculumManagement");
+                    return RedirectToAction("CourseManagement");
                 }
             }
             catch (Exception ex)
@@ -97,67 +97,67 @@ namespace SchoolSystem.Controllers
                 ModelState.AddModelError("", "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
             }
 
-            return View(Curriculum);
+            return View(course);
         }
 
         [HttpGet]
-        [Route("Curriculum/Add")]
-        public IActionResult AddCurriculum()
+        [Route("Course/Add")]
+        public IActionResult AddCourse()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Curriculum/Add")]
-        public IActionResult AddCurriculum(Curriculum Curriculum)
+        [Route("Course/Add")]
+        public IActionResult AddCourse(Course course)
         {
             if (ModelState.IsValid)
             {
-                Curriculum.CreateAt = DateTime.UtcNow;
-                Curriculum.UpdateAt = DateTime.UtcNow;
+                course.CreateAt = DateTime.UtcNow;
+                course.UpdateAt = DateTime.UtcNow;
 
-                _db.Curriculum.Add(Curriculum);
+                _db.Courses.Add(course);
                 _db.SaveChanges();
 
-                return RedirectToAction("CurriculumManagement");
+                return RedirectToAction("CourseManagement");
             }
 
-            return View(Curriculum); 
+            return View(course); 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Curriculum/Delete/{id:int}")]
-        public IActionResult DeleteCurriculum(int id)
+        [Route("Course/Delete/{id:int}")]
+        public IActionResult DeleteCourse(int id)
         {
-            var Curriculum = _db.Curriculum.Find(id);
-            if (Curriculum == null)
+            var course = _db.Courses.Find(id);
+            if (course == null)
             {
                 return NotFound(); 
             }
 
-            _db.Curriculum.Remove(Curriculum);
+            _db.Courses.Remove(course);
             _db.SaveChanges(); 
 
-            return RedirectToAction("CurriculumManagement"); 
+            return RedirectToAction("CourseManagement"); 
         }
 
 
         //จัดการกิจกรรมหลักสูตร
         [HttpGet]
-        [Route("Curriculum/Activity/{id:int}")]
-        public IActionResult CurriculumActivity(int id, string sortOrder, string filterStatus)
+        [Route("Course/Activity/{id:int}")]
+        public IActionResult CourseActivity(int id, string sortOrder, string filterStatus)
         {
-            var Curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
+            var course = _db.Courses.FirstOrDefault(c => c.CourseId == id);
 
-            if (Curriculum == null)
+            if (course == null)
             {
                 return NotFound();
             }
 
             var activitiesQuery = _db.ExtracurricularActivities
-                .Where(ea => ea.CurriculumId == id)
+                .Where(ea => ea.CourseId == id)
                 .Include(ea => ea.Activity)
                 .Select(ea => ea.Activity)
                 .Where(a => a != null)
@@ -174,29 +174,29 @@ namespace SchoolSystem.Controllers
 
             var activities = activitiesQuery.ToList();
 
-            var CurriculumActivityViewModel = new CurriculumActivityViewModel
+            var courseActivityViewModel = new CourseActivityViewModel
             {
-                CurriculumId = Curriculum.CurriculumId,
-                Curriculum_Code = Curriculum.Curriculum_Code,
-                CurriculumName = Curriculum.CurriculumName,
+                CourseId = course.CourseId,
+                Course_Code = course.Course_Code,
+                CourseName = course.CourseName,
                 Activities = activities
             };
 
-            return View(CurriculumActivityViewModel);
+            return View(courseActivityViewModel);
         }
         [HttpGet]
-        [Route("Curriculum/Activity/Add/{id:int}")]
+        [Route("Course/Activity/Add/{id:int}")]
         public IActionResult AddActivity(int id)
         {
-            var Curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
-            if (Curriculum == null)
+            var course = _db.Courses.FirstOrDefault(c => c.CourseId == id);
+            if (course == null)
             {
                 return NotFound();
             }
 
             // ดึงกิจกรรมที่ถูกเลือกไปแล้ว
             var selectedActivities = _db.ExtracurricularActivities
-                .Where(ea => ea.CurriculumId == id)
+                .Where(ea => ea.CourseId == id)
                 .Select(ea => ea.ActivityId)
                 .ToList();
 
@@ -206,16 +206,16 @@ namespace SchoolSystem.Controllers
                 .Select(a => new { a.ActivityId, a.ActivityName })
                 .ToList();
 
-            var model = new ExtracurricularActivity { CurriculumId = id };
+            var model = new ExtracurricularActivity { CourseId = id };
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Curriculum/Activity/Add/{id:int}")]
+        [Route("Course/Activity/Add/{id:int}")]
         public IActionResult AddActivity(int id, ExtracurricularActivity extracurricularActivity)
         {
-            if (extracurricularActivity.CurriculumId == 0 || extracurricularActivity.ActivityId == 0)
+            if (extracurricularActivity.CourseId == 0 || extracurricularActivity.ActivityId == 0)
             {
                 TempData["ErrorMessage"] = "กรุณาเลือกหลักสูตรและกิจกรรมที่ถูกต้อง!";
                 return View(extracurricularActivity);
@@ -230,7 +230,7 @@ namespace SchoolSystem.Controllers
                 _db.SaveChanges();
 
                 TempData["SuccessMessage"] = "เพิ่มกิจกรรมสำเร็จ!";
-                return RedirectToAction("AddActivity", new { id = extracurricularActivity.CurriculumId });
+                return RedirectToAction("AddActivity", new { id = extracurricularActivity.CourseId });
             }
 
             TempData["ErrorMessage"] = "เกิดข้อผิดพลาดในการเพิ่มกิจกรรม!";
@@ -241,10 +241,10 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Academic/DeleteActivity")]
-        public IActionResult DeleteActivity(int activityId, int CurriculumId)
+        public IActionResult DeleteActivity(int activityId, int courseId)
         {
             var activityToRemove = _db.ExtracurricularActivities
-                .FirstOrDefault(ea => ea.ActivityId == activityId && ea.CurriculumId == CurriculumId);
+                .FirstOrDefault(ea => ea.ActivityId == activityId && ea.CourseId == courseId);
 
             if (activityToRemove == null)
             {
@@ -254,7 +254,7 @@ namespace SchoolSystem.Controllers
             _db.ExtracurricularActivities.Remove(activityToRemove);
             _db.SaveChanges();
 
-            return RedirectToAction("CurriculumActivity", new { id = CurriculumId });
+            return RedirectToAction("CourseActivity", new { id = courseId });
         }
 
        

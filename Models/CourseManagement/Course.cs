@@ -1,30 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.SubjectManagement
+namespace SchoolSystem.Models.CourseManagement
 {
     public class Course
     {
         [Key]
-        public int SubjectId { get; set; } // Primary Key
+        public int CourseId { get; set; }
 
         [Required]
-        [MaxLength(50)] // กำหนดความยาวสูงสุดของ Subject Code
-        public string? Subject_Code { get; set; }
+        [MaxLength(50)]
+        public string Course_Code { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(200)] // กำหนดความยาวสูงสุดของชื่อรายวิชา
-        public string? SubjectName { get; set; }
+        [MaxLength(200)]
+        public string CourseName { get; set; } = string.Empty;
 
-        [MaxLength(500)] // คำอธิบายรายวิชา
         public string? Description { get; set; }
 
-        [Required]
-        public int Unit { get; set; } // จำนวนหน่วยกิต
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-        // Foreign Key เชื่อมกับตาราง SubjectCategory
-        [ForeignKey("CourseCategory")]
-        public int CourseCategoryId { get; set; }
-        public required CourseCategory CourseCategory { get; set; } // Navigation Property
+        public DateTime? UpdateAt { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
+        public virtual ICollection<ExtracurricularActivity> ExtracurricularActivities { get; set; } = new List<ExtracurricularActivity>();
     }
 }

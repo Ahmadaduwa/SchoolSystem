@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.SubjectManagement;
 
-namespace SchoolSystem.Models.CurriculumManagement
+namespace SchoolSystem.Models.CourseManagement
 {
-    public class CompulsoryElectiveCourse
+    public class ElectiveSubject
     {
         [Key]
-        public int CES_Id { get; set; } // Primary Key
+        public int ES_Id { get; set; } // Primary Key
 
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
 

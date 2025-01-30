@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using SchoolSystem.Models.CurriculumManagement;
+using SchoolSystem.Models.CourseManagement;
 
 namespace SchoolSystem.Models.ViewModels
 {
-    public class CurriculumActivityViewModel
+    public class CourseActivityViewModel
     {
         [Required]
-        public int CurriculumId { get; set; }
+        public int CourseId { get; set; }
 
         [Required]
         [MaxLength(50)]
-        public string Curriculum_Code { get; set; } = string.Empty;
+        public string Course_Code { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(200)]
-        public string CurriculumName { get; set; } = string.Empty;
+        public string CourseName { get; set; } = string.Empty;
 
         public List<Activity> Activities { get; set; } = new List<Activity>();
     }

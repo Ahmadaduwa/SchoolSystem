@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.SubjectManagement;
 
-namespace SchoolSystem.Models.CurriculumManagement
+namespace SchoolSystem.Models.CourseManagement
 {
-    public class CompulsoryCourse
+    public class CompulsorySubject
     {
         [Key]
         public int CS_Id { get; set; } // Primary Key

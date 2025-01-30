@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolSystem.Models.CurriculumManagement
+namespace SchoolSystem.Models.CourseManagement
 {
     public class ExtracurricularActivity
     {
@@ -13,8 +13,8 @@ namespace SchoolSystem.Models.CurriculumManagement
         public int ActivityId { get; set; }
 
         [Required]
-        [ForeignKey("Curriculum")]
-        public int CurriculumId { get; set; }
+        [ForeignKey("Course")]
+        public int CourseId { get; set; }
 
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
@@ -25,6 +25,6 @@ namespace SchoolSystem.Models.CurriculumManagement
         public string Status { get; set; } = "Active";
 
         public virtual Activity? Activity { get; set; }
-        public virtual Curriculum? Curriculum { get; set; }
+        public virtual Course? Course { get; set; }
     }
 }
