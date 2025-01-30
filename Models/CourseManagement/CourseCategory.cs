@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.SubjectManagement
+namespace SchoolSystem.Models.CourseManagement
 {
-    public class SubjectCategory
+    public class CourseCategory
     {
         [Key]
         public int SubjectCategoryId { get; set; } // Primary Key

@@ -1,19 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.CourseManagement
+namespace SchoolSystem.Models.CurriculumManagement
 {
-    public class Activity
+    public class Curriculum
     {
         [Key]
-        public int ActivityId { get; set; }
+        public int CurriculumId { get; set; }
 
         [Required]
-        [StringLength(100)]
-        public string ActivityName { get; set; } = string.Empty;
+        [MaxLength(50)]
+        public string Curriculum_Code { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(250)]
-        public string Description { get; set; } = string.Empty;
+        [MaxLength(200)]
+        public string CurriculumName { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
 
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 

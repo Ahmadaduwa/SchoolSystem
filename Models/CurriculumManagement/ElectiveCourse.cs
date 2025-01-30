@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SchoolSystem.Models.ClassManagement;
-using SchoolSystem.Models.SubjectManagement;
+using SchoolSystem.Models.CourseManagement;
 
-namespace SchoolSystem.Models.CourseManagement
+namespace SchoolSystem.Models.CurriculumManagement
 {
-    public class CompulsorySubject
+    public class ElectiveCourse
     {
         [Key]
-        public int CS_Id { get; set; } // Primary Key
+        public int ES_Id { get; set; } // Primary Key
 
         [Required]
         public int GradeLevelId { get; set; } // Foreign Key ไปยัง GradeLevels
@@ -20,6 +20,6 @@ namespace SchoolSystem.Models.CourseManagement
 
         public ICollection<GradeLevels>? GradeLevel { get; set; }
         public ICollection<Curriculum>? Curriculum { get; set; }
-        public ICollection<Course>? Course { get; set; }
+        public ICollection<Curriculum>? Course { get; set; }
     }
 }

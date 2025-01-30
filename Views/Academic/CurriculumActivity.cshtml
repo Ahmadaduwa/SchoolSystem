@@ -1,4 +1,4 @@
-﻿@model SchoolSystem.Models.ViewModels.CourseActivityViewModel
+﻿@model SchoolSystem.Models.ViewModels.CurriculumActivityViewModel
 
 @{
     ViewData["Title"] = "กิจกรรมของหลักสูตร";
@@ -28,11 +28,11 @@
         <!-- Header -->
         <div class="bg-blue-600 text-white px-6 py-4 flex flex-wrap items-center justify-between rounded-t-lg">
             <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">
-                <i class="fas fa-graduation-cap mr-2"></i> กิจกรรมของหลักสูตร: @Model.CourseName
+                <i class="fas fa-graduation-cap mr-2"></i> กิจกรรมของหลักสูตร: @Model.CurriculumName
             </h1>
 
             <div class="flex flex-wrap gap-4">
-                <form method="get" asp-controller="Academic" asp-action="CourseActivity" asp-route-id="@Model.CourseId" class="flex flex-wrap items-center gap-4">
+                <form method="get" asp-controller="Academic" asp-action="CurriculumActivity" asp-route-id="@Model.CurriculumId" class="flex flex-wrap items-center gap-4">
                     <!-- Sort Order -->
                     <select name="sortOrder" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto shadow-sm">
                         <option value="">เรียงลำดับ...</option>
@@ -47,7 +47,7 @@
                     </button>
                 </form>
 
-                <a asp-action="AddActivity" asp-controller="Academic" asp-route-id="@Model.CourseId"
+                <a asp-action="AddActivity" asp-controller="Academic" asp-route-id="@Model.CurriculumId"
                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition shadow-md">
                     <i class="fas fa-plus mr-2"></i> เพิ่มกิจกรรม
                 </a>
@@ -72,7 +72,7 @@
                             <form asp-action="DeleteActivity" asp-controller="Academic" method="post"
                                   onsubmit="return showDeleteConfirmation(event);">
                                 <input type="hidden" name="activityId" value="@activity.ActivityId" />
-                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                <input type="hidden" name="CurriculumeId" value="@Model.CurriculumId" />
                                 <button type="submit" class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition shadow-md">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -89,7 +89,7 @@
 
         <!-- Back Button -->
         <div class="px-6 py-4 bg-gray-100 flex justify-between items-center rounded-b-lg">
-            <a asp-action="CourseManagement" asp-controller="Academic"
+            <a asp-action="CurriculumManagement" asp-controller="Academic"
                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition shadow-md">
                 <i class="fas fa-arrow-left mr-2"></i> กลับไปหน้าหลักสูตร
             </a>

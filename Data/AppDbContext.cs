@@ -31,9 +31,9 @@ namespace SchoolSystem.Data
         private void ConfigureUserRelationship(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExtracurricularActivity>()
-                .HasOne(ea => ea.Course)
+                .HasOne(ea => ea.Curriculum)
                 .WithMany(c => c.ExtracurricularActivities)
-                .HasForeignKey(ea => ea.CourseId)
+                .HasForeignKey(ea => ea.CurriculumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ExtracurricularActivity>()

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolSystem.Models.SubjectManagement
+namespace SchoolSystem.Models.CourseManagement
 {
     public class Objectives
     {
