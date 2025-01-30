@@ -1,0 +1,120 @@
+﻿@model SchoolSystem.Models.ViewModels.CurriculumActivityViewModel
+
+@{
+    ViewData["Title"] = "จัดการกิจกรรมของหลักสูตร";
+}
+@section Css {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+}
+
+<div class="container mx-auto p-6">
+    <!-- ปุ่มย้อนกลับ -->
+    <div class="flex items-center mb-6">
+        <a asp-action="CurriculumManagement" asp-controller="Academic" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center transition">
+            <i class="fas fa-arrow-left mr-2 text-lg"></i> ย้อนกลับ
+        </a>
+        <h2 class="text-2xl font-bold text-gray-700 ml-4">
+            จัดการกิจกรรมของหลักสูตร: @Model.CurriculumName
+        </h2>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <!-- Alert Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-md mb-4 flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>@Html.Raw(TempData["SuccessMessage"])</span>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md mb-4 flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span>@Html.Raw(TempData["ErrorMessage"])</span>
+            </div>
+        }
+
+        <!-- Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- รายการกิจกรรม -->
+            <div class="lg:col-span-2">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">กิจกรรมที่เพิ่มไปแล้ว</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @if (Model.Activities != null && Model.Activities.Any())
+                    {
+                        @foreach (var activity in Model.Activities)
+                        {
+                            <div class="bg-white border p-4 rounded-lg shadow-md relative">
+                                <h4 class="text-md font-semibold text-blue-700">
+                                    <i class="fas fa-calendar-alt"></i> @activity.ActivityName
+                                </h4>
+                                <p class="text-sm text-gray-600">@activity.Description</p>
+                                <div class="text-xs text-gray-500 mt-2">
+                                    <i class="far fa-clock"></i> สร้างเมื่อ: @activity.CreateAt.ToString("yyyy-MM-dd")
+                                </div>
+                                <!-- ปุ่มลบกิจกรรม -->
+                                <form asp-action="DeleteActivity" asp-controller="Academic" method="post" onsubmit="return confirmDelete(event);">
+                                    <input type="hidden" name="activityId" value="@activity.ActivityId" />
+                                    <input type="hidden" name="CurriculumId" value="@Model.CurriculumId" />
+                                    <button type="submit" class="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded-full hover:bg-red-700 transition">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-gray-500 text-center py-6 text-lg col-span-full">❌ ไม่มีข้อมูลกิจกรรม</p>
+                    }
+                </div>
+            </div>
+
+            <!-- ฟอร์มเพิ่มกิจกรรม -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">เพิ่มกิจกรรมใหม่</h3>
+                <form asp-action="AddActivity" asp-controller="Academic" method="post">
+                    <input type="hidden" name="CurriculumId" value="@Model.CurriculumId" />
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium">เลือกกิจกรรม</label>
+                        <select name="ActivityId" id="activitySelect" class="w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300">
+                            <option value="">เลือกกิจกรรม...</option>
+                            @foreach (var activity in ViewBag.Activities)
+                            {
+                                <option value="@activity.ActivityId">@activity.ActivityName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition w-full">
+                        <i class="fas fa-plus"></i> เพิ่มกิจกรรม
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#activitySelect").select2({
+                placeholder: "เลือกกิจกรรม...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+        function confirmDelete(event) {
+            event.preventDefault();
+            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?')) {
+                event.target.closest("form").submit();
+            }
+        }
+    </script>
+}

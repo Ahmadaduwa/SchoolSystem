@@ -76,7 +76,7 @@
                                             <a asp-action="ManageCourses" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-cogs"></i> จัดการรายวิชา
                                             </a>
-                                            <a asp-action="CurriculumActivity" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="ManageCurriculumActivities" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-tasks"></i> กิจกรรม
                                             </a>
                                             <a asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
@@ -119,7 +119,7 @@
                             จัดการรายวิชา
                         </button>
                     </a>
-                    <a asp-action="CurriculumActivity" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
+                    <a asp-action="ManageCurriculumActivities" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             กิจกรรม
                         </button>

@@ -145,23 +145,23 @@ namespace SchoolSystem.Controllers
         }
 
 
-        //จัดการกิจกรรมหลักสูตร
+
+        // 📌 จัดการกิจกรรมของหลักสูตร (แสดงรายการ + เพิ่มกิจกรรม)
         [HttpGet]
         [Route("Curriculum/Activity/{id:int}")]
-        public IActionResult CurriculumActivity(int id, string sortOrder, string filterStatus)
+        public IActionResult ManageCurriculumActivities(int id, string sortOrder)
         {
-            var Curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
-
-            if (Curriculum == null)
+            var curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
+            if (curriculum == null)
             {
                 return NotFound();
             }
 
+            // 📌 ดึงกิจกรรมที่เพิ่มไปแล้ว
             var activitiesQuery = _db.ExtracurricularActivities
                 .Where(ea => ea.CurriculumId == id)
                 .Include(ea => ea.Activity)
                 .Select(ea => ea.Activity)
-                .Where(a => a != null)
                 .AsQueryable();
 
             activitiesQuery = sortOrder switch
@@ -175,73 +175,66 @@ namespace SchoolSystem.Controllers
 
             var activities = activitiesQuery.ToList();
 
-            var CurriculumActivityViewModel = new CurriculumActivityViewModel
-            {
-                CurriculumId = Curriculum.CurriculumId,
-                Curriculum_Code = Curriculum.Curriculum_Code,
-                CurriculumName = Curriculum.CurriculumName,
-                Activities = activities
-            };
-
-            return View(CurriculumActivityViewModel);
-        }
-        [HttpGet]
-        [Route("Curriculum/Activity/Add/{id:int}")]
-        public IActionResult AddActivity(int id)
-        {
-            var Curriculum = _db.Curriculum.FirstOrDefault(c => c.CurriculumId == id);
-            if (Curriculum == null)
-            {
-                return NotFound();
-            }
-
-            // ดึงกิจกรรมที่ถูกเลือกไปแล้ว
+            // 📌 กรองกิจกรรมที่ยังไม่ได้เพิ่มเข้าไป
             var selectedActivities = _db.ExtracurricularActivities
                 .Where(ea => ea.CurriculumId == id)
                 .Select(ea => ea.ActivityId)
                 .ToList();
 
-            // กรองเฉพาะกิจกรรมที่ยังไม่ถูกเลือก
             ViewBag.Activities = _db.Activities
                 .Where(a => a.Status == "Active" && !selectedActivities.Contains(a.ActivityId))
                 .Select(a => new { a.ActivityId, a.ActivityName })
                 .ToList();
 
-            var model = new ExtracurricularActivity { CurriculumId = id };
+            var model = new CurriculumActivityViewModel
+            {
+                CurriculumId = curriculum.CurriculumId,
+                CurriculumName = curriculum.CurriculumName,
+                Activities = activities
+            };
+
             return View(model);
         }
 
+        // 📌 เพิ่มกิจกรรมในหลักสูตร
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Curriculum/Activity/Add/{id:int}")]
-        public IActionResult AddActivity(int id, ExtracurricularActivity extracurricularActivity)
+        [Route("Curriculum/Activity/Add")]
+        public IActionResult AddActivity(int CurriculumId, int ActivityId)
         {
-            if (extracurricularActivity.CurriculumId == 0 || extracurricularActivity.ActivityId == 0)
+            if (CurriculumId == 0 || ActivityId == 0)
             {
-                TempData["ErrorMessage"] = "กรุณาเลือกหลักสูตรและกิจกรรมที่ถูกต้อง!";
-                return View(extracurricularActivity);
+                TempData["ErrorMessage"] = "กรุณาเลือกกิจกรรมที่ถูกต้อง!";
+                return RedirectToAction("ManageCurriculumActivities", new { id = CurriculumId });
             }
 
-            if (ModelState.IsValid)
+            // ตรวจสอบว่ามีอยู่แล้วหรือไม่
+            bool isExist = _db.ExtracurricularActivities.Any(ea => ea.CurriculumId == CurriculumId && ea.ActivityId == ActivityId);
+            if (isExist)
             {
-                extracurricularActivity.CreateAt = DateTime.UtcNow;
-                extracurricularActivity.Status = "Active";
-
-                _db.ExtracurricularActivities.Add(extracurricularActivity);
-                _db.SaveChanges();
-
-                TempData["SuccessMessage"] = "เพิ่มกิจกรรมสำเร็จ!";
-                return RedirectToAction("AddActivity", new { id = extracurricularActivity.CurriculumId });
+                TempData["ErrorMessage"] = "กิจกรรมนี้ถูกเพิ่มไปแล้ว!";
+                return RedirectToAction("ManageCurriculumActivities", new { id = CurriculumId });
             }
 
-            TempData["ErrorMessage"] = "เกิดข้อผิดพลาดในการเพิ่มกิจกรรม!";
-            return View(extracurricularActivity);
+            var newActivity = new ExtracurricularActivity
+            {
+                CurriculumId = CurriculumId,
+                ActivityId = ActivityId,
+                CreateAt = DateTime.UtcNow,
+                Status = "Active"
+            };
+
+            _db.ExtracurricularActivities.Add(newActivity);
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] = "เพิ่มกิจกรรมสำเร็จ!";
+            return RedirectToAction("ManageCurriculumActivities", new { id = CurriculumId });
         }
 
-
+        // 📌 ลบกิจกรรมออกจากหลักสูตร
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Academic/DeleteActivity")]
+        [Route("Curriculum/Activity/Delete")]
         public IActionResult DeleteActivity(int activityId, int CurriculumId)
         {
             var activityToRemove = _db.ExtracurricularActivities
@@ -249,13 +242,15 @@ namespace SchoolSystem.Controllers
 
             if (activityToRemove == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "ไม่พบกิจกรรมที่ต้องการลบ!";
+                return RedirectToAction("ManageCurriculumActivities", new { id = CurriculumId });
             }
 
             _db.ExtracurricularActivities.Remove(activityToRemove);
             _db.SaveChanges();
 
-            return RedirectToAction("CurriculumActivity", new { id = CurriculumId });
+            TempData["SuccessMessage"] = "ลบกิจกรรมสำเร็จ!";
+            return RedirectToAction("ManageCurriculumActivities", new { id = CurriculumId });
         }
 
 
