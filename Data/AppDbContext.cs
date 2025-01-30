@@ -23,7 +23,7 @@ namespace SchoolSystem.Data
         public DbSet<CompulsoryCourse> CompulsoryCourses { get; set; }
         public DbSet<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; }
         public DbSet<Course> Courses { get; set; }
-        public DbSet<CourseCategory> CourseCategorys { get; set; }
+        public DbSet<CourseCategory> CourseCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
