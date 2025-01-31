@@ -12,8 +12,8 @@ using SchoolSystem.Data;
 namespace SchoolSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250130141818_Changename")]
-    partial class Changename
+    [Migration("20250131172420_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,64 @@ namespace SchoolSystem.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.Activity", b =>
+                {
+                    b.Property<int>("ActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
+
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ActivityId");
+
+                    b.ToTable("Activities");
+                });
+
+            modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
+                {
+                    b.Property<int>("ClassId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClassId"));
+
+                    b.Property<int>("ClassNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GradeLevelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClassId");
+
+                    b.HasIndex("GradeLevelId");
+
+                    b.ToTable("Class");
+                });
+
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.GradeLevels", b =>
                 {
                     b.Property<int>("GradeLevelId")
@@ -212,7 +270,7 @@ namespace SchoolSystem.Migrations
 
                     b.HasIndex("CourseCategoryId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.CourseManagement.CourseCategory", b =>
@@ -235,40 +293,6 @@ namespace SchoolSystem.Migrations
                     b.HasKey("CourseCategoryId");
 
                     b.ToTable("CourseCategories");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Activity", b =>
-                {
-                    b.Property<int>("ActivityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
-
-                    b.Property<string>("ActivityName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ActivityId");
-
-                    b.ToTable("Activities");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.CompulsoryCourse", b =>
@@ -601,6 +625,17 @@ namespace SchoolSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
+                {
+                    b.HasOne("SchoolSystem.Models.ClassManagement.GradeLevels", "GradeLevels")
+                        .WithMany("Classes")
+                        .HasForeignKey("GradeLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GradeLevels");
+                });
+
             modelBuilder.Entity("SchoolSystem.Models.CourseManagement.Course", b =>
                 {
                     b.HasOne("SchoolSystem.Models.CourseManagement.CourseCategory", "CourseCategory")
@@ -695,7 +730,7 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.ExtracurricularActivity", b =>
                 {
-                    b.HasOne("SchoolSystem.Models.CurriculumManagement.Activity", "Activity")
+                    b.HasOne("SchoolSystem.Models.ActivityManagement.Activity", "Activity")
                         .WithMany("ExtracurricularActivities")
                         .HasForeignKey("ActivityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -721,8 +756,15 @@ namespace SchoolSystem.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.Activity", b =>
+                {
+                    b.Navigation("ExtracurricularActivities");
+                });
+
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.GradeLevels", b =>
                 {
+                    b.Navigation("Classes");
+
                     b.Navigation("CompulsoryCourses");
 
                     b.Navigation("CompulsoryElectiveCourses");
@@ -742,11 +784,6 @@ namespace SchoolSystem.Migrations
             modelBuilder.Entity("SchoolSystem.Models.CourseManagement.CourseCategory", b =>
                 {
                     b.Navigation("Courses");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Activity", b =>
-                {
-                    b.Navigation("ExtracurricularActivities");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.CurriculumManagement.Curriculum", b =>
