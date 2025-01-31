@@ -1,0 +1,25 @@
+﻿@model List<dynamic>
+@{
+    ViewData["Title"] = "รายวิชาที่อาจารย์สอนทั้งหมด";
+}
+
+<div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-lg p-8">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left">📚 วิชาทั้งหมดที่อาจารย์สอน</h1>
+        <a href="@Url.Action("ClassAttendance", "Attendance")"
+           class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 shadow-md transition-all duration-300 text-center">
+            📅 วิชาที่สอนวันนี้
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @foreach (var subject in Model)
+        {
+            <a href="@Url.Action("EditAttendance", "Attendance", new { classId = subject.Id })"
+               class="block bg-gradient-to-r from-green-500 to-teal-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 flex flex-col items-center justify-center text-center">
+                <h2 class="text-xl font-semibold">@subject.Name</h2>
+                <p class="text-sm opacity-80 mt-2">แตะเพื่อแก้ไขการเช็คชื่อ</p>
+            </a>
+        }
+    </div>
+</div>

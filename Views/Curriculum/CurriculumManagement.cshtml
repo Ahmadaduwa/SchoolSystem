@@ -35,7 +35,7 @@
                     ค้นหา
                 </button>
             </form>
-            <a asp-action="AddCurriculum" asp-controller="Academic" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
+            <a asp-action="AddCurriculum" asp-controller="Curriculum" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
                 <i class="fas fa-plus mr-2"></i> เพิ่มหลักสูตร
             </a>
         </div>
@@ -73,13 +73,13 @@
                                             ดำเนินการ <i class="fas fa-chevron-down ml-1"></i>
                                         </button>
                                         <div id="dropdown-@curriculum.Curriculum_Code" class="table-dropdown-menu hidden bg-white shadow-lg rounded-lg text-xs sm:text-sm">
-                                            <a asp-action="ManageCourses" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="ManageCourses" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-cogs"></i> จัดการรายวิชา
                                             </a>
-                                            <a asp-action="ManageCurriculumActivities" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="ManageCurriculumActivities" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-tasks"></i> กิจกรรม
                                             </a>
-                                            <a asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
+                                            <a asp-action="EditCurriculum" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
                                                 <i class="fas fa-pencil-alt"></i> แก้ไข
                                             </a>
                                         </div>
@@ -114,17 +114,17 @@
             </div>
             <div class="flex flex-col gap-4">
                 <div class="flex gap-4">
-                    <a asp-action="ManageCourses" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
+                    <a asp-action="ManageCourses" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-6 py-3 rounded-lg hover:bg-blue-600 transition">
                             จัดการรายวิชา
                         </button>
                     </a>
-                    <a asp-action="ManageCurriculumActivities" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
+                    <a asp-action="ManageCurriculumActivities" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             กิจกรรม
                         </button>
                     </a>
-                    <a asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@curriculum.CurriculumId">
+                    <a asp-action="EditCurriculum" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
                         <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                             แก้ไข
                         </button>

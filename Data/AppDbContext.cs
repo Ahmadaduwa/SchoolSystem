@@ -14,6 +14,19 @@ namespace SchoolSystem.Data
         {
         }
 
+        /// <summary>
+        /// Class Management
+        /// </summary>
+
+
+        /// <summary>
+        /// Attendance Management
+        /// </summary>
+        
+
+        /// <summary>
+        /// Curriculum Management
+        /// </summary>
         public DbSet<Curriculum> Curriculum { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Models.ActivityManagement.Activity> Activities { get; set; }
@@ -22,21 +35,38 @@ namespace SchoolSystem.Data
         public DbSet<ElectiveCourse> ElectiveCourses { get; set; }
         public DbSet<CompulsoryCourse> CompulsoryCourses { get; set; }
         public DbSet<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; }
-        public DbSet<Course> Courses { get; set; }
+        public DbSet<Course> Course { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            ConfigureUserRelationship(modelBuilder);
+            ConfigureCurriculumManagement(modelBuilder);
+            ConfigureClassManagement(modelBuilder);
+            ConfigureAttendanceManagement(modelBuilder);
+
+        }
+        private void ConfigureUserRelationship(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Profiles>()
                 .HasOne(p => p.User)
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profiles>(p => p.UserId);
-
-            ConfigureUserRelationship(modelBuilder);
         }
 
-        private void ConfigureUserRelationship(ModelBuilder modelBuilder)
+        private void ConfigureClassManagement(ModelBuilder modelBuilder)
+        {
+            Debug.WriteLine("Class Management");
+        }
+
+        private void ConfigureAttendanceManagement(ModelBuilder modelBuilder)
+        {
+            Debug.WriteLine("Class Management");
+        }
+
+        private void ConfigureCurriculumManagement(ModelBuilder modelBuilder)
         {
 
             modelBuilder.Entity<Course>()

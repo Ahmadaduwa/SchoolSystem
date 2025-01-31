@@ -14,7 +14,7 @@
         </div>
 
         <div class="p-4 sm:p-6">
-            <form asp-action="EditCurriculum" asp-controller="Academic" asp-route-id="@Model.CurriculumId" method="post">
+            <form asp-action="EditCurriculum" asp-controller="Curriculum" asp-route-id="@Model.CurriculumId" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="CurriculumId" />
 
@@ -99,7 +99,7 @@
                     class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm">
                 <i class="fas fa-times mr-2"></i>ยกเลิก
             </button>
-            <form asp-action="DeleteCurriculum" asp-controller="Academic" asp-route-id="@Model.CurriculumId" method="post">
+            <form asp-action="DeleteCurriculum" asp-controller="Curriculum" asp-route-id="@Model.CurriculumId" method="post">
                 @Html.AntiForgeryToken()
                 <button type="submit"
                         class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">

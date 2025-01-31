@@ -12,11 +12,11 @@ using SchoolSystem.Models.ViewModels;
 namespace SchoolSystem.Controllers
 {
     [Authorize(Policy = "AcademicPolicy")]
-    public class AcademicController : Controller
+    public class CurriculumController : Controller
     {
         private readonly AppDbContext _db;
 
-        public AcademicController(AppDbContext db)
+        public CurriculumController(AppDbContext db)
         {
             _db = db;
         }
@@ -266,7 +266,7 @@ namespace SchoolSystem.Controllers
 
             // ดึงข้อมูล GradeLevels และ Courses จาก Database
             ViewBag.GradeLevels = _db.GradeLevels.ToList();
-            ViewBag.Courses = _db.Courses.ToList();
+            ViewBag.Courses = _db.Course.ToList();
 
             var model = new ManageCoursesViewModel
             {

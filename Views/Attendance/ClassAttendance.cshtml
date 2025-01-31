@@ -1,0 +1,37 @@
+﻿@using SchoolSystem.Models.ViewModels
+@model List<dynamic>
+@{
+    ViewData["Title"] = "เลือกวิชาสำหรับเช็คชื่อ";
+}
+
+<div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 รายวิชาที่มีสอนวันนี้</h1>
+        <a href="@Url.Action("AllSubjects", "Attendance")"
+           class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 shadow-md transition-all duration-300">
+            📋 แก้ไขเช็คชื่อ
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach (var subject in Model)
+        {
+            <a href="@Url.Action("StudentAttendance", "Attendance", new { classId = subject.Id })"
+               class="block bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-6 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 text-center">
+
+                <p class="text-sm font-semibold text-white bg-blue-700 px-4 py-1 rounded-md inline-block mb-2 shadow-sm">
+                    🕒 @subject.Time
+                </p>
+
+                <h2 class="text-xl font-semibold mt-2">@subject.Name</h2>
+                <p class="text-sm opacity-90 mt-1">แตะเพื่อเข้าเช็คชื่อ</p>
+            </a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // You can add additional JavaScript here if needed
+    </script>
+}
