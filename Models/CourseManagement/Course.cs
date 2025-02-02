@@ -20,6 +20,9 @@ namespace SchoolSystem.Models.CourseManagement
         [MaxLength(500)] // คำอธิบายรายวิชา
         public string? Description { get; set; }
 
+        [MaxLength(500)]
+        public string? Objective { get; set; } // วัตถุประสงค์ของรายวิชา
+
         [Required]
         public int Unit { get; set; } // จำนวนหน่วยกิต
 

@@ -13,22 +13,18 @@ namespace SchoolSystem.Models.ClassManagement
         [Required]
         [ForeignKey("Class")]
         public int ClassId { get; set; }
-        public virtual Class Class { get; set; } // Navigation Property
 
         [Required]
         [ForeignKey("Teacher")]
         public int TeacherId { get; set; }
-        public virtual Teacher Teacher { get; set; } // Navigation Property
 
         [Required]
         [ForeignKey("Course")]
         public int CourseId { get; set; }
-        public virtual Course Course { get; set; } // Navigation Property
 
         [Required]
         [ForeignKey("Semester")]
         public int SemesterId { get; set; }
-        public virtual Semester Semester { get; set; } // Navigation Property
 
         [Required]
         [StringLength(255, ErrorMessage = "Scoring criteria must be less than 255 characters.")]
@@ -41,5 +37,9 @@ namespace SchoolSystem.Models.ClassManagement
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
+        public virtual Class Class { get; set; } // Navigation Property
+        public virtual Teacher Teacher { get; set; } // Navigation Property
+        public virtual Course Course { get; set; } // Navigation Property
+        public virtual Semester Semester { get; set; } // Navigation Property
     }
 }
