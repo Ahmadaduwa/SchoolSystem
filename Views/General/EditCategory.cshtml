@@ -1,0 +1,35 @@
+@model SchoolSystem.Models.ClassManagement.SubjectCategory
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<h2>Edit Subject Category</h2>
+
+<div class="border-b border-gray-200 mb-6">
+    <nav class="flex justify-center gap-6">
+
+        <a asp-controller="General" asp-action="CreateCategory" class="p-3 text-sm font-medium text-gray-500 hover:text-gray-700">CreateManage</a>
+        <a asp-controller="General" asp-action="IndexCategory" class="p-3 text-sm font-medium text-sky-600 border-b-2 border-sky-600">IndexManage</a>
+
+    </nav>
+</div>
+
+<form asp-action="EditCategory" method="post">
+    <input type="hidden" asp-for="SubjectCategoryId" />
+    <div class="form-group">
+        <label asp-for="CategoryName"></label>
+        <input asp-for="CategoryName" class="form-control" />
+        <span asp-validation-for="CategoryName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>

@@ -1,0 +1,65 @@
+﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>  Create Management system  </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 text-center">     Create Management system   </h2>
+
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="flex justify-center gap-6">
+
+                <a asp-controller="General" asp-action="CreateManage" class="p-3 text-sm font-medium text-gray-500 hover:text-gray-700">Create</a>
+                <a asp-controller="General" asp-action="IndexManage" class="p-3 text-sm font-medium text-sky-600 border-b-2 border-sky-600">List</a>
+
+            </nav>
+        </div>
+        <div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 text-center">Create Manage </h2>
+
+            <form asp-action="CreateManage" method="post">
+                <div>
+                    <label asp-for="ClassID" class="block text-sm font-medium text-gray-700">Class</label>
+                    <select asp-for="ClassID" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="@(new SelectList(ViewBag.Classes, "ClassID", "ClassName"))"></select>
+                    <span asp-validation-for="ClassID" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="TeacherID" class="block text-sm font-medium text-gray-700">Teacher</label>
+                    <select asp-for="TeacherID" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="@(new SelectList(ViewBag.Teachers, "TeacherID", "TeacherName"))"></select>
+                    <span asp-validation-for="TeacherID" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="CourseID" class="block text-sm font-medium text-gray-700">Course</label>
+                    <select asp-for="CourseID" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="@(new SelectList(ViewBag.Courses, "CourseID", "CourseName"))"></select>
+                    <span asp-validation-for="CourseID" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="SubjectID" class="block text-sm font-medium text-gray-700">Subject</label>
+                    <select asp-for="SubjectID" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="@(new SelectList(ViewBag.Subjects, "SubjectID", "SubjectName"))"></select>
+                    <span asp-validation-for="SubjectID" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="SemesterID" class="block text-sm font-medium text-gray-700">Semester</label>
+                    <select asp-for="SemesterID" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="@(new SelectList(ViewBag.Semesters, "SemesterID", "SemesterYear"))"></select>
+                    <span asp-validation-for="SemesterID" class="text-red-500 text-sm"></span>
+                </div>
+                <div class="flex justify-end gap-4 mt-4">
+                    <a asp-action="Index" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+                    <button type="submit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Submit</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</body>
+

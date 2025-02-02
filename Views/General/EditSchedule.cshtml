@@ -1,0 +1,50 @@
+@model SchoolSystem.Models.ClassManagement.ClassSchedule
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<h2>Edit Class Schedule</h2>
+
+<div class="border-b border-gray-200 mb-6">
+    <nav class="flex justify-center gap-6">
+
+        <a asp-controller="General" asp-action="CreateSchedule" class="p-3 text-sm font-medium text-gray-500 hover:text-gray-700">Create</a>
+        <a asp-controller="General" asp-action="IndexSchedule" class="p-3 text-sm font-medium text-sky-600 border-b-2 border-sky-600">Index</a>
+
+    </nav>
+</div>
+
+<form asp-action="EditSchedule" method="post">
+    <input type="hidden" asp-for="ScheduleID" />
+    <div class="form-group">
+        <label asp-for="CM_ID">Class Management</label>
+        <select asp-for="CM_ID" class="form-control" asp-items="ViewBag.ClassManagements"></select>
+    </div>
+    <div class="form-group">
+        <label asp-for="DayOfWeek"></label>
+        <input asp-for="DayOfWeek" class="form-control" />
+        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="StartTime"></label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndTime"></label>
+        <input asp-for="EndTime" type="time" class="form-control" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Status"></label>
+        <select asp-for="Status" class="form-control">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>

@@ -1,4 +1,4 @@
-namespace SchoolSystem.Models
+﻿namespace Test_proj.Models
 {
     public class ErrorViewModel
     {

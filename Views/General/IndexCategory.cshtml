@@ -1,0 +1,55 @@
+@model IEnumerable<SchoolSystem.Models.ClassManagement.SubjectCategory>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Course Management List</h2>
+
+    <div class="border-b border-gray-200 mb-6">
+        <nav class="flex justify-center gap-6">
+
+            <a asp-controller="General" asp-action="CreateCategory" class="p-3 text-sm font-medium text-gray-500 hover:text-gray-700">Create</a>
+            <a asp-controller="General" asp-action="IndexCategory" class="p-3 text-sm font-medium text-sky-600 border-b-2 border-sky-600">List</a>
+
+        </nav>
+    </div>
+
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-center divide-y divide-gray-200">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 font-medium text-gray-900">Name</th>
+                    <th class="px-4 py-2 font-medium text-gray-900">Description</th>
+                    <th class="px-4 py-2 font-medium text-gray-900">Edit</th>
+                    <th class="px-4 py-2 font-medium text-gray-900">Delete</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">@category.CategoryName</td>
+                        <td class="border border-gray-300 px-4 py-2">@category.Description</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <a asp-action="EditCategory" asp-route-id="@category.SubjectCategoryId" class="btn btn-warning text-sky-600">Edit</a>
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <a asp-action="DeleteCategory" asp-route-id="@category.SubjectCategoryId" class="btn btn-danger text-red-600">Delete</a>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <div class="mt-5 flex justify-end gap-4">
+            <a asp-controller="General" asp-action="Index" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+        </div>
+    </div>
+</div>

@@ -18,23 +18,18 @@ namespace SchoolSystem.Data
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<SchoolSystem.Models.CurriculumManagement.Activity> Activities { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
-        public DbSet<GradeLevels> GradeLevels { get; set; }
+     
         public DbSet<ElectiveCourse> ElectiveCourses { get; set; }
         public DbSet<CompulsoryCourse> CompulsoryCourses { get; set; }
         public DbSet<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; }
-        public DbSet<Course> Courses { get; set; }
+    
         public DbSet<CourseCategory> CourseCategories { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Profiles>()
-                .HasOne(p => p.User)
-                .WithOne(u => u.Profile)
-                .HasForeignKey<Profiles>(p => p.UserId);
 
-            ConfigureUserRelationship(modelBuilder);
-        }
+        public DbSet<GradeLevels> GradeLevels { get; set; }
+
+        public DbSet<Course> Courses { get; set; }
+
 
         private void ConfigureUserRelationship(ModelBuilder modelBuilder)
         {
@@ -111,6 +106,78 @@ namespace SchoolSystem.Data
                 .HasForeignKey(cec => cec.CourseId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+         
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Profiles>()
+                .HasOne(p => p.User)
+                .WithOne(u => u.Profile)
+                .HasForeignKey<Profiles>(p => p.UserId);
+
+            ConfigureUserRelationship(modelBuilder);
+        }
+    }
+    public class ApplicationDBContext : DbContext // Ensure 'public' is specified here
+    {
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options)
+        {
+        }
+
+        // Define DbSet properties here
+
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<Semester> Semesters { get; set; }
+        public DbSet<ClassManagement> ClassManagements { get; set; }
+        public DbSet<ClassSchedule> ClassSchedules { get; set; } // Added ClassSchedule
+        public DbSet<Subject> Subjects { get; set; } // Added Subject
+        public DbSet<SubjectCategory> SubjectCategories { get; set; } // Added SubjectCategory
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure relationships for ClassManagement
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Class)
+                .WithMany(c => c.ClassManagements)
+                .HasForeignKey(cm => cm.ClassID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Teacher)
+                .WithMany(t => t.ClassManagements)
+                .HasForeignKey(cm => cm.TeacherID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Semester)
+                .WithMany(s => s.ClassManagements)
+                .HasForeignKey(cm => cm.SemesterID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Subject)
+                .WithMany(sj => sj.ClassManagements)
+                .HasForeignKey(cm => cm.SubjectID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassSchedule>()
+                .HasOne(cs => cs.ClassManagement)
+                .WithMany(cm => cm.ClassSchedules)
+                .HasForeignKey(cs => cs.CM_ID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Subject>()
+                .HasOne(sj => sj.SubjectCategory)
+                .WithMany(sc => sc.Subjects)
+                .HasForeignKey(sj => sj.SubjectCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
     }
 }
 

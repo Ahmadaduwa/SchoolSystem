@@ -1,0 +1,39 @@
+﻿@model SchoolSystem.Models.ClassManagement.Teacher
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Teacher </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<h2>Edit Teacher</h2>
+
+<div class="border-b border-gray-200 mb-6">
+    <nav class="flex justify-center gap-6">
+
+        <a asp-controller="General" asp-action="CreateSemester" class="p-3 text-sm font-medium text-gray-500 hover:text-gray-700">Create</a>
+        <a asp-controller="General" asp-action="IndexSemester" class="p-3 text-sm font-medium text-sky-600 border-b-2 border-sky-600">Index</a>
+
+    </nav>
+</div>
+
+<form asp-action="EditTeacher" method="post">
+    <input type="hidden" asp-for="TeacherID" />
+    <div class="form-group">
+        <label asp-for="UserId"></label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Status"></label>
+        <input asp-for="Status" class="form-control" />
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DepartmentId"></label>
+        <input asp-for="DepartmentId" class="form-control" />
+        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>

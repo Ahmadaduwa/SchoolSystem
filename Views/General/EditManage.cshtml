@@ -1,0 +1,32 @@
+﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit mangement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<h2>Edit Class Management</h2>
+
+<form asp-action="EditManage" method="post">
+    <input type="hidden" asp-for="CM_ID" />
+    <div class="form-group">
+        <label>Class</label>
+        <select asp-for="ClassID" class="form-control" asp-items="@(new SelectList(ViewBag.Classes, "ClassID", "ClassName", Model.ClassID))"></select>
+    </div>
+    <div class="form-group">
+        <label>Teacher</label>
+        <select asp-for="TeacherID" class="form-control" asp-items="@(new SelectList(ViewBag.Teachers, "TeacherID", "TeacherName", Model.TeacherID))"></select>
+    </div>
+    <div class="form-group">
+        <label>Course</label>
+        <select asp-for="CourseID" class="form-control" asp-items="@(new SelectList(ViewBag.Courses, "CourseID", "CourseName", Model.CourseID))"></select>
+    </div>
+    <div class="form-group">
+        <label>Semester</label>
+        <select asp-for="SemesterID" class="form-control" asp-items="@(new SelectList(ViewBag.Semesters, "SemesterID", "SemesterYear", Model.SemesterID))"></select>
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>

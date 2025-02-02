@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
     <Folder Include="Views\Teacher\" />
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>

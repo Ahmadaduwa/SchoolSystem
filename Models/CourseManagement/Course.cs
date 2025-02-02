@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using SchoolSystem.Models.CurriculumManagement;
+using System.Collections.Generic;
+using System.Diagnostics;
+
 
 namespace SchoolSystem.Models.CourseManagement
 {
@@ -30,5 +33,6 @@ namespace SchoolSystem.Models.CourseManagement
         public virtual ICollection<ElectiveCourse> ElectiveCourses { get; set; } = new List<ElectiveCourse>();
         public virtual ICollection<CompulsoryCourse> CompulsoryCourses { get; set; } = new List<CompulsoryCourse>();
         public virtual ICollection<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; } = new List<CompulsoryElectiveCourse>();
+
     }
 }

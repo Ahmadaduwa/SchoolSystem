@@ -117,7 +117,7 @@ app.UseWebOptimizer();
 app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=General}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapControllers();
