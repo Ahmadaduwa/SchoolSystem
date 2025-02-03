@@ -30,9 +30,10 @@ namespace SchoolSystem.Models.CourseManagement
         [StringLength(20)]
         public string Status { get; set; } = "Active"; // ค่าเริ่มต้นเป็น Active
 
+        [Required(ErrorMessage = "Please select a category.")]
         [ForeignKey("CourseCategory")]
-        public int CourseCategoryId { get; set; }
-        public required CourseCategory CourseCategory { get; set; }
+        public int? CourseCategoryId { get; set; }
+        public virtual CourseCategory? CourseCategory { get; set; }
 
         // 📌 Timestamp
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // เพิ่ม CreatedAt

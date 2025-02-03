@@ -29,58 +29,57 @@ namespace SchoolSystem.Controllers
                 return RedirectToAction("IndexCourse");
             }
         }
-
-        // 📌 แสดงฟอร์มสร้างคอร์ส
         public IActionResult CreateCourse()
         {
-            try
-            {
-                var categories = _db.CourseCategories.ToList();
-
-                if (categories == null || categories.Count == 0)
-                {
-                    TempData["ErrorMessage"] = "No course categories found. Please add categories first.";
-                    return RedirectToAction("IndexCourse");
-                }
-
-                ViewBag.CourseCategories = new SelectList(categories, "CourseCategoryId", "Name");
-                return View();
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Error loading categories: {ex.Message}";
-                return RedirectToAction("IndexCourse");
-            }
+            ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
+            return View();
         }
 
-
-        // 📌 บันทึกการสร้างคอร์ส
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateCourse(Course model)
+        public IActionResult CreateCourse(Course newCourse)
         {
+            Console.WriteLine($"CourseCategoryId from Form: {Request.Form["CourseCategoryId"]}");
+            Console.WriteLine($"CourseCategoryId from Model: {newCourse.CourseCategoryId}");
+
             if (!ModelState.IsValid)
             {
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    foreach (var error in state.Errors)
+                    {
+                        Console.WriteLine($"Key: {key}, Error: {error.ErrorMessage}");
+                    }
+                }
+
                 ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
-                return View(model);
+                return View(newCourse);
             }
 
             try
             {
-                _db.Course.Add(model);
+                _db.Course.Add(newCourse); // 🔹 ใช้ _db.Courses (ไม่ใช่ _db.Course)
                 _db.SaveChanges();
                 TempData["SuccessMessage"] = "Course created successfully!";
+                return RedirectToAction("IndexCourse");
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error creating course: {ex.Message}";
+                ModelState.AddModelError("", $"Database Error: {ex.Message}");
             }
-            return RedirectToAction("IndexCourse");
+
+            ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
+            return View(newCourse);
         }
+
+
+
 
         // 📌 แสดงฟอร์มแก้ไขคอร์ส
         public IActionResult EditCourse(int id)
         {
+
             try
             {
                 var course = _db.Course.Find(id); // 🔄 แก้จาก _db.Course → _db.Courses
@@ -136,5 +135,46 @@ namespace SchoolSystem.Controllers
             }
             return RedirectToAction("IndexCourse");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteCourse(int id)
+        {
+            try
+            {
+                var course = _db.Course.Include(c => c.ClassManagements)
+                                        .Include(c => c.ElectiveCourses)
+                                        .Include(c => c.CompulsoryCourses)
+                                        .Include(c => c.CompulsoryElectiveCourses)
+                                        .FirstOrDefault(c => c.CourseId == id);
+
+                if (course == null)
+                {
+                    TempData["ErrorMessage"] = "Course not found.";
+                    return RedirectToAction("IndexCourse");
+                }
+
+                // ตรวจสอบว่าคอร์สนี้ถูกอ้างอิงอยู่หรือไม่
+                if (course.ClassManagements.Any() ||
+                    course.ElectiveCourses.Any() ||
+                    course.CompulsoryCourses.Any() ||
+                    course.CompulsoryElectiveCourses.Any())
+                {
+                    TempData["ErrorMessage"] = "This course cannot be deleted because it is linked to other records.";
+                    return RedirectToAction("IndexCourse");
+                }
+
+                _db.Course.Remove(course);
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Course deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error deleting course: {ex.Message}";
+            }
+
+            return RedirectToAction("IndexCourse");
+        }
+
     }
 }

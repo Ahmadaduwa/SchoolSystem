@@ -6,12 +6,10 @@
 <div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
     <h2 class="text-2xl font-bold mb-4 text-center">Create Course</h2>
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="p-4 mb-4 text-red-700 bg-red-200 rounded">
-            @TempData["ErrorMessage"]
-        </div>
-    }
+
+
+    <!-- แสดงข้อผิดพลาดจาก ModelState -->
+    <div asp-validation-summary="All" class="text-red-500 text-sm mb-4"></div>
 
     <form asp-action="CreateCourse" asp-controller="Course" method="post" class="space-y-4">
         <div>
@@ -46,11 +44,14 @@
 
         <div>
             <label asp-for="CourseCategoryId" class="block text-sm font-medium text-gray-700">Category</label>
-            <select asp-for="CourseCategoryId" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="ViewBag.CourseCategories" required>
+            <select asp-for="CourseCategoryId" class="border border-gray-300 rounded px-2 py-1 w-full"
+                    asp-items="@(ViewBag.CourseCategories ?? new SelectList(Enumerable.Empty<SelectListItem>(), "CourseCategoryId", "Name"))" required>
                 <option value="">-- Select Category --</option>
             </select>
             <span asp-validation-for="CourseCategoryId" class="text-red-500 text-sm"></span>
         </div>
+
+
 
         <div>
             <label asp-for="Status" class="block text-sm font-medium text-gray-700">Status</label>
@@ -66,4 +67,5 @@
             <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">Create Course</button>
         </div>
     </form>
+
 </div>
