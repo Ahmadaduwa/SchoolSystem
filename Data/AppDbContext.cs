@@ -64,7 +64,15 @@ namespace SchoolSystem.Data
             modelBuilder.Entity<Profiles>()
                 .HasOne(p => p.User)
                 .WithOne(u => u.Profile)
-                .HasForeignKey<Profiles>(p => p.UserId);
+                .HasForeignKey<Profiles>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ✅ 2. Profile กับ Teacher (1-1)
+            modelBuilder.Entity<Teacher>()
+                .HasOne(t => t.Profile)
+                .WithOne(p => p.Teacher) // ✅ ใช้ Navigation Property ให้ถูกต้อง
+                .HasForeignKey<Teacher>(t => t.ProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void ConfigureClassManagement(ModelBuilder modelBuilder)

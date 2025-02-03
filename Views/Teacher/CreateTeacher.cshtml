@@ -1,0 +1,56 @@
+﻿@model SchoolSystem.ViewModels.TeacherViewModel
+@{
+    ViewData["Title"] = "Create Teacher";
+}
+
+<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700">Create Teacher</h2>
+
+    <div asp-validation-summary="All" class="text-red-500 text-sm mb-4"></div>
+
+    <form asp-action="CreateTeacher" method="post">
+        <fieldset class="border p-4 rounded-lg mb-4">
+            <legend class="text-lg font-bold">Profile Information</legend>
+
+            <label class="block">First Name:</label>
+            <input asp-for="FirstName" class="border rounded w-full p-2 mb-4" required />
+
+            <label class="block">Last Name:</label>
+            <input asp-for="LastName" class="border rounded w-full p-2 mb-4" required />
+
+            <label class="block">Gender:</label>
+            <select asp-for="Gender" class="border rounded w-full p-2 mb-4">
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+
+            <label class="block">Address:</label>
+            <input asp-for="Address" class="border rounded w-full p-2 mb-4" />
+
+            <label class="block">Date of Birth:</label>
+            <input asp-for="DateOfBirth" type="date" class="border rounded w-full p-2 mb-4" required />
+        </fieldset>
+
+        <fieldset class="border p-4 rounded-lg mb-4">
+            <legend class="text-lg font-bold">Teacher Information</legend>
+
+            <label class="block">Department:</label>
+            <select asp-for="DepartmentId" asp-items="Model.Departments" class="border rounded w-full p-2 mb-4"></select>
+
+            <label class="block">Hire Date:</label>
+            <input asp-for="HireDate" type="date" class="border rounded w-full p-2 mb-4" required />
+
+            <label class="block">Salary:</label>
+            <input asp-for="Salary" type="number" step="0.01" class="border rounded w-full p-2 mb-4" required />
+
+            <label class="block">Status:</label>
+            <select asp-for="Status" class="border rounded w-full p-2 mb-4">
+                <option>Active</option>
+                <option>Inactive</option>
+            </select>
+        </fieldset>
+
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Create Teacher</button>
+    </form>
+</div>

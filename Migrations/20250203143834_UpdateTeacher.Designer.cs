@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolSystem.Data;
 
@@ -11,9 +12,11 @@ using SchoolSystem.Data;
 namespace SchoolSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250203143834_UpdateTeacher")]
+    partial class UpdateTeacher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -602,7 +605,11 @@ namespace SchoolSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -611,6 +618,10 @@ namespace SchoolSystem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ProfileId");
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique()
+                        .HasFilter("[TeacherId] IS NOT NULL");
 
                     b.HasIndex("UserId")
                         .IsUnique()
@@ -636,9 +647,6 @@ namespace SchoolSystem.Migrations
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ProfileId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
@@ -650,11 +658,14 @@ namespace SchoolSystem.Migrations
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("TeacherId");
 
-                    b.HasIndex("ProfileId")
+                    b.HasIndex("UserId")
                         .IsUnique()
-                        .HasFilter("[ProfileId] IS NOT NULL");
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Teachers");
                 });
@@ -955,22 +966,26 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Profiles", b =>
                 {
+                    b.HasOne("SchoolSystem.Models.UserManagement.Teacher", "Teacher")
+                        .WithOne("Profile")
+                        .HasForeignKey("SchoolSystem.Models.UserManagement.Profiles", "TeacherId");
+
                     b.HasOne("SchoolSystem.Models.UserManagement.Users", "User")
                         .WithOne("Profile")
-                        .HasForeignKey("SchoolSystem.Models.UserManagement.Profiles", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SchoolSystem.Models.UserManagement.Profiles", "UserId");
+
+                    b.Navigation("Teacher");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Teacher", b =>
                 {
-                    b.HasOne("SchoolSystem.Models.UserManagement.Profiles", "Profile")
+                    b.HasOne("SchoolSystem.Models.UserManagement.Users", "User")
                         .WithOne("Teacher")
-                        .HasForeignKey("SchoolSystem.Models.UserManagement.Teacher", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SchoolSystem.Models.UserManagement.Teacher", "UserId");
 
-                    b.Navigation("Profile");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.Activity", b =>
@@ -1031,19 +1046,18 @@ namespace SchoolSystem.Migrations
                     b.Navigation("ExtracurricularActivities");
                 });
 
-            modelBuilder.Entity("SchoolSystem.Models.UserManagement.Profiles", b =>
-                {
-                    b.Navigation("Teacher");
-                });
-
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Teacher", b =>
                 {
                     b.Navigation("ClassManagements");
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Users", b =>
                 {
                     b.Navigation("Profile");
+
+                    b.Navigation("Teacher");
                 });
 #pragma warning restore 612, 618
         }

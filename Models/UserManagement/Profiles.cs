@@ -15,27 +15,17 @@ namespace SchoolSystem.Models.UserManagement
 
         public string Address { get; set; } = string.Empty;
 
-        private DateOnly _dateOfBirth;
-        public DateOnly DateOfBirth
-        {
-            get => _dateOfBirth;
-            set
-            {
-                if (value == default)
-                    throw new ArgumentException("Date of Birth cannot be the default value.");
-                _dateOfBirth = value;
-            }
-        }
-        [Url] // Data Annotation to validate URL format
-        public string ProfilePictureUrl { get; set; } = string.Empty;
+        public DateOnly DateOfBirth { get; set; }
+
+        public string? ProfilePictureUrl { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public int Age => DateTime.UtcNow.Year - DateOfBirth.Year;
+        
         public string? UserId { get; set; }
-
         [ForeignKey("UserId")]
         public Users? User { get; set; }
+        public Teacher? Teacher { get; set; }
     }
 }

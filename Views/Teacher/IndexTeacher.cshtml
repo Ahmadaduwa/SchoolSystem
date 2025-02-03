@@ -1,0 +1,95 @@
+﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.UserManagement.Teacher>
+@{
+    ViewData["Title"] = "Teacher Management";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="container mx-auto max-w-5xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Teacher List</h2>
+
+    <div class="flex justify-between mb-4">
+        <a asp-action="CreateTeacher" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500">
+            + Add Teacher
+        </a>
+        <a asp-controller="Dashboard" asp-action="Index" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-400">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <table class="w-full border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100 text-gray-700">
+                <th class="border px-4 py-2">Name</th>
+                <th class="border px-4 py-2">Gender</th>
+                <th class="border px-4 py-2">Department</th>
+                <th class="border px-4 py-2">Salary</th>
+                <th class="border px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var teacher in Model)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="border px-4 py-2">@($"{teacher.Profile.FirstName} {teacher.Profile.LastName}")</td>
+                    <td class="border px-4 py-2">@teacher.Profile.Gender</td>
+                    <td class="border px-4 py-2">
+                        @{
+                            var departmentName = teacher.DepartmentId switch
+                            {
+                                1 => "Mathematics",
+                                2 => "Science",
+                                3 => "English",
+                                4 => "History",
+                                5 => "Computer Science",
+                                _ => "Unknown"
+                            };
+                        }
+                        @departmentName
+                    </td>
+                    <td class="border px-4 py-2">@($"{teacher.Salary:C}")</td>
+                    <td class="border px-4 py-2 flex gap-2 justify-center">
+                        <a asp-action="DetailsTeacher" asp-route-id="@teacher.TeacherId"
+                           class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-400">
+                            View
+                        </a>
+                        <a asp-action="EditTeacher" asp-route-id="@teacher.TeacherId"
+                           class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-400">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="flex justify-center mt-6">
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex - 1)"
+               class="px-4 py-2 mx-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                Previous
+            </a>
+        }
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex + 1)"
+               class="px-4 py-2 mx-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                Next
+            </a>
+        }
+    </div>
+</div>

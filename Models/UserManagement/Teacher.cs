@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using SchoolSystem.Models.ClassManagement;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolSystem.Models.UserManagement
 {
@@ -9,13 +10,15 @@ namespace SchoolSystem.Models.UserManagement
         [Key]
         public int TeacherId { get; set; }
 
-        [Required]
-        public string? UserId { get; set; }
+        public int? ProfileId { get; set; } // ✅ เปลี่ยนจาก int เป็น int?
+
+        [ForeignKey("ProfileId")]
+        public Profiles Profile { get; set; } = new Profiles();
 
         public int DepartmentId { get; set; }
 
         [Required]
-        public DateTime HireDate { get; set; } // แทน DateOnly เพื่อรองรับ EF Core
+        public DateTime HireDate { get; set; }
 
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive value.")]
@@ -23,12 +26,12 @@ namespace SchoolSystem.Models.UserManagement
 
         [Required]
         [StringLength(50)]
-        public string Status { get; set; } = "Active"; // ค่าเริ่มต้น
+        public string Status { get; set; } = "Active";
 
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation Properties
+        // ✅ Navigation Properties
         public virtual ICollection<ClassManagement.ClassManagement> ClassManagements { get; set; } = new List<ClassManagement.ClassManagement>();
     }
 }

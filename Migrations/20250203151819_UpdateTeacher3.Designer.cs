@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolSystem.Data;
 
@@ -11,9 +12,11 @@ using SchoolSystem.Data;
 namespace SchoolSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250203151819_UpdateTeacher3")]
+    partial class UpdateTeacher3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -602,7 +605,11 @@ namespace SchoolSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -611,6 +618,8 @@ namespace SchoolSystem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ProfileId");
+
+                    b.HasIndex("TeacherId");
 
                     b.HasIndex("UserId")
                         .IsUnique()
@@ -636,7 +645,7 @@ namespace SchoolSystem.Migrations
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ProfileId")
+                    b.Property<int>("ProfileId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Salary")
@@ -653,8 +662,7 @@ namespace SchoolSystem.Migrations
                     b.HasKey("TeacherId");
 
                     b.HasIndex("ProfileId")
-                        .IsUnique()
-                        .HasFilter("[ProfileId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Teachers");
                 });
@@ -955,10 +963,16 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Profiles", b =>
                 {
+                    b.HasOne("SchoolSystem.Models.UserManagement.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
                     b.HasOne("SchoolSystem.Models.UserManagement.Users", "User")
                         .WithOne("Profile")
                         .HasForeignKey("SchoolSystem.Models.UserManagement.Profiles", "UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Teacher");
 
                     b.Navigation("User");
                 });
@@ -966,9 +980,10 @@ namespace SchoolSystem.Migrations
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Teacher", b =>
                 {
                     b.HasOne("SchoolSystem.Models.UserManagement.Profiles", "Profile")
-                        .WithOne("Teacher")
+                        .WithOne()
                         .HasForeignKey("SchoolSystem.Models.UserManagement.Teacher", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Profile");
                 });
@@ -1029,11 +1044,6 @@ namespace SchoolSystem.Migrations
                     b.Navigation("ElectiveCourses");
 
                     b.Navigation("ExtracurricularActivities");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.UserManagement.Profiles", b =>
-                {
-                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Teacher", b =>
