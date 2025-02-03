@@ -16,20 +16,24 @@ namespace SchoolSystem.Models.CourseManagement
         [Required]
         [MaxLength(200)] // กำหนดความยาวสูงสุดของชื่อรายวิชา
         public string? CourseName { get; set; }
-
-        [MaxLength(500)] // คำอธิบายรายวิชา
         public string? Description { get; set; }
 
         [MaxLength(500)]
         public string? Objective { get; set; } // วัตถุประสงค์ของรายวิชา
 
-        [Required]
         public int Unit { get; set; } // จำนวนหน่วยกิต
 
+        [Required]
+        [StringLength(20)]
+        public required string Status { get; set; } // Status (e.g., Active/Inactive)
+
         // Foreign Key เชื่อมกับตาราง SubjectCategory
-        [ForeignKey("SubjectCategory")]
+        [ForeignKey("CourseCategory")]
         public int CourseCategoryId { get; set; }
         public required CourseCategory CourseCategory { get; set; } // Navigation Property
+
+        // Relationships
+        public virtual ICollection<ClassManagement.ClassManagement> ClassManagements { get; set; } = new List<ClassManagement.ClassManagement>();
         public virtual ICollection<ElectiveCourse> ElectiveCourses { get; set; } = new List<ElectiveCourse>();
         public virtual ICollection<CompulsoryCourse> CompulsoryCourses { get; set; } = new List<CompulsoryCourse>();
         public virtual ICollection<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; } = new List<CompulsoryElectiveCourse>();

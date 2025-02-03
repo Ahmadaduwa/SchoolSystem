@@ -28,7 +28,7 @@ namespace SchoolSystem.Models.ClassManagement
 
         [Required]
         [StringLength(255, ErrorMessage = "Scoring criteria must be less than 255 characters.")]
-        public string ScoringCriteria { get; set; }
+        public string? ScoringCriteria { get; set; }
 
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "CheckCount must be a non-negative integer.")]
@@ -37,9 +37,11 @@ namespace SchoolSystem.Models.ClassManagement
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
-        public virtual Class Class { get; set; } // Navigation Property
-        public virtual Teacher Teacher { get; set; } // Navigation Property
-        public virtual Course Course { get; set; } // Navigation Property
-        public virtual Semester Semester { get; set; } // Navigation Property
+        public Class? Class { get; set; } // Navigation Property
+        public Teacher? Teacher { get; set; } // Navigation Property
+        public Course? Course { get; set; } // Navigation Property
+        public Semester? Semester { get; set; } // Navigation Property
+
+        public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
     }
 }

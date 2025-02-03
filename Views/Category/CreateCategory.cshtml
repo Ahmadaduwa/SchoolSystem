@@ -1,0 +1,27 @@
+﻿@model SchoolSystem.Models.CourseManagement.CourseCategory
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-4 text-center">Create Category</h2>
+
+    <form asp-action="CreateCategory" method="post" class="space-y-4">
+        <div>
+            <label asp-for="Name" class="block text-sm font-medium text-gray-700">Category Name</label>
+            <input asp-for="Name" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="Name" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea asp-for="Description" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
+            <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between gap-4">
+            <a asp-action="IndexCategory" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+            <button type="submit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Create Category</button>
+        </div>
+    </form>
+</div>

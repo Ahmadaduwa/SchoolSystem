@@ -15,28 +15,39 @@ namespace SchoolSystem.Data
         }
 
         /// <summary>
+        /// User Management
+        /// </summary>
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Profiles> Profiles { get; set; }
+        /// <summary>
         /// Class Management
         /// </summary>
+        public DbSet<Course> Course { get; set; }
+        public DbSet<CourseCategory> CourseCategories { get; set; }
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<Semester> Semesters { get; set; }
+        public DbSet<ClassManagement> ClassManagements { get; set; }
+        public DbSet<ClassSchedule> ClassSchedules { get; set; } // Added ClassSchedule
+        public DbSet<CourseCategory> SubjectCategories { get; set; } // Added SubjectCategory
 
 
         /// <summary>
         /// Attendance Management
         /// </summary>
-        
+
 
         /// <summary>
         /// Curriculum Management
         /// </summary>
         public DbSet<Curriculum> Curriculum { get; set; }
-        public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Models.ActivityManagement.Activity> Activities { get; set; }
         public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
         public DbSet<GradeLevels> GradeLevels { get; set; }
         public DbSet<ElectiveCourse> ElectiveCourses { get; set; }
         public DbSet<CompulsoryCourse> CompulsoryCourses { get; set; }
         public DbSet<CompulsoryElectiveCourse> CompulsoryElectiveCourses { get; set; }
-        public DbSet<Course> Course { get; set; }
-        public DbSet<CourseCategory> CourseCategories { get; set; }
+
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,7 +69,42 @@ namespace SchoolSystem.Data
 
         private void ConfigureClassManagement(ModelBuilder modelBuilder)
         {
-            Debug.WriteLine("Class Management");
+            // Configure relationships for ClassManagement
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Class)
+                .WithMany(c => c.ClassManagement)
+                .HasForeignKey(cm => cm.ClassId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Teacher)
+                .WithMany(t => t.ClassManagements)
+                .HasForeignKey(cm => cm.TeacherId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Course)
+                .WithMany(c => c.ClassManagements)
+                .HasForeignKey(cm => cm.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassManagement>()
+                .HasOne(cm => cm.Semester)
+                .WithMany(s => s.ClassManagements)
+                .HasForeignKey(cm => cm.SemesterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClassSchedule>()
+                .HasOne(cs => cs.ClassManagement)
+                .WithMany(cm => cm.ClassSchedules)
+                .HasForeignKey(cs => cs.CM_ID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Course>()
+                .HasOne(sj => sj.CourseCategory)
+                .WithMany(sc => sc.Courses)
+                .HasForeignKey(sj => sj.CourseCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void ConfigureAttendanceManagement(ModelBuilder modelBuilder)

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using SchoolSystem.Models.ClassManagement;
 
 namespace SchoolSystem.Models.UserManagement
 {
@@ -27,5 +27,8 @@ namespace SchoolSystem.Models.UserManagement
 
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation Properties
+        public virtual ICollection<ClassManagement.ClassManagement> ClassManagements { get; set; } = new List<ClassManagement.ClassManagement>();
     }
 }

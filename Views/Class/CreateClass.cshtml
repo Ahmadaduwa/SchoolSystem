@@ -1,0 +1,35 @@
+﻿@model SchoolSystem.Models.ClassManagement.Class
+@{
+    ViewData["Title"] = "Create Class";
+}
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Create Class</h2>
+
+    <form asp-action="CreateClass" method="post" class="space-y-4">
+        <div>
+            <label asp-for="ClassNumber" class="block text-sm font-medium text-gray-700">Class Number</label>
+            <input asp-for="ClassNumber" type="number" class="border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="ClassNumber" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Capacity" class="block text-sm font-medium text-gray-700">Capacity</label>
+            <input asp-for="Capacity" type="number" class="border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="Capacity" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="GradeLevelId" class="block text-sm font-medium text-gray-700">Grade Level</label>
+            <select asp-for="GradeLevelId" asp-items="@(new SelectList(ViewBag.GradeLevels, "GradeLevelId", "Name"))" class="border border-gray-300 rounded px-2 py-1 w-full">
+                <option value="">-- Select Grade Level --</option>
+            </select>
+            <span asp-validation-for="GradeLevelId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <a asp-action="IndexClass" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+            <button type="submit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Submit</button>
+        </div>
+    </form>
+</div>
