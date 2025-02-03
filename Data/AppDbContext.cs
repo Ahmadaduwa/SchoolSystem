@@ -109,7 +109,7 @@ namespace SchoolSystem.Data
 
         private void ConfigureAttendanceManagement(ModelBuilder modelBuilder)
         {
-            Debug.WriteLine("Class Management");
+            Debug.WriteLine("Attendance Management");
         }
 
         private void ConfigureCurriculumManagement(ModelBuilder modelBuilder)

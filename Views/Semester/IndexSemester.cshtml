@@ -1,0 +1,49 @@
+﻿@model List<SchoolSystem.Models.ClassManagement.Semester>
+
+<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Semester List</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="flex justify-between mb-4">
+        <a asp-action="CreateSemester" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500">+ Add Semester</a>
+    </div>
+
+    <table class="w-full text-center border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border px-4 py-2">Year</th>
+                <th class="border px-4 py-2">Number</th>
+                <th class="border px-4 py-2">Start Date</th>
+                <th class="border px-4 py-2">End Date</th>
+                <th class="border px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var semester in Model)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="border px-4 py-2">@semester.SemesterYear</td>
+                    <td class="border px-4 py-2">@semester.SemesterNumber</td>
+                    <td class="border px-4 py-2">@semester.StartTime.ToShortDateString()</td>
+                    <td class="border px-4 py-2">@semester.EndTime.ToShortDateString()</td>
+                    <td class="border px-4 py-2 flex gap-2 justify-center">
+                        <a asp-action="EditSemester" asp-route-id="@semester.SemesterID" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

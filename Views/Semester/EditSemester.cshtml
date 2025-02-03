@@ -1,0 +1,49 @@
+﻿@model SchoolSystem.Models.ClassManagement.Semester
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Edit Semester</h2>
+
+    <form asp-action="EditSemester" method="post" class="space-y-4">
+        <input type="hidden" asp-for="SemesterID" />
+
+        <div>
+            <label asp-for="SemesterYear" class="block text-sm font-medium text-gray-700">Semester Year</label>
+            <input asp-for="SemesterYear" class="border rounded px-3 py-2 w-full" />
+            <span asp-validation-for="SemesterYear" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="SemesterNumber" class="block text-sm font-medium text-gray-700">Semester Number</label>
+            <input asp-for="SemesterNumber" class="border rounded px-3 py-2 w-full" />
+            <span asp-validation-for="SemesterNumber" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="StartTime" class="block text-sm font-medium text-gray-700">Start Date</label>
+            <input asp-for="StartTime" type="date" class="border rounded px-3 py-2 w-full" />
+            <span asp-validation-for="StartTime" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="EndTime" class="block text-sm font-medium text-gray-700">End Date</label>
+            <input asp-for="EndTime" type="date" class="border rounded px-3 py-2 w-full" />
+            <span asp-validation-for="EndTime" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <a asp-action="IndexSemester" class="text-gray-600 hover:underline">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500">Save</button>
+        </div>
+    </form>
+
+    <!-- Delete Button -->
+    <form asp-action="DeleteSemester" asp-controller="Semester" asp-route-id="@Model.SemesterID" method="post" onsubmit="return confirm('Are you sure you want to delete this semester?');">
+        <input type="hidden" asp-for="SemesterID" />
+        <button type="submit" class="w-full mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500">Delete</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+}

@@ -1,0 +1,32 @@
+﻿@model SchoolSystem.Models.ClassManagement.Semester
+
+<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Create Semester</h2>
+
+    <form asp-action="CreateSemester" asp-controller="Semester" method="post" class="space-y-4">
+        <div>
+            <label class="block text-gray-700">Semester Year</label>
+            <input asp-for="SemesterYear" class="border rounded px-3 py-2 w-full" />
+        </div>
+
+        <div>
+            <label class="block text-gray-700">Semester Number</label>
+            <input asp-for="SemesterNumber" class="border rounded px-3 py-2 w-full" />
+        </div>
+
+        <div>
+            <label class="block text-gray-700">Start Date</label>
+            <input asp-for="StartTime" type="date" class="border rounded px-3 py-2 w-full" />
+        </div>
+
+        <div>
+            <label class="block text-gray-700">End Date</label>
+            <input asp-for="EndTime" type="date" class="border rounded px-3 py-2 w-full" />
+        </div>
+
+        <div class="flex justify-between mt-4">
+            <a asp-action="IndexSemester" class="text-gray-600">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500">Save</button>
+        </div>
+    </form>
+</div>

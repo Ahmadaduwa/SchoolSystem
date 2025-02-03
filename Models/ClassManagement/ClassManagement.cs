@@ -37,10 +37,10 @@ namespace SchoolSystem.Models.ClassManagement
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
-        public Class? Class { get; set; } // Navigation Property
-        public Teacher? Teacher { get; set; } // Navigation Property
-        public Course? Course { get; set; } // Navigation Property
-        public Semester? Semester { get; set; } // Navigation Property
+        public virtual Class? Class { get; set; } // Navigation Property
+        public virtual Teacher? Teacher { get; set; } // Navigation Property
+        public virtual Course? Course { get; set; } // Navigation Property
+        public virtual Semester? Semester { get; set; } // Navigation Property
 
         public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
     }
