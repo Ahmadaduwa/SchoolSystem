@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.CurriculumManagement;
 
 namespace SchoolSystem.Models.CourseManagement
@@ -10,29 +10,34 @@ namespace SchoolSystem.Models.CourseManagement
         public int CourseId { get; set; } // Primary Key
 
         [Required]
-        [MaxLength(50)] // กำหนดความยาวสูงสุดของ Subject Code
-        public string? Course_Code { get; set; }
+        [MaxLength(50)]
+        public string? Course_Code { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(200)] // กำหนดความยาวสูงสุดของชื่อรายวิชา
-        public string? CourseName { get; set; }
+        [MaxLength(200)]
+        public string? CourseName { get; set; } = string.Empty;
+
         public string? Description { get; set; }
 
         [MaxLength(500)]
-        public string? Objective { get; set; } // วัตถุประสงค์ของรายวิชา
+        public string? Objective { get; set; }
 
-        public int Unit { get; set; } // จำนวนหน่วยกิต
+        [Required]
+        [Range(0.5, 10.0, ErrorMessage = "Units must be between 0.5 and 10.0")]
+        public float Unit { get; set; } // เปลี่ยนเป็น float
 
         [Required]
         [StringLength(20)]
-        public required string Status { get; set; } // Status (e.g., Active/Inactive)
+        public string Status { get; set; } = "Active"; // ค่าเริ่มต้นเป็น Active
 
-        // Foreign Key เชื่อมกับตาราง SubjectCategory
         [ForeignKey("CourseCategory")]
         public int CourseCategoryId { get; set; }
-        public required CourseCategory CourseCategory { get; set; } // Navigation Property
+        public required CourseCategory CourseCategory { get; set; }
 
-        // Relationships
+        // 📌 Timestamp
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // เพิ่ม CreatedAt
+        public DateTime? UpdatedAt { get; set; } // อัปเดตเวลาล่าสุดเมื่อมีการแก้ไข
+
         public virtual ICollection<ClassManagement.ClassManagement> ClassManagements { get; set; } = new List<ClassManagement.ClassManagement>();
         public virtual ICollection<ElectiveCourse> ElectiveCourses { get; set; } = new List<ElectiveCourse>();
         public virtual ICollection<CompulsoryCourse> CompulsoryCourses { get; set; } = new List<CompulsoryCourse>();

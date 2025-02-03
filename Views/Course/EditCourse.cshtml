@@ -2,3 +2,72 @@
 @{
     ViewData["Title"] = "Edit Course";
 }
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-4 text-center">Edit Course</h2>
+
+    <form asp-action="EditCourse" method="post">
+        <input asp-for="CourseId" type="hidden" />
+
+        <div>
+            <label asp-for="Course_Code" class="block text-sm font-medium text-gray-700">Course Code</label>
+            <input asp-for="Course_Code" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" required />
+            <span asp-validation-for="Course_Code" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="CourseName" class="block text-sm font-medium text-gray-700">Course Name</label>
+            <input asp-for="CourseName" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" required />
+            <span asp-validation-for="CourseName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea asp-for="Description" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
+            <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Objective" class="block text-sm font-medium text-gray-700">Objective</label>
+            <textarea asp-for="Objective" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
+            <span asp-validation-for="Objective" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Unit" class="block text-sm font-medium text-gray-700">Units</label>
+            <input asp-for="Unit" type="number" step="0.5" class="border border-gray-300 rounded px-2 py-1 w-full" required />
+            <span asp-validation-for="Unit" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="CourseCategoryId" class="block text-sm font-medium text-gray-700">Category</label>
+            <select asp-for="CourseCategoryId" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="ViewBag.CourseCategories" required>
+                <option value="">-- Select Category --</option>
+            </select>
+            <span asp-validation-for="CourseCategoryId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select asp-for="Status" class="border border-gray-300 rounded px-2 py-1 w-full">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between gap-4 mt-4">
+            <a asp-action="IndexCourse" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">Save Changes</button>
+        </div>
+    </form>
+
+    <!-- ปุ่ม Delete พร้อม Confirm -->
+    <form asp-action="DeleteCourse" asp-controller="Course" asp-route-id="@Model.CourseId" method="post" class="mt-4">
+        <input type="hidden" asp-for="CourseId" />
+        <button type="submit" class="w-full rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
+                onclick="return confirm('Are you sure you want to delete this course?');">
+            Delete Course
+        </button>
+    </form>
+</div>
