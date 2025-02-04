@@ -21,10 +21,10 @@ namespace SchoolSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var classManagements = await _db.ClassManagements
-                .Include(cm => cm.Class).ThenInclude(c => c.GradeLevels)
-                .Include(cm => cm.Teacher).ThenInclude(t => t.Profile)
-                .Include(cm => cm.Semester)
-                .Include(cm => cm.Course)
+                .Include(cm => cm.Class!).ThenInclude(c => c.GradeLevels!)
+                .Include(cm => cm.Teacher!).ThenInclude(t => t.Profile!)
+                .Include(cm => cm.Semester!)
+                .Include(cm => cm.Course!)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -44,7 +44,7 @@ namespace SchoolSystem.Controllers
                 .Select(c => new SelectListItem
                 {
                     Value = c.ClassId.ToString(),
-                    Text = c.GradeLevels.Name + "/" + c.ClassNumber
+                    Text = c.GradeLevels!.Name + "/" + c.ClassNumber
                 }).ToList();
 
             ViewData["Teachers"] = _db.Teachers
@@ -82,10 +82,14 @@ namespace SchoolSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                classManagement.CheckCount = 0; // ✅ กำหนดค่าเป็น 0 อัตโนมัติ
+                classManagement.CheckCount = 0;
                 classManagement.CreateAt = DateTime.UtcNow;
                 classManagement.UpdateAt = DateTime.UtcNow;
 
+                if(classManagement.ScoringCriteria == null)
+                {
+                    classManagement.ScoringCriteria = "DefaultCriteria";
+                }
                 _db.ClassManagements.Add(classManagement);
                 await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Class management created successfully!";
@@ -156,8 +160,8 @@ namespace SchoolSystem.Controllers
         public async Task<IActionResult> ViewManage(int id)
         {
             var classManagement = await _db.ClassManagements
-                .Include(cm => cm.Class).ThenInclude(c => c.GradeLevels)
-                .Include(cm => cm.Teacher).ThenInclude(t => t.Profile)
+                .Include(cm => cm.Class!).ThenInclude(c => c.GradeLevels)
+                .Include(cm => cm.Teacher!).ThenInclude(t => t.Profile)
                 .Include(cm => cm.Semester)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == id);
