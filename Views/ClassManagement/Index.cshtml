@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SchoolSystem.Models.ClassManagement.ClassManagement>
+@{
+    ViewData["Title"] = "Class Management List";
+}
+
+<div class="container mx-auto my-6 w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Class Management List</h2>
+
+    <div class="flex justify-between mb-4">
+        <a asp-action="CreateManage" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500">+ Add</a>
+    </div>
+
+    <table class="w-full border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border px-4 py-2">Class</th>
+                <th class="border px-4 py-2">Teacher</th>
+                <th class="border px-4 py-2">Course</th>
+                <th class="border px-4 py-2">Semester</th>
+                <th class="border px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="hover:bg-gray-50">
+                    <td class="border px-4 py-2">@($"{item.Class.GradeLevels.Name}/{item.Class.ClassNumber}")</td>
+                    <td class="border px-4 py-2">@item.Teacher.Profile.FirstName</td>
+                    <td class="border px-4 py-2">@item.Course.CourseName</td>
+                    <td class="border px-4 py-2">@item.Semester.SemesterYear</td>
+                    <td class="border px-4 py-2 flex gap-2">
+                        <a asp-action="ViewManage" asp-controller="ClassManagement" asp-route-id="@item.CM_Id" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-400">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.UserManagement;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolSystem.Models.ClassManagement
 {
@@ -26,7 +28,6 @@ namespace SchoolSystem.Models.ClassManagement
         [ForeignKey("Semester")]
         public int SemesterId { get; set; }
 
-        [Required]
         [StringLength(255, ErrorMessage = "Scoring criteria must be less than 255 characters.")]
         public string? ScoringCriteria { get; set; }
 
@@ -37,10 +38,10 @@ namespace SchoolSystem.Models.ClassManagement
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
-        public virtual Class? Class { get; set; } // Navigation Property
-        public virtual Teacher? Teacher { get; set; } // Navigation Property
-        public virtual Course? Course { get; set; } // Navigation Property
-        public virtual Semester? Semester { get; set; } // Navigation Property
+        public virtual Class? Class { get; set; }
+        public virtual Teacher? Teacher { get; set; }
+        public virtual Course? Course { get; set; }
+        public virtual Semester? Semester { get; set; }
 
         public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
     }

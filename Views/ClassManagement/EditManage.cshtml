@@ -1,0 +1,84 @@
+﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
+@{
+    ViewData["Title"] = "Edit Class Management";
+}
+
+
+<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Edit Class Management</h2>
+
+    <div asp-validation-summary="All" class="text-red-500 text-sm mb-4"></div>
+
+    <form asp-action="EditManage" method="post">
+        <input type="hidden" asp-for="CM_Id" />
+
+        <div>
+            <label class="block">Class:</label>
+            <select asp-for="ClassId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Classes ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Class" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Teacher:</label>
+            <select asp-for="TeacherId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Teachers ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Teacher" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Course:</label>
+            <select asp-for="CourseId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Courses ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Course" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Semester:</label>
+            <select asp-for="SemesterId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Semesters ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Semester" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Scoring Criteria:</label>
+            <input asp-for="ScoringCriteria" class="border rounded w-full p-2 mb-4" />
+        </div>
+
+        <!-- ✅ แสดงค่า Check Count แต่ไม่สามารถแก้ไขได้ -->
+        <div>
+            <label class="block">Check Count:</label>
+            <p class="border rounded w-full p-2 mb-4 bg-gray-100">@Model.CheckCount</p>
+        </div>
+
+        <div class="flex justify-between">
+            <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-400">
+                Save Changes
+            </button>
+
+            <!-- ✅ ปุ่ม Delete พร้อม JavaScript Confirm Dialog -->
+            <button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500"
+                    onclick="confirmDelete(@Model.CM_Id)">
+                Delete
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+        <script>
+        function confirmDelete(id) {
+            if (confirm("Are you sure you want to delete this record?")) {
+                fetch(`/ClassManagement/DeleteManage/${id}`, {
+                    method: "POST",
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "/ClassManagement/Index?deleted=true";
+                    } else {
+                        alert("Error deleting record.");
+                    }
+                });
+            }
+        }
+    </script>
+
+}

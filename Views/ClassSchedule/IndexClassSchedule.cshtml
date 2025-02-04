@@ -1,0 +1,60 @@
+﻿@model IEnumerable<SchoolSystem.Models.ClassManagement.ClassSchedule>
+@{
+    ViewData["Title"] = "Class Schedule";
+    int cmId = (int)ViewData["CM_ID"];
+}
+
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-4">Class Schedule for CM_ID: @cmId</h2>
+
+    <a asp-action="Create" asp-controller="ClassSchedule" asp-route-cmId="@ViewData["CM_ID"]" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        + Add Schedule
+    </a>
+
+    <table class="w-full mt-4 border border-gray-200 rounded-lg shadow-md">
+        <thead class="bg-gray-100">
+            <tr class="text-left">
+                <th class="p-2">Day</th>
+                <th class="p-2">Start Time</th>
+                <th class="p-2">End Time</th>
+                <th class="p-2">Status</th>
+                <th class="p-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="border-b">
+                    <td class="p-2">@item.DayOfWeek</td>
+                    <td class="p-2">@item.StartTime</td>
+                    <td class="p-2">@item.EndTime</td>
+                    <td class="p-2">@item.Status</td>
+                    <td class="p-2">
+                        <a asp-action="Edit" asp-route-id="@item.ScheduleID" class="text-blue-500 hover:underline">Edit</a>
+                        <button class="text-red-500 hover:underline ml-2 delete-btn" data-id="@item.ScheduleID">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            let scheduleId = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this schedule?')) {
+                fetch('/ClassSchedule/Delete/' + scheduleId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        });
+    });
+</script>

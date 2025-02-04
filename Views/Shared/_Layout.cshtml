@@ -118,6 +118,28 @@
 
                 <!-- Main Content -->
         <main class="flex-1 pt-5 sm:p-5 lg:px-8 bg-gray-50">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div id="flash-message" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
+                    @TempData["SuccessMessage"]
+                </div>
+                <script>
+                    setTimeout(() => {
+                        document.getElementById('flash-message').style.display = 'none';
+                    }, 3000);
+                </script>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div id="flash-message" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
+                    @TempData["ErrorMessage"]
+                </div>
+                <script>
+                    setTimeout(() => {
+                        document.getElementById('flash-message').style.display = 'none';
+                    }, 3000);
+                </script>
+            }
                     @RenderBody()
                 </main>
             </div>

@@ -1,0 +1,41 @@
+﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
+
+<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Create Class Management</h2>
+
+    <form asp-action="CreateManage" method="post">
+        <div>
+            <label class="block">Class:</label>
+            <select asp-for="ClassId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Classes ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Class" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Teacher:</label>
+            <select asp-for="TeacherId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Teachers ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Teacher" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Course:</label>
+            <select asp-for="CourseId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Courses ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Course" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Semester:</label>
+            <select asp-for="SemesterId" class="border rounded w-full p-2 mb-4"
+                    asp-items="@(ViewBag.Semesters ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Semester" } })">
+            </select>
+        </div>
+        <div>
+            <label class="block">Scoring Criteria:</label>
+            <input asp-for="ScoringCriteria" class="border rounded w-full p-2 mb-4" />
+        </div>
+
+        <div class="flex justify-between">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Create</button>
+            <a asp-action="Index" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">Cancel</a>
+        </div>
+    </form>
+</div>

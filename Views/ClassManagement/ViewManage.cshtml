@@ -1,0 +1,33 @@
+﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
+@{
+    ViewData["Title"] = "View Class Management";
+}
+
+<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Class Management Details</h2>
+
+    <div class="mb-6 bg-gray-100 p-4 rounded-lg">
+        <p class="text-lg"><strong>Class:</strong> @($"{Model.Class.GradeLevels.Name}/{Model.Class.ClassNumber}")</p>
+        <p class="text-lg"><strong>Teacher:</strong> @Model.Teacher.Profile.FirstName @Model.Teacher.Profile.LastName</p>
+        <p class="text-lg"><strong>Course:</strong> @Model.Course.CourseName</p>
+        <p class="text-lg"><strong>Semester:</strong> @Model.Semester.SemesterYear / @Model.Semester.SemesterNumber</p>
+        <p class="text-lg"><strong>Scoring Criteria:</strong> @Model.ScoringCriteria</p>
+        <p class="text-lg"><strong>Check Count:</strong> @Model.CheckCount</p>
+    </div>
+
+    <div class="flex justify-between">
+        <a asp-action="EditManage" asp-route-id="@Model.CM_Id" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-400">
+            Edit
+        </a>
+
+        <a asp-action="IndexClassSchedule" asp-controller="ClassSchedule" asp-route-cmid="@Model.CM_Id" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400">
+            Manage Schedule
+        </a>
+    </div>
+
+    <div class="mt-6">
+        <a asp-action="Index" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">
+            Back to List
+        </a>
+    </div>
+</div>
