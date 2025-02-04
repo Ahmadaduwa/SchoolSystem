@@ -54,6 +54,36 @@
             <span class="font-medium">จัดการครู</span>
         </a>
     </li>
+    <li>
+        <a asp-controller="Semester" asp-action="IndexSemester" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-book w-6"></i>
+            <span class="font-medium">Semester</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Class" asp-action="IndexClass" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-book w-6"></i>
+            <span class="font-medium">Class</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="ClassManagement" asp-action="Index" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-book w-6"></i>
+            <span class="font-medium">ClassManagement</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Course" asp-action="IndexCourse" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-book w-6"></i>
+            <span class="font-medium">Course</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Category" asp-action="IndexCategory" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-book w-6"></i>
+            <span class="font-medium">Category</span>
+        </a>
+    </li>
 }
 @if (User.IsInRole("Director"))
 {
