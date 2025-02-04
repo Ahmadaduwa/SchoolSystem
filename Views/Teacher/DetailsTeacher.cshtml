@@ -1,0 +1,54 @@
+﻿@model SchoolSystem.Models.UserManagement.Teacher
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">Teacher Details</h2>
+
+    <!-- Profile Information -->
+    <fieldset class="border p-4 rounded-lg mb-4">
+        <legend class="text-lg font-bold">Profile Information</legend>
+
+        <p><strong>First Name:</strong> @Model.Profile.FirstName</p>
+        <p><strong>Last Name:</strong> @Model.Profile.LastName</p>
+        <p><strong>Gender:</strong> @Model.Profile.Gender</p>
+        <p><strong>Address:</strong> @Model.Profile.Address</p>
+        <p><strong>Date of Birth:</strong> @Model.Profile.DateOfBirth.ToShortDateString()</p>
+    </fieldset>
+
+    <!-- Teacher Information -->
+    <fieldset class="border p-4 rounded-lg mb-4">
+        <legend class="text-lg font-bold">Teacher Information</legend>
+
+        <p>
+            <strong>Department:</strong>
+            @{
+                var departmentName = Model.DepartmentId switch
+                {
+                    1 => "Mathematics",
+                    2 => "Science",
+                    3 => "English",
+                    4 => "History",
+                    5 => "Computer Science",
+                    _ => "Unknown"
+                };
+            }
+            @departmentName
+        </p>
+        <p><strong>Hire Date:</strong> @Model.HireDate.ToShortDateString()</p>
+        <p><strong>Salary:</strong> @($"{Model.Salary:C}")</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+    </fieldset>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between mt-4">
+        <a asp-action="IndexTeacher" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-400">
+            Back to List
+        </a>
+        <a asp-action="EditTeacher" asp-route-id="@Model.TeacherId"
+           class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-400">
+            Edit
+        </a>
+    </div>
+</div>

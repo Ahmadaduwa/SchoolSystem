@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Views\Teacher\DetailsTeacher.cshtml" />
     <Content Include="Views\Teacher\EditTeacher.cshtml" />
     <Content Include="Views\Teacher\CreateTeacher.cshtml" />
     <Content Include="Views\Teacher\IndexTeacher.cshtml" />

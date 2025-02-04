@@ -21,38 +21,15 @@ namespace SchoolSystem.Controllers
         }
 
         // 📌 แสดงรายชื่อครู
-        public async Task<IActionResult> IndexTeacher(int pageNumber = 1)
+        public async Task<IActionResult> IndexTeacher(int? pageNumber)
         {
-            int pageSize = 10; // ✅ กำหนดให้แสดง 10 รายการต่อหน้า
-
+            int pageSize = 10;
             var teachers = _db.Teachers
                 .Include(t => t.Profile)
                 .OrderByDescending(t => t.UpdateAt)
                 .AsNoTracking();
 
-            var paginatedTeachers = await PaginatedList<Teacher>.CreateAsync(teachers, pageNumber, pageSize);
-
-            return View(paginatedTeachers);
-        }
-
-
-
-        // 📌 ค้นหาครูโดยชื่อหรือเพศ
-        public async Task<IActionResult> SearchTeacher(string keyword)
-        {
-            if (string.IsNullOrEmpty(keyword))
-                return RedirectToAction("IndexTeacher");
-
-            var teachers = await _db.Teachers
-                .Include(t => t.Profile)
-                .Where(t => t.Profile != null &&
-                            (t.Profile.FirstName.Contains(keyword) ||
-                             t.Profile.LastName.Contains(keyword) ||
-                             t.Profile.Gender.Contains(keyword)))
-                .AsNoTracking()
-                .ToListAsync();
-
-            return View("IndexTeacher", teachers);
+            return View(await PaginatedList<Teacher>.CreateAsync(teachers, pageNumber ?? 1, pageSize));
         }
 
         // 📌 ดูรายละเอียดครู
@@ -61,7 +38,7 @@ namespace SchoolSystem.Controllers
             try
             {
                 var teacher = await _db.Teachers
-                    .Include(t => t.Profile)
+                    .Include(t => t.Profile) // โหลด Profile มาพร้อมกับ Teacher
                     .FirstOrDefaultAsync(t => t.TeacherId == id);
 
                 if (teacher == null)
@@ -78,6 +55,7 @@ namespace SchoolSystem.Controllers
                 return RedirectToAction("IndexTeacher");
             }
         }
+
         public IActionResult CreateTeacher()
         {
             var viewModel = new TeacherViewModel
@@ -261,6 +239,7 @@ namespace SchoolSystem.Controllers
 
             return RedirectToAction("IndexTeacher");
         }
+
 
 
     }
