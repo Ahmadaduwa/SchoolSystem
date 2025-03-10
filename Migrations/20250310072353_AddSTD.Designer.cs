@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolSystem.Data;
 
@@ -11,9 +12,11 @@ using SchoolSystem.Data;
 namespace SchoolSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310072353_AddSTD")]
+    partial class AddSTD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,91 +190,6 @@ namespace SchoolSystem.Migrations
                     b.HasKey("ActivityId");
 
                     b.ToTable("Activities");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivityAttendance", b =>
-                {
-                    b.Property<int>("AA_id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AA_id"));
-
-                    b.Property<int>("AM_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("int");
-
-                    b.Property<int>("Student_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.HasKey("AA_id");
-
-                    b.HasIndex("AM_id");
-
-                    b.HasIndex("Student_id");
-
-                    b.ToTable("ActivityAttendances");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivityManagement", b =>
-                {
-                    b.Property<int>("AM_id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AM_id"));
-
-                    b.Property<int>("ActivityId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CheckCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SemesterId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AM_id");
-
-                    b.HasIndex("ActivityId");
-
-                    b.HasIndex("SemesterId");
-
-                    b.ToTable("ActivityManagement");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivitySchedule", b =>
-                {
-                    b.Property<int>("AS_id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AS_id"));
-
-                    b.Property<int>("AM_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AS_id");
-
-                    b.HasIndex("AM_id");
-
-                    b.ToTable("ActivitySchedule");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
@@ -721,8 +639,7 @@ namespace SchoolSystem.Migrations
                         .HasColumnType("date");
 
                     b.Property<float>("GPA")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("real(3)");
+                        .HasColumnType("real");
 
                     b.Property<int>("GuardianId")
                         .HasColumnType("int");
@@ -735,8 +652,7 @@ namespace SchoolSystem.Migrations
 
                     b.Property<string>("Student_Code")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
@@ -761,17 +677,17 @@ namespace SchoolSystem.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DepartmentId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ProfileId")
+                    b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Salary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -784,7 +700,8 @@ namespace SchoolSystem.Migrations
                     b.HasKey("TeacherId");
 
                     b.HasIndex("ProfileId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ProfileId] IS NOT NULL");
 
                     b.ToTable("Teachers");
                 });
@@ -913,55 +830,6 @@ namespace SchoolSystem.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivityAttendance", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.ActivityManagement.ActivityManagement", "ActivityManagement")
-                        .WithMany("ActivityAttendance")
-                        .HasForeignKey("AM_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.UserManagement.Student", "Student")
-                        .WithMany("ActivityAttendance")
-                        .HasForeignKey("Student_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ActivityManagement");
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivityManagement", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.ActivityManagement.Activity", "Activity")
-                        .WithMany("ActivityManagement")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolSystem.Models.ClassManagement.Semester", "Semester")
-                        .WithMany("ActivityManagement")
-                        .HasForeignKey("SemesterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-
-                    b.Navigation("Semester");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivitySchedule", b =>
-                {
-                    b.HasOne("SchoolSystem.Models.ActivityManagement.ActivityManagement", "ActivityManagement")
-                        .WithMany("ActivitySchedule")
-                        .HasForeignKey("AM_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ActivityManagement");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
@@ -1157,24 +1025,14 @@ namespace SchoolSystem.Migrations
                     b.HasOne("SchoolSystem.Models.UserManagement.Profiles", "Profile")
                         .WithOne("Teacher")
                         .HasForeignKey("SchoolSystem.Models.UserManagement.Teacher", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.Activity", b =>
                 {
-                    b.Navigation("ActivityManagement");
-
                     b.Navigation("ExtracurricularActivities");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.ActivityManagement.ActivityManagement", b =>
-                {
-                    b.Navigation("ActivityAttendance");
-
-                    b.Navigation("ActivitySchedule");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
@@ -1200,8 +1058,6 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Semester", b =>
                 {
-                    b.Navigation("ActivityManagement");
-
                     b.Navigation("ClassManagements");
                 });
 
@@ -1237,11 +1093,6 @@ namespace SchoolSystem.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("SchoolSystem.Models.UserManagement.Student", b =>
-                {
-                    b.Navigation("ActivityAttendance");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.UserManagement.Teacher", b =>

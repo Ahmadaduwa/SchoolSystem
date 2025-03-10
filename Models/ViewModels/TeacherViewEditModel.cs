@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SchoolSystem.ViewModels
 {
-    public class TeacherViewModel
+    public class TeacherViewEditModel
     {
+        // รหัสสำหรับ Teacher และ Profile
+        public int TeacherId { get; set; }
+        public int ProfileId { get; set; }
+
         // Account Information
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Please enter a valid email address")]
@@ -16,16 +20,15 @@ namespace SchoolSystem.ViewModels
         [StringLength(50, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 50 characters")]
         public string Username { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required")]
+        // กรอกรหัสผ่านใหม่เฉพาะกรณีที่ต้องการเปลี่ยนแปลง (ไม่บังคับ)
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = string.Empty;
+        public string? Password { get; set; }
 
-        [Required(ErrorMessage = "Please confirm your password")]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
-        public string ConfirmPassword { get; set; } = string.Empty;
+        public string? ConfirmPassword { get; set; }
 
         // Profile Information
         [Required(ErrorMessage = "First name is required")]
@@ -54,7 +57,6 @@ namespace SchoolSystem.ViewModels
 
         // Teacher Information
         [Display(Name = "Department")]
-        // Make DepartmentId nullable since it's optional
         public int? DepartmentId { get; set; }
 
         [Required(ErrorMessage = "Hire date is required")]
@@ -70,10 +72,10 @@ namespace SchoolSystem.ViewModels
         [Required(ErrorMessage = "Status is required")]
         public string Status { get; set; } = "Active";
 
-        // Dropdown options
+        // Dropdown options สำหรับ Department
         public List<SelectListItem> Departments { get; set; } = new List<SelectListItem>();
 
-        // Fixed role
+        // Role ที่คงที่สำหรับ Teacher
         public string Role { get; set; } = "Teacher";
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Models.UserManagement
 {
@@ -8,10 +10,13 @@ namespace SchoolSystem.Models.UserManagement
         public int StudentId { get; set; }
 
         [Required]
+        [StringLength(50)]
         public string? Student_Code { get; set; }
 
-        [Required]
-        public string? UserId { get; set; }
+        public int? ProfileId { get; set; } 
+
+        [ForeignKey("ProfileId")]
+        public Profiles Profile { get; set; } = new Profiles();
 
         [Required]
         public int ClassId { get; set; }
@@ -27,6 +32,6 @@ namespace SchoolSystem.Models.UserManagement
 
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-
+        public virtual ICollection<ActivityAttendance> ActivityAttendance { get; set; } = new List<ActivityAttendance>();
     }
 }

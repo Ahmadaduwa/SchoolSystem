@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Models.ClassManagement
 {
@@ -32,6 +33,7 @@ namespace SchoolSystem.Models.ClassManagement
 
         // Navigation Properties
         public virtual ICollection<ClassManagement> ClassManagements { get; set; } = new HashSet<ClassManagement>();
+        public virtual ICollection<ActivityManagement.ActivityManagement> ActivityManagement { get; set; } = new List<ActivityManagement.ActivityManagement>();
     }
 
     public class DateAfterAttribute : ValidationAttribute

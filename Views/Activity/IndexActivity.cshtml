@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SchoolSystem.Models.ActivityManagement.Activity>
+@{
+    ViewData["Title"] = "Activity List";
+}
+
+<div class="container mx-auto my-6 w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Activity List</h2>
+
+    <div class="flex justify-between mb-4">
+        <a asp-action="CreateActivity" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">+ Create Activity</a>
+    </div>
+
+    <table class="w-full border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="border p-2">Activity Name</th>
+                <th class="border p-2">Description</th>
+                <th class="border p-2">Status</th>
+                <th class="border p-2">Created At</th>
+                <th class="border p-2 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="border p-2">@item.ActivityName</td>
+                    <td class="border p-2">@item.Description</td>
+                    <td class="border p-2">@item.Status</td>
+                    <td class="border p-2">@item.CreateAt.ToString("yyyy-MM-dd")</td>
+                    <td class="border p-2 text-center flex justify-center gap-2">
+                        <a asp-action="EditActivity" asp-route-id="@item.ActivityId" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-500">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

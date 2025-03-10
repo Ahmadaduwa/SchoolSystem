@@ -25,5 +25,6 @@ namespace SchoolSystem.Models.ActivityManagement
         public string Status { get; set; } = "Active";
 
         public virtual ICollection<ExtracurricularActivity> ExtracurricularActivities { get; set; } = new List<ExtracurricularActivity>();
+        public virtual ICollection<ActivityManagement> ActivityManagement { get; set; } = new List<ActivityManagement>();
     }
 }

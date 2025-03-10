@@ -1,0 +1,36 @@
+﻿@model SchoolSystem.Models.ActivityManagement.Activity
+@{
+    ViewData["Title"] = "Create Activity";
+}
+
+<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Create Activity</h2>
+
+    <form asp-action="CreateActivity" method="post" class="space-y-4">
+        <div>
+            <label asp-for="ActivityName" class="block text-sm font-medium text-gray-700">Activity Name</label>
+            <input asp-for="ActivityName" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" />
+            <span asp-validation-for="ActivityName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea asp-for="Description" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
+            <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select asp-for="Status" class="border border-gray-300 rounded px-2 py-1 w-full">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <a asp-action="IndexActivity" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
+            <button type="submit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">Submit</button>
+        </div>
+    </form>
+</div>

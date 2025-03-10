@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SchoolSystem.Models.ActivityManagement;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.CurriculumManagement;
@@ -19,6 +20,7 @@ namespace SchoolSystem.Data
         /// </summary>
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
+        public DbSet<Student> Students { get; set; }
         /// <summary>
         /// Class Management
         /// </summary>
@@ -34,7 +36,8 @@ namespace SchoolSystem.Data
         /// <summary>
         /// Attendance Management
         /// </summary>
-
+        public DbSet<ActivityAttendance> ActivityAttendances { get; set; }
+        public DbSet<ActivityManagement> ActivityManagement { get; set; }
 
         /// <summary>
         /// Curriculum Management
@@ -73,6 +76,22 @@ namespace SchoolSystem.Data
                 .WithOne(p => p.Teacher) // ✅ ใช้ Navigation Property ให้ถูกต้อง
                 .HasForeignKey<Teacher>(t => t.ProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Teacher>()
+                .Property(t => t.Salary)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Student>(entity =>
+            {
+                entity.HasOne(t => t.Profile)
+                    .WithOne(p => p.Student)
+                    .HasForeignKey<Student>(t => t.ProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(s => s.GPA)
+                      .HasPrecision(3, 2); // จำกัดทศนิยมของ GPA เป็น xx.xx
+
+            });
         }
 
         private void ConfigureClassManagement(ModelBuilder modelBuilder)
@@ -117,7 +136,51 @@ namespace SchoolSystem.Data
 
         private void ConfigureAttendanceManagement(ModelBuilder modelBuilder)
         {
-            Debug.WriteLine("Attendance Management");
+
+            // กำหนด ActivityAttendance Table
+            modelBuilder.Entity<ActivityAttendance>(entity =>
+            {
+                entity.HasKey(aa => aa.AA_id); // Primary Key
+
+                entity.HasOne(aa => aa.Student)
+                      .WithMany(s => s.ActivityAttendance)
+                      .HasForeignKey(aa => aa.Student_id)
+                      .OnDelete(DeleteBehavior.Cascade); // ลบ Student แล้วลบ ActivityAttendance ด้วย
+
+                entity.HasOne(aa => aa.ActivityManagement)
+                      .WithMany(s => s.ActivityAttendance)
+                      .HasForeignKey(aa => aa.AM_id)
+                      .OnDelete(DeleteBehavior.Cascade); 
+
+                entity.Property(aa => aa.Status)
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(aa => aa.TimeStamp)
+                      .HasDefaultValueSql("GETUTCDATE()");
+            });
+            // กำหนด ActivityAttendance Table
+            modelBuilder.Entity<ActivityManagement>(entity =>
+            {
+                entity.HasOne(a => a.Activity)
+                    .WithMany(s => s.ActivityManagement)
+                    .HasForeignKey(a => a.ActivityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(s => s.Semester)
+                    .WithMany(a => a.ActivityManagement)
+                    .HasForeignKey(s => s.SemesterId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ActivitySchedule>(entity =>
+            {
+                entity.HasOne(a => a.ActivityManagement)
+                    .WithMany(s => s.ActivitySchedule)
+                    .HasForeignKey(a => a.AM_id)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
         }
 
         private void ConfigureCurriculumManagement(ModelBuilder modelBuilder)
