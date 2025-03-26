@@ -70,6 +70,8 @@ namespace SchoolSystem.ViewModels
         [Required(ErrorMessage = "Status is required")]
         public string Status { get; set; } = "Active";
 
+      
+
         // Dropdown options
         public List<SelectListItem> Departments { get; set; } = new List<SelectListItem>();
 

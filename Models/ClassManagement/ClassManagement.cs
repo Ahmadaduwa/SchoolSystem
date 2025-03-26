@@ -44,5 +44,8 @@ namespace SchoolSystem.Models.ClassManagement
         public virtual Semester? Semester { get; set; }
 
         public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
+        public virtual ICollection<ClassAttendanceSummary> ClassAttendanceSummary { get; set; } = new List<ClassAttendanceSummary>();
+        public virtual ICollection<ClassAttendance> ClassAttendance { get; set; } = new List<ClassAttendance>();
+        public virtual ICollection<ClassAttendanceCheck> ClassAttendanceCheck { get; set; } = new List<ClassAttendanceCheck>();
     }
 }

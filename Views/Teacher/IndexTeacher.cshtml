@@ -1,208 +1,182 @@
 ﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.UserManagement.Teacher>
 @{
     ViewData["Title"] = "Teacher Management";
-    var departments = ViewData["Departments"] as List<SchoolSystem.Models.UserManagement.Department>;
+    var departments = ViewData["Departments"] as List<SelectListItem>;
+    var currentFilter = ViewData["CurrentFilter"]?.ToString();
+    var currentSort = ViewData["CurrentSort"]?.ToString();
+    var currentDepartment = ViewData["CurrentDepartment"]?.ToString();
 }
 
-<div class="container mx-auto max-w-6xl p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Teacher Management</h2>
+<div class="container mx-auto md:px-4 py-6">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Teacher Management</h2>
 
-    <!-- Search and Filter Section -->
-    <div class="bg-gray-50 p-4 rounded-lg mb-6">
-        <form asp-action="IndexTeacher" method="get" class="flex flex-wrap gap-4">
-            <div class="flex-1 min-w-fit">
-                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="w-full p-2 border rounded" placeholder="Search by name..." />
-            </div>
+        <!-- Search and Filter Section -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <form asp-action="IndexTeacher" method="get" class="flex flex-wrap gap-4">
+                <!-- Search by Name -->
+                <div class="flex-1 min-w-fit">
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by name..." />
+                </div>
 
-            <div class="flex-1 min-w-fit">
-                <select name="departmentFilter" class="w-full p-2 border rounded" onchange="this.form.submit()">
-                    <option value="">All Departments</option>
-                    @foreach (var dept in departments)
-                    {
-                        <option value="@dept.DepartmentId" selected="@(ViewData["CurrentDepartment"]?.ToString() == dept.DepartmentId.ToString())">
-                            @dept.Name
-                        </option>
-                    }
-                </select>
-            </div>
+                <!-- Department Filter Dropdown -->
+                <div class="flex-1 min-w-fit">
+                    <select name="departmentFilter" class="w-full p-2 border rounded">
+                        <option value="">All Departments</option>
+                        @foreach (var dept in departments)
+                        {
+                            <option value="@dept.Value" selected="@(dept.Value == currentDepartment ? "selected" : null)">@dept.Text</option>
+                        }
+                    </select>
+                </div>
 
-            <div class="flex gap-2">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400">
-                    <i class="fas fa-search mr-1"></i> Search
-                </button>
-                <a asp-action="IndexTeacher" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">
-                    Reset
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex justify-between mb-4">
-        <a asp-action="CreateTeacher" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500 flex items-center">
-            <i class="fas fa-plus-circle mr-2"></i> Add New Teacher
-        </a>
-
-        <div class="text-gray-600">
-            Showing @Model.Count of ViewData["TotalItems"] teachers | Page @Model.PageIndex of @Model.TotalPages
+                <!-- Action Buttons -->
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
+                        <i class="fas fa-search mr-1"></i> Search
+                    </button>
+                    <a asp-action="IndexTeacher" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
+                        Reset
+                    </a>
+                </div>
+            </form>
         </div>
-    </div>
 
-    <!-- Teachers Table -->
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-100 text-gray-700">
-                    <th class="border px-4 py-2">
-                        <a asp-action="IndexTeacher" asp-route-sortOrder="@ViewData["NameSortParam"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" asp-route-departmentFilter="@ViewData["CurrentDepartment"]" class="flex items-center justify-between">
-                            Name
-                            @if (ViewData["CurrentSort"]?.ToString() == "" || ViewData["CurrentSort"]?.ToString() == "name_desc")
-                            {
-                                <i class="fas fa-sort-@(ViewData["CurrentSort"]?.ToString() == "name_desc" ? "down" : "up") ml-1"></i>
-                            }
-                        </a>
-                    </th>
-                    <th class="border px-4 py-2">Gender</th>
-                    <th class="border px-4 py-2">
-                        <a asp-action="IndexTeacher" asp-route-sortOrder="@ViewData["DepartmentSortParam"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" asp-route-departmentFilter="@ViewData["CurrentDepartment"]" class="flex items-center justify-between">
-                            Department
-                            @if (ViewData["CurrentSort"]?.ToString() == "department" || ViewData["CurrentSort"]?.ToString() == "department_desc")
-                            {
-                                <i class="fas fa-sort-@(ViewData["CurrentSort"]?.ToString() == "department_desc" ? "down" : "up") ml-1"></i>
-                            }
-                        </a>
-                    </th>
-                    <th class="border px-4 py-2">
-                        <a asp-action="IndexTeacher" asp-route-sortOrder="@ViewData["SalarySortParam"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" asp-route-departmentFilter="@ViewData["CurrentDepartment"]" class="flex items-center justify-between">
-                            Salary
-                            @if (ViewData["CurrentSort"]?.ToString() == "salary" || ViewData["CurrentSort"]?.ToString() == "salary_desc")
-                            {
-                                <i class="fas fa-sort-@(ViewData["CurrentSort"]?.ToString() == "salary_desc" ? "down" : "up") ml-1"></i>
-                            }
-                        </a>
-                    </th>
-                    <th class="border px-4 py-2">Last Updated</th>
-                    <th class="border px-4 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Any())
-                {
-                    @foreach (var teacher in Model)
-                    {
-                        <tr class="hover:bg-gray-50">
-                            <td class="border px-4 py-2">@($"{teacher.Profile.FirstName} {teacher.Profile.LastName}")</td>
-                            <td class="border px-4 py-2">@teacher.Profile.Gender</td>
-                            <td class="border px-4 py-2">
-                                @{
-                                    var departmentName = teacher.DepartmentId switch
-                                    {
-                                        1 => "Mathematics",
-                                        2 => "Science",
-                                        3 => "English",
-                                        4 => "History",
-                                        5 => "Computer Science",
-                                        _ => "Unknown"
-                                    };
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+            <a asp-action="CreateTeacher" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
+                <i class="fas fa-plus-circle mr-2"></i> Add New Teacher
+            </a>
+            <div class="text-gray-600">
+                Showing @Model.Count of @ViewData["TotalItems"] teachers | Page @Model.PageIndex of @Model.TotalPages
+            </div>
+        </div>
+
+        <!-- Teachers Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexTeacher"
+                               asp-route-sortOrder="@ViewData["NameSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-departmentFilter="@currentDepartment"
+                               class="flex items-center justify-between">
+                                Name
+                                @if (string.IsNullOrEmpty(currentSort) || currentSort == "name_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
                                 }
-                                <span class="px-2 py-1 rounded text-xs font-semibold
-                                    @(teacher.DepartmentId == 1 ? "bg-blue-100 text-blue-800" :
-                                    teacher.DepartmentId == 2 ? "bg-green-100 text-green-800" :
-                                    teacher.DepartmentId == 3 ? "bg-purple-100 text-purple-800" :
-                                    teacher.DepartmentId == 4 ? "bg-yellow-100 text-yellow-800" :
-                                    teacher.DepartmentId == 5 ? "bg-red-100 text-red-800" :
-                                    "bg-gray-100 text-gray-800")">
-                                    @departmentName
-                                </span>
-                            </td>
-                            <td class="border px-4 py-2">@($"{teacher.Salary:C}")</td>
-                            <td class="border px-4 py-2 text-sm text-gray-600">@teacher.UpdateAt.ToString("dd MMM yyyy HH:mm")</td>
-                            <td class="border px-4 py-2">
-                                <div class="flex justify-center gap-1">
-                                    <a asp-action="DetailsTeacher" asp-route-id="@teacher.TeacherId"
-                                       class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-400" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a asp-action="EditTeacher" asp-route-id="@teacher.TeacherId"
-                                       class="bg-yellow-500 text-white px-2 py-1 rounded text-sm hover:bg-yellow-400" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-action="DeleteTeacher" asp-route-id="@teacher.TeacherId"
-                                       class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-400" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexTeacher"
+                               asp-route-sortOrder="@ViewData["SalarySortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-departmentFilter="@currentDepartment"
+                               class="flex items-center justify-between">
+                                Salary
+                                @if (currentSort == "salary" || currentSort == "salary_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "salary_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexTeacher"
+                               asp-route-sortOrder="@ViewData["DepartmentSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-departmentFilter="@currentDepartment"
+                               class="flex items-center justify-between">
+                                Department
+                                @if (currentSort == "department" || currentSort == "department_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "department_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var teacher in Model)
+                        {
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-4 py-2">@($"{teacher.Profile.FirstName} {teacher.Profile.LastName}")</td>
+                                <td class="border px-4 py-2">@teacher.Salary.ToString("C")</td>
+                                <td class="border px-4 py-2">
+                                    @{
+                                        var deptInfo = departments?.FirstOrDefault(d => d.Value == teacher.DepartmentId.ToString())?.Text ?? "Unknown";
+                                    }
+                                    @deptInfo
+                                </td>
+                                <td class="border px-4 py-2">
+                                    <div class="flex justify-center gap-1">
+                                        <a asp-action="DetailsTeacher" asp-route-id="@teacher.TeacherId" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="EditTeacher" asp-route-id="@teacher.TeacherId" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-gray-500 p-6">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-search text-4xl mb-2"></i>
+                                    <p>No teachers found matching your criteria.</p>
                                 </div>
                             </td>
                         </tr>
                     }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-6">
+            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <div class="flex space-x-2">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-departmentFilter="@currentDepartment" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </a>
                 }
                 else
                 {
-                    <tr>
-                        <td colspan="6" class="text-center text-gray-500 p-6">
-                            <div class="flex flex-col items-center">
-                                <i class="fas fa-search text-4xl mb-2"></i>
-                                <p>No teachers found matching your criteria.</p>
-                            </div>
-                        </td>
-                    </tr>
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </span>
                 }
-            </tbody>
-        </table>
-    </div>
 
-    <!-- Pagination Controls -->
-    <div class="flex justify-between items-center mt-6">
-        <div>
-            @if (Model.TotalPages > 0)
-            {
-                <span class="text-gray-600">Page @Model.PageIndex of @Model.TotalPages</span>
-            }
-        </div>
-
-        <div class="flex">
-            @if (Model.HasPreviousPage)
-            {
-                <a asp-action="IndexTeacher"
-                   asp-route-pageNumber="@(Model.PageIndex - 1)"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   asp-route-departmentFilter="@ViewData["CurrentDepartment"]"
-                   class="px-4 py-2 mx-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                    <i class="fas fa-chevron-left mr-1"></i> Previous
-                </a>
-            }
-            else
-            {
-                <span class="px-4 py-2 mx-1 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                    <i class="fas fa-chevron-left mr-1"></i> Previous
-                </span>
-            }
-
-            @if (Model.HasNextPage)
-            {
-                <a asp-action="IndexTeacher"
-                   asp-route-pageNumber="@(Model.PageIndex + 1)"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   asp-route-departmentFilter="@ViewData["CurrentDepartment"]"
-                   class="px-4 py-2 mx-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                    Next <i class="fas fa-chevron-right ml-1"></i>
-                </a>
-            }
-            else
-            {
-                <span class="px-4 py-2 mx-1 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                    Next <i class="fas fa-chevron-right ml-1"></i>
-                </span>
-            }
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-departmentFilter="@currentDepartment" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </span>
+                }
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // Add FontAwesome if not already included in your layout
         if (!document.getElementById('fontawesome-css')) {
             var link = document.createElement('link');
             link.id = 'fontawesome-css';

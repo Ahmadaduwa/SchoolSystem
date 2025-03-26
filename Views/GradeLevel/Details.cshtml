@@ -1,0 +1,91 @@
+﻿@model SchoolSystem.Models.ClassManagement.GradeLevels
+
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden max-w-4xl mx-auto">
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 text-center sm:text-left w-full sm:w-auto">
+                Grade Level Details
+            </h2>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto text-center">
+                <a asp-action="Edit" asp-route-id="@Model.GradeLevelId"
+                   class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a asp-action="Index"
+                   class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-tag mr-2 text-indigo-500"></i>Grade Level Name
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.Name</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-check-circle mr-2 text-indigo-500"></i>Status
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <span class="@(Model.Status == "Active" ? "text-green-600" : "text-red-600") font-semibold">
+                                @Model.Status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                        <i class="fas fa-file-alt mr-2 text-indigo-500"></i>Description
+                    </h3>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm min-h-[200px]">
+                        @if (string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <p class="text-gray-500 italic text-center pt-8">
+                                <i class="fas fa-info-circle mr-2"></i>No description provided
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="text-gray-900 leading-relaxed">@Model.Description</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-indigo-500"></i>Additional Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-gray-600 block mb-1">Created At</span>
+                        <p class="font-medium text-gray-800">
+                            <i class="fas fa-calendar-alt mr-2 text-indigo-500"></i>
+                            @(Model.CreatedAt.ToString("dd MMM yyyy HH:mm") ?? "N/A")
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 block mb-1">Last Updated</span>
+                        <p class="font-medium text-gray-800">
+                            <i class="fas fa-clock mr-2 text-indigo-500"></i>
+                            @(Model.UpdatedAt?.ToString("dd MMM yyyy HH:mm") ?? "N/A")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Css {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+}

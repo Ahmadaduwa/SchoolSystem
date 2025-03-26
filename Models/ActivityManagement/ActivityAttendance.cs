@@ -21,8 +21,8 @@ namespace SchoolSystem.Models.ActivityManagement
 
         [Required]
         [StringLength(20)]
-        public int Status { get; set; }
+        public String? Status { get; set; }
 
-        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+        public DateOnly TimeStamp { get; set; }
     }
 }

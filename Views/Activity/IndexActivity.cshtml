@@ -1,38 +1,183 @@
-﻿@model IEnumerable<SchoolSystem.Models.ActivityManagement.Activity>
+﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.ActivityManagement.Activity>
 @{
-    ViewData["Title"] = "Activity List";
+    ViewData["Title"] = "Activity Management";
+    var currentFilter = ViewData["CurrentFilter"]?.ToString();
+    var currentSort = ViewData["CurrentSort"]?.ToString();
+    var currentTypeFilter = ViewData["CurrentTypeFilter"]?.ToString();
+    var activityTypes = ViewData["ActivityTypes"] as List<SelectListItem>;
 }
 
-<div class="container mx-auto my-6 w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
-    <h2 class="text-2xl font-bold mb-6 text-center">Activity List</h2>
+<div class="container mx-auto md:px-4 py-6">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Activity Management</h2>
 
-    <div class="flex justify-between mb-4">
-        <a asp-action="CreateActivity" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">+ Create Activity</a>
+        <!-- ส่วนค้นหาและกรองข้อมูล -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <form asp-action="IndexActivity" method="get" class="flex flex-wrap gap-4">
+                <!-- ค้นหาตามชื่อกิจกรรมหรือคำอธิบาย -->
+                <div class="flex-1 min-w-fit">
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by Activity Name or Description..." />
+                </div>
+
+                <!-- กรองตามประเภทกิจกรรม -->
+                <div class="flex-1 min-w-fit">
+                    <select name="activityTypeFilter" class="w-full p-2 border rounded">
+                        @foreach (var type in activityTypes)
+                        {
+                            <option value="@type.Value" selected="@(type.Value == currentTypeFilter)">@type.Text</option>
+                        }
+                    </select>
+
+                </div>
+
+                <!-- ปุ่มดำเนินการ -->
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
+                        <i class="fas fa-search mr-1"></i> Search
+                    </button>
+                    <a asp-action="IndexActivity" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- ปุ่มเพิ่มกิจกรรมใหม่และแสดงจำนวนข้อมูล -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+            <a asp-action="CreateActivity" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
+                <i class="fas fa-plus-circle mr-2"></i> Create Activity
+            </a>
+            <div class="text-gray-600">
+                Showing @Model.Count of @ViewData["TotalItems"] activities | Page @Model.PageIndex of @Model.TotalPages
+            </div>
+        </div>
+
+        <!-- ตารางแสดงกิจกรรม -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexActivity"
+                               asp-route-sortOrder="@ViewData["NameSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-activityTypeFilter="@currentTypeFilter"
+                               class="flex items-center justify-between">
+                                Activity Name
+                                @if (string.IsNullOrEmpty(currentSort) || currentSort == "name_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">Activity Type</th>
+                        <th class="border px-4 py-2">Description</th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexActivity"
+                               asp-route-sortOrder="@ViewData["StatusSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-activityTypeFilter="@currentTypeFilter"
+                               class="flex items-center justify-between">
+                                Status
+                                @if (currentSort == "status" || currentSort == "status_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "status_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexActivity"
+                               asp-route-sortOrder="@ViewData["DateSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-activityTypeFilter="@currentTypeFilter"
+                               class="flex items-center justify-between">
+                                Created At
+                                @if (currentSort == "date" || currentSort == "date_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "date_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var activity in Model)
+                        {
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-4 py-2">@activity.ActivityName</td>
+                                <td class="border px-4 py-2">@activity.ActivityType</td>
+                                <td class="border px-4 py-2">@activity.Description</td>
+                                <td class="border px-4 py-2">@activity.Status</td>
+                                <td class="border px-4 py-2">@activity.CreateAt.ToString("yyyy-MM-dd")</td>
+                                <td class="border px-4 py-2 flex justify-center gap-2">
+                                    <a asp-action="EditActivity" asp-route-id="@activity.ActivityId" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-gray-500 p-6">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-search text-4xl mb-2"></i>
+                                    <p>No activities found matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- การแสดง Pagination -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-6">
+            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <div class="flex space-x-2">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="IndexActivity" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-activityTypeFilter="@currentTypeFilter" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </span>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="IndexActivity" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-activityTypeFilter="@currentTypeFilter" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </span>
+                }
+            </div>
+        </div>
     </div>
-
-    <table class="w-full border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="border p-2">Activity Name</th>
-                <th class="border p-2">Description</th>
-                <th class="border p-2">Status</th>
-                <th class="border p-2">Created At</th>
-                <th class="border p-2 text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td class="border p-2">@item.ActivityName</td>
-                    <td class="border p-2">@item.Description</td>
-                    <td class="border p-2">@item.Status</td>
-                    <td class="border p-2">@item.CreateAt.ToString("yyyy-MM-dd")</td>
-                    <td class="border p-2 text-center flex justify-center gap-2">
-                        <a asp-action="EditActivity" asp-route-id="@item.ActivityId" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-500">Edit</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
+
+@section Scripts {
+    <script>
+        // Dynamically include FontAwesome ถ้ายังไม่ได้โหลดใน Layout
+        if (!document.getElementById('fontawesome-css')) {
+            var link = document.createElement('link');
+            link.id = 'fontawesome-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    </script>
+}

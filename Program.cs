@@ -9,12 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using WebOptimizer;
 using SchoolSystem.Models.UserManagement;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
+builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 builder.Services.AddOpenApi();
@@ -60,6 +62,12 @@ builder.Services.AddAuthentication(options =>
                     context.Token = context.Request.Cookies["AuthToken"];
                 }
                 return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+                context.Response.Redirect("/NotAuthorized");
+                return Task.CompletedTask;
             }
         };
     });
@@ -73,6 +81,7 @@ builder.Services.AddAuthorization(Options =>
     Options.AddPolicy("AcademicPolicy", policy => policy.RequireRole("Academic"));
     Options.AddPolicy("StudentCouncil", policy => policy.RequireRole("StudentCouncil"));
     Options.AddPolicy("DirectorPolicy", policy => policy.RequireRole("Director"));
+    Options.AddPolicy("AcademicPolicyOrAdminPolicy", policy => policy.RequireRole("Academic", "Admin"));
 
 });
 
@@ -86,10 +95,13 @@ var app = builder.Build();
 await SeedService.SeedDatabase(app.Services);
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("Home/Error");
     app.UseHsts();
 }
 

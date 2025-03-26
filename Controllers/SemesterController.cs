@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
+using SchoolSystem.Models.ActivityManagement;
 using SchoolSystem.Models.ClassManagement;
 using System;
 using System.Linq;
@@ -42,7 +43,6 @@ namespace SchoolSystem.Controllers
             return View();
         }
 
-        // 📌 บันทึกการสร้างภาคเรียน
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateSemester(Semester model)
@@ -54,8 +54,32 @@ namespace SchoolSystem.Controllers
 
             try
             {
+                // บันทึกภาคเรียนใหม่ลงฐานข้อมูล
                 _db.Semesters.Add(model);
                 await _db.SaveChangesAsync();
+
+                // 📌 ดึงกิจกรรมทั้งหมดที่เป็น Daily
+                var dailyActivities = await _db.Activities
+                                               .Where(a => a.ActivityType == "Daily")
+                                               .ToListAsync();
+
+                // 📌 สร้าง ActivityManagement สำหรับทุกกิจกรรม Daily ที่มีอยู่
+                var activityManagementList = dailyActivities.Select(activity => new ActivityManagement
+                {
+                    ActivityId = activity.ActivityId,
+                    CheckCount = 0, // ค่าเริ่มต้น
+                    SemesterId = model.SemesterID, // ใช้เทอมที่เพิ่งเพิ่มเข้าไป
+                    Type = "Daily",
+                    UpdateAt = DateTime.UtcNow
+                }).ToList();
+
+                // 📌 บันทึกข้อมูลลงฐานข้อมูล
+                if (activityManagementList.Any())
+                {
+                    await _db.ActivityManagement.AddRangeAsync(activityManagementList);
+                    await _db.SaveChangesAsync();
+                }
+
                 TempData["SuccessMessage"] = "Semester created successfully!";
                 return RedirectToAction("IndexSemester");
             }
@@ -65,6 +89,7 @@ namespace SchoolSystem.Controllers
                 return View(model);
             }
         }
+
 
         // 📌 แสดงฟอร์มแก้ไขภาคเรียน
         public async Task<IActionResult> EditSemester(int id)

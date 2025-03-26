@@ -36,50 +36,46 @@ namespace SchoolSystem.Controllers
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentDepartment"] = departmentFilter;
 
-           
-            // Get departments for dropdown
+            // ดึงข้อมูล department สำหรับ dropdown (อาจมีการนำไปใช้ใน View เพิ่มเติม)
             var departments = await GetDepartmentListItems();
             ViewData["Departments"] = departments;
 
             int pageSize = 10;
-            var teachers = _db.Teachers
+            var teachersQuery = _db.Teachers
                 .Include(t => t.Profile)
                 .AsNoTracking();
 
-            // Apply search filter
-            if (!string.IsNullOrEmpty(searchString))
+            // ค้นหาตามชื่อ (first name หรือ last name)
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                teachers = teachers.Where(t =>
+                teachersQuery = teachersQuery.Where(t =>
                     t.Profile.FirstName.Contains(searchString) ||
                     t.Profile.LastName.Contains(searchString));
             }
 
-            int totalItems = await teachers.CountAsync();
-            ViewData["TotalItems"] = totalItems;
-
-            // Apply department filter
+            // กรองตามแผนก
             if (departmentFilter.HasValue)
             {
-                teachers = teachers.Where(t => t.DepartmentId == departmentFilter);
+                teachersQuery = teachersQuery.Where(t => t.DepartmentId == departmentFilter);
             }
 
- 
-            // Apply sorting
-            teachers = sortOrder switch
+            int totalItems = await teachersQuery.CountAsync();
+            ViewData["TotalItems"] = totalItems;
+
+            // การจัดเรียงข้อมูล
+            teachersQuery = sortOrder switch
             {
-                "name_desc" => teachers.OrderByDescending(t => t.Profile.LastName)
-                                      .ThenByDescending(t => t.Profile.FirstName),
-                "salary" => teachers.OrderBy(t => t.Salary),
-                "salary_desc" => teachers.OrderByDescending(t => t.Salary),
-                "department" => teachers.OrderBy(t => t.DepartmentId),
-                "department_desc" => teachers.OrderByDescending(t => t.DepartmentId),
-                _ => teachers.OrderBy(t => t.Profile.LastName)
-                            .ThenBy(t => t.Profile.FirstName)
+                "name_desc" => teachersQuery.OrderByDescending(t => t.Profile.LastName).ThenByDescending(t => t.Profile.FirstName),
+                "salary" => teachersQuery.OrderBy(t => t.Salary),
+                "salary_desc" => teachersQuery.OrderByDescending(t => t.Salary),
+                "department" => teachersQuery.OrderBy(t => t.DepartmentId),
+                "department_desc" => teachersQuery.OrderByDescending(t => t.DepartmentId),
+                _ => teachersQuery.OrderBy(t => t.Profile.LastName).ThenBy(t => t.Profile.FirstName),
             };
 
-
-            return View(await PaginatedList<Teacher>.CreateAsync(teachers, pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<Teacher>.CreateAsync(teachersQuery, pageNumber ?? 1, pageSize));
         }
+
 
         public async Task<IActionResult> DetailsTeacher(int id)
         {
@@ -246,14 +242,14 @@ namespace SchoolSystem.Controllers
         {
             // Ideally, fetch from database
             return new List<SelectListItem>
-    {
-        new SelectListItem { Value = "", Text = "Select Department (Optional)" },
-        new SelectListItem { Value = "1", Text = "Mathematics" },
-        new SelectListItem { Value = "2", Text = "Science" },
-        new SelectListItem { Value = "3", Text = "English" },
-        new SelectListItem { Value = "4", Text = "History" },
-        new SelectListItem { Value = "5", Text = "Computer Science" }
-    };
+            {
+                new SelectListItem { Value = "", Text = "Select Department (Optional)" },
+                new SelectListItem { Value = "1", Text = "Mathematics" },
+                new SelectListItem { Value = "2", Text = "Science" },
+                new SelectListItem { Value = "3", Text = "English" },
+                new SelectListItem { Value = "4", Text = "History" },
+                new SelectListItem { Value = "5", Text = "Computer Science" }
+            };
         }
 
         [HttpGet]

@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "ลงทะเบียนเรียนทั้งห้อง";
+}
+
+<div class="max-w-4xl mx-auto py-8 px-4">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">ลงทะเบียนเรียนทั้งห้อง</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+            <p>@TempData["Success"]</p>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <p>@TempData["Error"]</p>
+        </div>
+    }
+
+    <form method="post" asp-action="Register" class="bg-white shadow-md rounded-lg p-6">
+        <div class="mb-6">
+            <label for="classId" class="block text-gray-700 text-sm font-medium mb-2">เลือกห้องเรียน</label>
+            <select id="classId" name="classId" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" required>
+                <option value="">-- กรุณาเลือกห้องเรียน --</option>
+                @foreach (var cls in ViewBag.Classes)
+                {
+                    <option value="@cls.ClassId">@cls.ClassNumber</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-medium mb-2">เลือกวิชาที่จะลงทะเบียน</label>
+            <div class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto">
+                @foreach (var course in ViewBag.Courses)
+                {
+                    <div class="flex items-center mb-2 last:mb-0">
+                        <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                               type="checkbox" name="courseIds" value="@course.CourseId" id="course_@course.CourseId">
+                        <label class="ml-2 text-sm text-gray-700" for="course_@course.CourseId">@course.CourseName</label>
+                    </div>
+                }
+            </div>
+            <p class="mt-2 text-sm text-gray-500">จำนวนวิชาทั้งหมด: @ViewBag.Courses.Count</p>
+        </div>
+
+        <div class="mb-6">
+            <label for="semesterId" class="block text-gray-700 text-sm font-medium mb-2">ภาคเรียน</label>
+            <select id="semesterId" name="semesterId" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" required>
+                <option value="">-- กรุณาเลือกภาคเรียน --</option>
+                @foreach (var semester in ViewBag.Semesters)
+                {
+                    <option value="@semester.SemesterID">@semester.SemesterYear - ภาคเรียนที่ @semester.SemesterNumber</option>
+                }
+            </select>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                ยืนยันการลงทะเบียน
+            </button>
+            <a href="@Url.Action("Index", "Home")" class="text-blue-600 hover:text-blue-800 font-medium">
+                กลับหน้าหลัก
+            </a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,96 @@
+﻿@using SchoolSystem.ViewModels
+@model ClassAttendanceViewModel
+@{
+    ViewData["Title"] = "เช็คชื่อนักเรียน";
+}
+
+<div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <div class="mb-4 bg-gray-100 p-4 rounded-lg">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-gray-500">วันที่ปัจจุบัน</p>
+                <h2 class="text-xl font-bold text-gray-800">วัน@(Model.CurrentDay) ที่ @(Model.CurrentDate)</h2>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-500">ผู้ใช้งาน</p>
+                <h2 class="text-xl font-bold text-gray-800">@User.Identity?.Name</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+            📚 รายวิชาที่มีการสอนวันนี้
+        </h1>
+        <div class="flex space-x-3">
+            <a href="@Url.Action("TeacherCourses", "ClassAttendance")"
+               class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 shadow-md transition-all duration-300">
+                📋 รายวิชาที่สอนในเทอม
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Schedules != null && Model.Schedules.Any())
+    {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var subject in Model.Schedules)
+            {
+                <a asp-controller="ClassAttendance" asp-action="MarkAttendance" asp-route-cmId="@subject.Id"
+                   class="block bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-6 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-sm font-semibold text-white bg-blue-700 px-3 py-1 rounded-md inline-block shadow-sm">
+                            🕒 @subject.Time
+                        </p>
+                        @if (subject.GradeLevel != null && subject.ClassNumber > 0)
+                        {
+                            <p class="text-sm font-semibold text-white bg-indigo-700 px-3 py-1 rounded-md inline-block shadow-sm">
+                                ชั้น @subject.GradeLevel/@subject.ClassNumber
+                            </p>
+                        }
+                    </div>
+
+                    <div class="text-center mt-2">
+                        @if (!string.IsNullOrEmpty(subject.CourseCode))
+                        {
+                            <p class="text-sm opacity-90">@subject.CourseCode</p>
+                        }
+                        <h2 class="text-xl font-semibold mt-1">@subject.Name</h2>
+                        <div class="mt-4 pt-3 border-t border-blue-400 border-opacity-30">
+                            <p class="text-sm opacity-90 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                แตะเพื่อเช็คชื่อนักเรียน
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center p-10 bg-gray-50 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-700 mt-4">ไม่มีวิชาที่ต้องสอนในวันนี้</h3>
+            <p class="text-gray-500 mt-2">คุณไม่มีตารางสอนที่ต้องเช็คชื่อสำหรับวันนี้</p>
+            <a href="@Url.Action("Index", "Teacher")" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300">
+                กลับไปหน้าหลัก
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // แสดงการโหลดเมื่อผู้ใช้กดที่วิชา
+        document.querySelectorAll('a[href*="MarkAttendance"]').forEach(link => {
+            link.addEventListener('click', function() {
+                this.classList.add('opacity-75', 'pointer-events-none');
+                this.innerHTML += '<div class="flex justify-center mt-3"><div class="loader">กำลังโหลด...</div></div>';
+            });
+        });
+    </script>
+}

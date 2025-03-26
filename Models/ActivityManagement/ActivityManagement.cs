@@ -21,8 +21,15 @@ namespace SchoolSystem.Models.ActivityManagement
         public int SemesterId { get; set; }
         [ForeignKey("SemesterId")]
         public virtual Semester? Semester { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string? Type { get; set; }
         public DateTime? UpdateAt { get; set; }
+
         public virtual ICollection<ActivityAttendance> ActivityAttendance { get; set; } = new List<ActivityAttendance>();
-        public virtual ICollection<ActivitySchedule> ActivitySchedule { get; set; } = new List<ActivitySchedule>();
+        public virtual ICollection<ActivitySchedule> ActivitySchedule { get; set; } = new List<ActivitySchedule>(); 
+        public virtual ICollection<ActivityAttendanceSummary> AcitivityAttendanceSummary { get; set; } = new List<ActivityAttendanceSummary>();
+        public virtual ICollection<ActivityAttendanceCheck> ActivityAttendanceCheck { get; set; } = new List<ActivityAttendanceCheck>();
     }
 }

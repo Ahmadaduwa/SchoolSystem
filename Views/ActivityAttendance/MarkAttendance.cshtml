@@ -1,0 +1,67 @@
+﻿@model SchoolSystem.Models.ViewModels.ActivityAttendanceViewModel
+
+@{
+    ViewData["Title"] = "Mark Attendance";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+        Mark Attendance for <span class="text-blue-600">@Model.ActivityName</span>
+        - Class <span class="text-blue-600">@ViewBag.ClassName</span>
+    </h2>
+
+    <form asp-action="MarkAttendance" asp-controller="ActivityAttendance" method="post" class="bg-white shadow-md rounded-lg p-6">
+        <input type="hidden" asp-for="ActivityManagementId" />
+        <input type="hidden" asp-for="ActivityName" />
+        <input type="hidden" asp-for="AttendanceDate" />
+        <input type="hidden" asp-for="ClassId" />
+
+        <div class="mb-4 text-gray-600">
+            <p>Date: <span class="font-semibold">@Model.AttendanceDate.ToString("MMMM dd, yyyy")</span></p>
+        </div>
+
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Student Name</th>
+                    <th class="border p-2 text-center">Present</th>
+                    <th class="border p-2 text-center">Absent</th>
+                    <th class="border p-2 text-center">Late</th>
+                    <th class="border p-2 text-center">Excused</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Students.Count; i++)
+                {
+                    <tr>
+                        <td class="border p-2">
+                            @Model.Students[i].StudentName
+                            <input type="hidden" asp-for="Students[i].StudentId" />
+                            <input type="hidden" asp-for="Students[i].StudentName" />
+                        </td>
+                        <td class="border p-2 text-center">
+                            <input type="radio" asp-for="Students[i].Status" value="present" class="form-radio h-5 w-5 text-green-600" />
+                        </td>
+                        <td class="border p-2 text-center">
+                            <input type="radio" asp-for="Students[i].Status" value="absent" class="form-radio h-5 w-5 text-red-600" />
+                        </td>
+                        <td class="border p-2 text-center">
+                            <input type="radio" asp-for="Students[i].Status" value="late" class="form-radio h-5 w-5 text-yellow-600" />
+                        </td>
+                        <td class="border p-2 text-center">
+                            <input type="radio" asp-for="Students[i].Status" value="excused" class="form-radio h-5 w-5 text-blue-600" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit"
+                class="mt-6 w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+            Save Attendance
+        </button>
+    </form>
+</div>
+
+<!-- Optional: Tailwind CSS CDN for testing -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">

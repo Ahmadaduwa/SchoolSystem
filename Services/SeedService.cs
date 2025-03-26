@@ -32,12 +32,12 @@ namespace SchoolSystem.Services
                     logger.LogInformation("Seeding users for roles");
 
                     // Create users for each role
-                    await CreateUserWithRoleAsync(userManager, logger, "admin@admin.com", "Admin123456", "Admin@123", "Admin");
+                    await CreateUserWithRoleAsync(userManager, logger, "admin@admin.com", "AdminUser", "65iO0D6PE3sFzI9", "Admin");
                     await CreateUserWithRoleAsync(userManager, logger, "student@test.com", "StudentUser", "Student@123", "Student");
                     await CreateUserWithRoleAsync(userManager, logger, "teacher@test.com", "TeacherUser", "Teacher@123", "Teacher");
-                    await CreateUserWithRoleAsync(userManager, logger, "academic@test.com", "AcademicUser", "Academic@123", "Academic");
-                    await CreateUserWithRoleAsync(userManager, logger, "studentcouncil@test.com", "StudentCouncilUser", "StudentCouncil@123", "StudentCouncil");
-                    await CreateUserWithRoleAsync(userManager, logger, "director@test.com", "DirectorUser", "Director@123", "Director");
+                    await CreateUserWithRoleAsync(userManager, logger, "academic@test.com", "AcademicUser", "xJSyziDPzmnPbpN", "Academic");
+                    await CreateUserWithRoleAsync(userManager, logger, "studentcouncil@test.com", "StudentCouncilUser", "bSVMx0SXMgm7bIa", "StudentCouncil");
+                    await CreateUserWithRoleAsync(userManager, logger, "director@test.com", "DirectorUser", "bbY0yEXyzwBmC1j", "Director");
             
                 }
                 catch(Exception ex)

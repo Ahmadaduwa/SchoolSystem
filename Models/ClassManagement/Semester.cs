@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using SchoolSystem.Models.ActivityManagement;
+using SchoolSystem.Models.RegistrationManagement;
 
 namespace SchoolSystem.Models.ClassManagement
 {
@@ -33,6 +34,7 @@ namespace SchoolSystem.Models.ClassManagement
 
         // Navigation Properties
         public virtual ICollection<ClassManagement> ClassManagements { get; set; } = new HashSet<ClassManagement>();
+        public virtual ICollection<RegisteredCourse> RegisteredCourse { get; set; } = new List<RegisteredCourse>();
         public virtual ICollection<ActivityManagement.ActivityManagement> ActivityManagement { get; set; } = new List<ActivityManagement.ActivityManagement>();
     }
 

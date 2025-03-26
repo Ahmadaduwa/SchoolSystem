@@ -50,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <Folder Include="Views\Shared\Layout\" />
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 

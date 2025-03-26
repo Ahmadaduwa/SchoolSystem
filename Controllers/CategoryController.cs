@@ -19,7 +19,7 @@ namespace SchoolSystem.Controllers
         {
             try
             {
-                var categories = _db.SubjectCategories.ToList();
+                var categories = _db.CourseCategories.ToList();
                 return View(categories);
             }
             catch (Exception ex)
@@ -47,7 +47,7 @@ namespace SchoolSystem.Controllers
 
             try
             {
-                _db.SubjectCategories.Add(model);
+                _db.CourseCategories.Add(model);
                 _db.SaveChanges();
                 TempData["SuccessMessage"] = "Subject category created successfully!";
                 return RedirectToAction("IndexCategory");
@@ -64,7 +64,7 @@ namespace SchoolSystem.Controllers
         {
             try
             {
-                var category = _db.SubjectCategories.Find(id);
+                var category = _db.CourseCategories.Find(id);
                 if (category == null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
@@ -91,7 +91,7 @@ namespace SchoolSystem.Controllers
 
             try
             {
-                var category = _db.SubjectCategories.Find(model.CourseCategoryId);
+                var category = _db.CourseCategories.Find(model.CourseCategoryId);
                 if (category == null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
@@ -119,7 +119,7 @@ namespace SchoolSystem.Controllers
         {
             try
             {
-                var category = _db.SubjectCategories.Include(c => c.Courses).FirstOrDefault(c => c.CourseCategoryId == id);
+                var category = _db.CourseCategories.Include(c => c.Courses).FirstOrDefault(c => c.CourseCategoryId == id);
                 if (category == null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
@@ -133,7 +133,7 @@ namespace SchoolSystem.Controllers
                     return RedirectToAction("IndexCategory");
                 }
 
-                _db.SubjectCategories.Remove(category);
+                _db.CourseCategories.Remove(category);
                 _db.SaveChanges();
                 TempData["SuccessMessage"] = "Subject category deleted successfully!";
             }

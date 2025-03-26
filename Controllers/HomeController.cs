@@ -5,10 +5,13 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SchoolSystem.Data;
 using SchoolSystem.Models;
 using SchoolSystem.Models.UserManagement;
 using SchoolSystem.Models.ViewModels;
+using SchoolSystem.Models.Alert;
 
 namespace SchoolSystem.Controllers
 {   
@@ -19,12 +22,14 @@ namespace SchoolSystem.Controllers
         private readonly SignInManager<Users> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly AppDbContext _db;
 
         public HomeController(
             ILogger<HomeController> logger,
             UserManager<Users> userManager,
             RoleManager<IdentityRole> roleManager,
             SignInManager<Users> signInManager,
+            AppDbContext db,
             IConfiguration configuration)
         {
             _logger = logger;
@@ -32,6 +37,7 @@ namespace SchoolSystem.Controllers
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _db = db;
         }
 
         [Route("")]
@@ -40,11 +46,35 @@ namespace SchoolSystem.Controllers
             return View();
         }
 
-        [Authorize]
-        [Route("Home")]
-        public IActionResult Home()
+        [Route("NotReady")]
+        public IActionResult NotReady()
         {
             return View();
+        }
+
+        [Route("NotAuthorized")]
+        public IActionResult NotAuthorized()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [Route("Home")]
+        public async Task<IActionResult> Home()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var notifications = await _db.Notifications
+                .Include(n => n.Profile)
+                .Where(n => n.Profile.UserId == user.Id)
+                .OrderByDescending(n => n.NotificationTime)
+                .ToListAsync();
+
+            return View(notifications);
         }
 
         [HttpGet]
@@ -54,6 +84,7 @@ namespace SchoolSystem.Controllers
             TempData["ErrorMessage"] = null;
             return View();
         }
+
         [HttpPost]
         [Route("login")]
         [ValidateAntiForgeryToken]
@@ -130,7 +161,7 @@ namespace SchoolSystem.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
+        /*
         [HttpGet]
         [Route("register")]
         public IActionResult Register()
@@ -221,7 +252,7 @@ namespace SchoolSystem.Controllers
             TempData["ErrorMessage"] = "Registration failed. Please try again.";
             return View(model);
         }
-
+        */
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
