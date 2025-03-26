@@ -190,6 +190,7 @@ namespace SchoolSystem.Controllers
 
             try
             {
+
                 using var transaction = await _db.Database.BeginTransactionAsync();
 
                 // 1. สร้าง User account
@@ -233,6 +234,22 @@ namespace SchoolSystem.Controllers
                 // จัดการการอัพโหลดรูปภาพ
                 if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
                 {
+                    var validationResult = ValidateImageFile(model.ProfilePicture);
+                    if (!validationResult.IsValid)
+                    {
+                        ModelState.AddModelError("ProfilePicture", validationResult.ErrorMessage);
+                        model.Classes = await _db.Classes
+                            .Where(g => g.Status == "Active")
+                            .Include(c => c.GradeLevels)
+                            .Select(c => new SelectListItem
+                            {
+                                Value = c.ClassId.ToString(),
+                                Text = $"{c.GradeLevels.Name}/{c.ClassNumber}"
+                            })
+                            .ToListAsync();
+                        return View(model);
+                    }
+
                     // สร้างชื่อไฟล์แบบสุ่มโดยใช้ GUID
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfilePicture.FileName);
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profiles", fileName);
@@ -320,6 +337,7 @@ namespace SchoolSystem.Controllers
                 };
 
                 model.Classes = await _db.Classes
+                    .Where(g => g.Status == "Active")
                     .Include(c => c.GradeLevels)
                     .Select(c => new SelectListItem
                     {
@@ -346,6 +364,7 @@ namespace SchoolSystem.Controllers
             if (!ModelState.IsValid)
             {
                 model.Classes = await _db.Classes
+                    .Where(g => g.Status == "Active")
                     .Include(c => c.GradeLevels)
                     .Select(c => new SelectListItem
                     {
@@ -380,6 +399,22 @@ namespace SchoolSystem.Controllers
                 // จัดการการอัพโหลดรูปภาพใหม่
                 if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
                 {
+                    var validationResult = ValidateImageFile(model.ProfilePicture);
+                    if (!validationResult.IsValid)
+                    {
+                        ModelState.AddModelError("ProfilePicture", validationResult.ErrorMessage);
+                        model.Classes = await _db.Classes
+                            .Where(g => g.Status == "Active")
+                            .Include(c => c.GradeLevels)
+                            .Select(c => new SelectListItem
+                            {
+                                Value = c.ClassId.ToString(),
+                                Text = $"{c.GradeLevels.Name}/{c.ClassNumber}"
+                            })
+                            .ToListAsync();
+                        return View(model);
+                    }
+
                     // ลบไฟล์เก่า (ถ้ามี)
                     if (!string.IsNullOrEmpty(student.Profile.ProfilePictureUrl))
                     {
@@ -455,6 +490,16 @@ namespace SchoolSystem.Controllers
                     return RedirectToAction(nameof(IndexStudent));
                 }
 
+                // ตรวจสอบและลบไฟล์รูปภาพโปรไฟล์ (ถ้ามี)
+                if (!string.IsNullOrEmpty(student.Profile?.ProfilePictureUrl))
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", student.Profile.ProfilePictureUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+
                 // ลบ Student และ Profile ที่เกี่ยวข้อง
                 _db.Students.Remove(student);
                 _db.Profiles.Remove(student.Profile);
@@ -483,6 +528,46 @@ namespace SchoolSystem.Controllers
             }
 
             return RedirectToAction(nameof(IndexStudent));
+        }
+
+        private (bool IsValid, string ErrorMessage) ValidateImageFile(IFormFile file)
+        {
+            // ตรวจสอบขนาดไฟล์ (จำกัดที่ 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return (false, "ขนาดไฟล์เกิน 5MB");
+            }
+
+            // ตรวจสอบนามสกุลไฟล์
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                return (false, "ประเภทไฟล์ไม่ถูกต้อง ต้องเป็น .jpg, .jpeg, .png, .gif หรือ .bmp เท่านั้น");
+            }
+
+            // ตรวจสอบ MIME Type
+            var allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
+            if (!allowedMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                return (false, "ประเภทไฟล์ไม่ถูกต้อง ต้องเป็นภาพเท่านั้น");
+            }
+
+            // ตรวจสอบเนื้อหาของไฟล์ว่าเป็นภาพจริงหรือไม่
+            try
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var image = SixLabors.ImageSharp.Image.Load(stream); // ใช้ SixLabors.ImageSharp
+                                                                         // ถ้าโหลดสำเร็จ แปลว่าเป็นภาพ
+                }
+            }
+            catch
+            {
+                return (false, "ไฟล์นี้ไม่ใช่ภาพที่ถูกต้อง");
+            }
+
+            return (true, null);
         }
     }
 }
