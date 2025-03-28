@@ -32,6 +32,13 @@ namespace SchoolSystem.Models.ClassManagement
         [Display(Name = "End Date")]
         public DateTime EndTime { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
+        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         // Navigation Properties
         public virtual ICollection<ClassManagement> ClassManagements { get; set; } = new HashSet<ClassManagement>();
         public virtual ICollection<RegisteredCourse> RegisteredCourse { get; set; } = new List<RegisteredCourse>();

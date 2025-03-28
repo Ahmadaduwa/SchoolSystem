@@ -8,7 +8,7 @@ using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Controllers
 {
-    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
+    [Authorize(Policy = "AdminPolicy")]
     public class ActivityController : Controller
     {
         private readonly AppDbContext _db;
@@ -88,46 +88,63 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [Route("Activity/Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateActivity(Activity newActivity, bool isDaily)
+        public async Task<IActionResult> CreateActivity(Activity newActivity, bool isDaily)
         {
             if (!ModelState.IsValid)
             {
                 return View(newActivity);
             }
 
-            try
+            // ใช้ transaction เพื่อให้การบันทึกทั้งหมดเป็น atomic operation
+            using (var transaction = _db.Database.BeginTransaction())
             {
-                _db.Activities.Add(newActivity);
-                _db.SaveChanges();
-
-                if (isDaily)
+                try
                 {
-                    // ดึงรายการ SemesterId ทั้งหมดจากฐานข้อมูล
-                    var semesterIds = _db.Semesters.Select(s => s.SemesterID).ToList();
+                    // บันทึก Activity ใหม่ลงฐานข้อมูล
+                    _db.Activities.Add(newActivity);
+                    await _db.SaveChangesAsync();
 
-                    var activityManagementList = semesterIds.Select(semesterId => new ActivityManagement
+                    // สร้าง ActivityManagement เฉพาะเมื่อเป็น Daily และ Activity มีสถานะ Active
+                    if (isDaily && newActivity.Status == "Active")
                     {
-                        ActivityId = newActivity.ActivityId,
-                        CheckCount = 0, // ค่าเริ่มต้น
-                        SemesterId = semesterId,
-                        Type = "Daily",
-                        UpdateAt = DateTime.UtcNow
-                    }).ToList();
+                        // ดึงเฉพาะ Semester ที่ Active
+                        var activeSemesterIds = await _db.Semesters
+                            .Where(s => s.Status == "Active")
+                            .Select(s => s.SemesterID)
+                            .ToListAsync();
 
-                    _db.ActivityManagement.AddRange(activityManagementList);
-                    _db.SaveChanges();
+                        // สร้าง ActivityManagement สำหรับแต่ละ Semester ที่ Active
+                        var activityManagementList = activeSemesterIds.Select(semesterId => new ActivityManagement
+                        {
+                            ActivityId = newActivity.ActivityId,
+                            CheckCount = 0,
+                            SemesterId = semesterId,
+                            Type = "Daily",
+                            Status = "Active", // กำหนดเป็น Active เพราะทั้ง Activity กับ Semester Active
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        }).ToList();
+
+                        if (activityManagementList.Any())
+                        {
+                            _db.ActivityManagement.AddRange(activityManagementList);
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+
+                    transaction.Commit();
+                    TempData["SuccessMessage"] = "Activity created successfully!";
+                    return RedirectToAction("IndexActivity");
                 }
-
-                TempData["SuccessMessage"] = "Activity created successfully!";
-                return RedirectToAction("IndexActivity");
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    ModelState.AddModelError("", $"Database Error: {ex.Message}");
+                    return View(newActivity);
+                }
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Database Error: {ex.Message}");
-            }
-
-            return View(newActivity);
         }
+
 
         // แสดงหน้าแก้ไขกิจกรรม
         [HttpGet]
@@ -141,31 +158,82 @@ namespace SchoolSystem.Controllers
             }
             return View(activityToEdit);
         }
-
         [HttpPost]
         [Route("Activity/Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditActivity(Activity updatedActivity)
+        public async Task<IActionResult> EditActivity(Activity updatedActivity)
         {
             if (!ModelState.IsValid)
             {
                 return View(updatedActivity);
             }
 
-            try
+            using (var transaction = await _db.Database.BeginTransactionAsync())
             {
-                _db.Activities.Update(updatedActivity);
-                _db.SaveChanges();
-                TempData["SuccessMessage"] = "Activity updated successfully!";
-                return RedirectToAction("IndexActivity");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error: {ex.Message}");
-            }
+                try
+                {
+                    // ดึงรายการ Semester ที่มี Status = "Active"
+                    var activeSemesterIds = await _db.Semesters
+                        .Where(s => s.Status == "Active")
+                        .Select(s => s.SemesterID)
+                        .ToListAsync();
 
-            return View(updatedActivity);
+                    // ดึง ActivityManagement ที่เกี่ยวข้องกับ Activity นี้ใน Semester ที่ Active
+                    var existingManagements = await _db.ActivityManagement
+                        .Where(am => am.ActivityId == updatedActivity.ActivityId && activeSemesterIds.Contains(am.SemesterId))
+                        .ToListAsync();
+
+                    // สำหรับแต่ละ Semester ที่ Active
+                    foreach (var semesterId in activeSemesterIds)
+                    {
+                        var existing = existingManagements.FirstOrDefault(am => am.SemesterId == semesterId);
+                        if (existing != null)
+                        {
+                            // ถ้ามีอยู่แล้ว ให้ update Status และ UpdatedAt
+                            existing.Status = updatedActivity.Status;
+                            existing.UpdatedAt = DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            // ถ้ายังไม่มี ActivityManagement และ Activity ยัง Active ให้สร้างใหม่
+                            if (updatedActivity.Status == "Active")
+                            {
+                                var newManagement = new ActivityManagement
+                                {
+                                    ActivityId = updatedActivity.ActivityId,
+                                    CheckCount = 0,
+                                    SemesterId = semesterId,
+                                    Type = "Daily",
+                                    Status = updatedActivity.Status,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow
+                                };
+                                await _db.ActivityManagement.AddAsync(newManagement);
+                            }
+                        }
+                    }
+
+                    // บันทึกการเปลี่ยนแปลง ActivityManagement
+                    await _db.SaveChangesAsync();
+
+                    // อัปเดตข้อมูล Activity
+                    _db.Activities.Update(updatedActivity);
+                    await _db.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+
+                    TempData["SuccessMessage"] = "Activity updated successfully!";
+                    return RedirectToAction("IndexActivity");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError("", $"Error: {ex.Message}");
+                    return View(updatedActivity);
+                }
+            }
         }
+
 
         [HttpPost]
         [Route("Activity/Delete/{id}")]

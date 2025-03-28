@@ -11,6 +11,7 @@ using SchoolSystem.Models.Alert;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "TeacherPolicy")]
     public class ClassAttendanceController : Controller
     {
         private readonly AppDbContext _db;

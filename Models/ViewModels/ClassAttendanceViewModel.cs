@@ -11,4 +11,6 @@ namespace SchoolSystem.ViewModels
         public int TeacherId { get; set; }
         public int Debug_AllTeacherSchedulesCount { get; set; }
     }
+
+    
 }

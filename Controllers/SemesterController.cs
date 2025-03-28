@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
+using SchoolSystem.Helpers;
 using SchoolSystem.Models.ActivityManagement;
 using SchoolSystem.Models.ClassManagement;
 using System;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class SemesterController : Controller
     {
         private readonly AppDbContext _db;
@@ -18,32 +21,49 @@ namespace SchoolSystem.Controllers
             _db = db;
         }
 
-        // 📌 แสดงรายการภาคเรียนทั้งหมด
-        public async Task<IActionResult> IndexSemester()
+        [HttpGet]
+        [Route("Semester")]
+        public async Task<IActionResult> IndexSemester(int? pageNumber, string searchString, string sortOrder)
         {
-            try
+            // เก็บค่าที่ใช้ใน View
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["SemesterSortParam"] = string.IsNullOrEmpty(sortOrder) ? "Semester_desc" : "";
+            ViewData["CurrentFilter"] = searchString;
+
+            int pageSize = 10;
+            var semestersQuery = _db.Semesters.AsNoTracking();
+
+            // ค้นหาโดยดูจาก SemesterYear หรือ SemesterNumber
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                var semesters = await _db.Semesters
-                    .AsNoTracking()
-                    .OrderByDescending(s => s.SemesterYear)
-                    .ThenByDescending(s => s.SemesterNumber)
-                    .ToListAsync();
-                return View(semesters);
+                semestersQuery = semestersQuery.Where(s =>
+                    (s.SemesterYear + "/" + s.SemesterNumber).Contains(searchString));
             }
-            catch (Exception ex)
+
+            // การจัดเรียงข้อมูล
+            semestersQuery = sortOrder switch
             {
-                TempData["ErrorMessage"] = $"Error loading semesters: {ex.Message}";
-                return View(new List<Semester>());
-            }
+                "Semester_desc" => semestersQuery.OrderByDescending(s => s.SemesterYear + "/" + s.SemesterNumber),
+                _ => semestersQuery.OrderBy(s => s.SemesterYear + "/" + s.SemesterNumber),
+            };
+
+            int totalItems = await semestersQuery.CountAsync();
+            ViewData["TotalItems"] = totalItems;
+
+            // ใช้ PaginatedList<Semester> เพื่อแบ่งหน้า
+            return View(await PaginatedList<SchoolSystem.Models.ClassManagement.Semester>.CreateAsync(semestersQuery, pageNumber ?? 1, pageSize));
         }
 
-        // 📌 แสดงฟอร์มสร้างภาคเรียน
+
+        [HttpGet]
+        [Route("Semester/Create")]
         public IActionResult CreateSemester()
         {
             return View();
         }
 
         [HttpPost]
+        [Route("Semester/Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateSemester(Semester model)
         {
@@ -52,46 +72,60 @@ namespace SchoolSystem.Controllers
                 return View(model);
             }
 
-            try
+            using (var transaction = _db.Database.BeginTransaction())
             {
-                // บันทึกภาคเรียนใหม่ลงฐานข้อมูล
-                _db.Semesters.Add(model);
-                await _db.SaveChangesAsync();
-
-                // 📌 ดึงกิจกรรมทั้งหมดที่เป็น Daily
-                var dailyActivities = await _db.Activities
-                                               .Where(a => a.ActivityType == "Daily")
-                                               .ToListAsync();
-
-                // 📌 สร้าง ActivityManagement สำหรับทุกกิจกรรม Daily ที่มีอยู่
-                var activityManagementList = dailyActivities.Select(activity => new ActivityManagement
+                try
                 {
-                    ActivityId = activity.ActivityId,
-                    CheckCount = 0, // ค่าเริ่มต้น
-                    SemesterId = model.SemesterID, // ใช้เทอมที่เพิ่งเพิ่มเข้าไป
-                    Type = "Daily",
-                    UpdateAt = DateTime.UtcNow
-                }).ToList();
-
-                // 📌 บันทึกข้อมูลลงฐานข้อมูล
-                if (activityManagementList.Any())
-                {
-                    await _db.ActivityManagement.AddRangeAsync(activityManagementList);
+                    // บันทึก Semester ใหม่ลงฐานข้อมูล
+                    _db.Semesters.Add(model);
                     await _db.SaveChangesAsync();
-                }
 
-                TempData["SuccessMessage"] = "Semester created successfully!";
-                return RedirectToAction("IndexSemester");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error creating semester: {ex.Message}");
-                return View(model);
+                    // เฉพาะเมื่อ Semester ที่สร้างขึ้นมีสถานะ Active
+                    if (model.Status == "Active")
+                    {
+                        // ดึง Activity ที่เป็น Daily และมีสถานะ Active
+                        var dailyActivityIds = await _db.Activities
+                            .Where(a => a.ActivityType == "Daily" && a.Status == "Active")
+                            .Select(a => a.ActivityId)
+                            .ToListAsync();
+
+                        // สำหรับ Semester ใหม่ เราสร้าง ActivityManagement เฉพาะสำหรับ Activity ที่ Active เท่านั้น
+                        var activityManagementList = dailyActivityIds.Select(activityId => new ActivityManagement
+                        {
+                            ActivityId = activityId,
+                            CheckCount = 0,
+                            SemesterId = model.SemesterID,
+                            Type = "Daily",
+                            Status = "Active",
+                            UpdatedAt = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        }).ToList();
+
+                        if (activityManagementList.Any())
+                        {
+                            _db.ActivityManagement.AddRange(activityManagementList);
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+
+                    transaction.Commit();
+                    TempData["SuccessMessage"] = "Semester created successfully!";
+                    return RedirectToAction("IndexSemester");
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    ModelState.AddModelError("", $"Error creating semester: {ex.Message}");
+                    return View(model);
+                }
             }
         }
 
 
+
         // 📌 แสดงฟอร์มแก้ไขภาคเรียน
+        [HttpGet]
+        [Route("Semester/Edit/{id}")]
         public async Task<IActionResult> EditSemester(int id)
         {
             try
@@ -111,8 +145,8 @@ namespace SchoolSystem.Controllers
             }
         }
 
-        // 📌 บันทึกการแก้ไขภาคเรียน
         [HttpPost]
+        [Route("Semester/Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditSemester(Semester model)
         {
@@ -121,33 +155,93 @@ namespace SchoolSystem.Controllers
                 return View(model);
             }
 
-            try
+            // ใช้ transaction เพื่อให้การอัปเดตทั้งหมดเป็น atomic
+            using (var transaction = await _db.Database.BeginTransactionAsync())
             {
-                var semester = await _db.Semesters.FirstOrDefaultAsync(s => s.SemesterID == model.SemesterID);
-                if (semester == null)
+                try
                 {
-                    TempData["ErrorMessage"] = "Semester not found.";
+                    // ดึง Semester ที่ต้องการแก้ไข
+                    var semester = await _db.Semesters.FirstOrDefaultAsync(s => s.SemesterID == model.SemesterID);
+                    if (semester == null)
+                    {
+                        TempData["ErrorMessage"] = "Semester not found.";
+                        return RedirectToAction("IndexSemester");
+                    }
+
+                    // อัปเดตข้อมูล Semester
+                    semester.SemesterYear = model.SemesterYear;
+                    semester.SemesterNumber = model.SemesterNumber;
+                    semester.StartTime = model.StartTime;
+                    semester.EndTime = model.EndTime;
+                    semester.Status = model.Status; // สมมุติว่า Status ถูกแก้ไขได้จาก form
+                    semester.UpdatedAt = DateTime.UtcNow;
+
+                    // บันทึกการเปลี่ยนแปลง Semester
+                    await _db.SaveChangesAsync();
+
+                    // ดึง Activity ที่เป็น Daily และ Active อยู่ (เฉพาะ ActivityId)
+                    var dailyActivities = await _db.Activities
+                        .Where(a => a.ActivityType == "Daily" && a.Status == "Active")
+                        .Select(a => a.ActivityId)
+                        .ToListAsync();
+
+                    // ดึง ActivityManagement ที่มีอยู่แล้วสำหรับ Semester นี้
+                    var existingManagements = await _db.ActivityManagement
+                        .Where(am => am.SemesterId == semester.SemesterID && dailyActivities.Contains(am.ActivityId))
+                        .ToListAsync();
+
+                    // สำหรับแต่ละ Activity ที่เป็น Daily
+                    foreach (var activityId in dailyActivities)
+                    {
+                        var existing = existingManagements.FirstOrDefault(am => am.ActivityId == activityId);
+                        if (existing != null)
+                        {
+                            // ถ้ามีอยู่แล้ว ให้ update Status และ UpdatedAt
+                            existing.Status = semester.Status;
+                            existing.UpdatedAt = DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            // ถ้ายังไม่มี ActivityManagement และ Semester ยัง Active ให้สร้างใหม่
+                            if (semester.Status == "Active")
+                            {
+                                var newManagement = new ActivityManagement
+                                {
+                                    ActivityId = activityId,
+                                    CheckCount = 0,
+                                    SemesterId = semester.SemesterID,
+                                    Type = "Daily",
+                                    Status = semester.Status,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow
+                                };
+                                await _db.ActivityManagement.AddAsync(newManagement);
+                            }
+                        }
+                    }
+
+                    // บันทึกการเปลี่ยนแปลง ActivityManagement
+                    await _db.SaveChangesAsync();
+
+                    // ยืนยัน transaction
+                    await transaction.CommitAsync();
+
+                    TempData["SuccessMessage"] = "Semester updated successfully!";
                     return RedirectToAction("IndexSemester");
                 }
-
-                semester.SemesterYear = model.SemesterYear;
-                semester.SemesterNumber = model.SemesterNumber;
-                semester.StartTime = model.StartTime;
-                semester.EndTime = model.EndTime;
-
-                await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Semester updated successfully!";
-                return RedirectToAction("IndexSemester");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error updating semester: {ex.Message}");
-                return View(model);
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError("", $"Error updating semester: {ex.Message}");
+                    return View(model);
+                }
             }
         }
 
+
         // 📌 ลบภาคเรียนจากหน้า Edit
         [HttpPost]
+        [Route("Semester/Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteSemester(int id)
         {

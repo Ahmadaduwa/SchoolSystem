@@ -27,6 +27,7 @@ namespace SchoolSystem.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Department> Departments { get; set; }
         /// <summary>
         /// Class Management
         /// </summary>
@@ -121,6 +122,12 @@ namespace SchoolSystem.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Teacher>()
+                .HasOne(a => a.Department)
+                .WithMany(s => s.Teachers)
+                .HasForeignKey(a => a.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Teacher>()
                 .Property(t => t.Salary)
                 .HasColumnType("decimal(18,2)");
 
@@ -133,7 +140,6 @@ namespace SchoolSystem.Data
 
                 entity.Property(s => s.GPA)
                       .HasPrecision(3, 2); // จำกัดทศนิยมของ GPA เป็น xx.xx
-
             });
         }
 

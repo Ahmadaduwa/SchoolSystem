@@ -1,83 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SchoolSystem.ViewModels
 {
     public class TeacherViewEditModel
     {
-        // รหัสสำหรับ Teacher และ Profile
         public int TeacherId { get; set; }
         public int ProfileId { get; set; }
 
-        // Account Information
         [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
-        public string Email { get; set; } = string.Empty;
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Username is required")]
-        [StringLength(50, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 50 characters")]
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; set; }
 
-        // กรอกรหัสผ่านใหม่เฉพาะกรณีที่ต้องการเปลี่ยนแปลง (ไม่บังคับ)
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
         [DataType(DataType.Password)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         public string? Password { get; set; }
 
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm Password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string? ConfirmPassword { get; set; }
 
-        // Profile Information
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
-        [Display(Name = "First Name")]
-        public string FirstName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "First Name is required")]
+        public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
-        [Display(Name = "Last Name")]
-        public string LastName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Last Name is required")]
+        public string LastName { get; set; }
 
-        [Required(ErrorMessage = "Gender is required")]
-        public string Gender { get; set; } = "Not Specified";
+        public string Gender { get; set; }
+        public string Address { get; set; }
 
-        [Required(ErrorMessage = "Address is required")]
-        public string Address { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date)]
-        [Display(Name = "Date of Birth")]
-        public DateTime DateOfBirth { get; set; } = DateTime.Now.AddYears(-30);
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DateOfBirth { get; set; }
 
-        [Display(Name = "Profile Picture")]
         public string? ProfilePictureUrl { get; set; }
+        public IFormFile? ProfilePicture { get; set; }
 
-        // Teacher Information
-        [Display(Name = "Department")]
         public int? DepartmentId { get; set; }
+        public List<SelectListItem>? Departments { get; set; }
 
-        [Required(ErrorMessage = "Hire date is required")]
         [DataType(DataType.Date)]
-        [Display(Name = "Hire Date")]
-        public DateTime HireDate { get; set; } = DateTime.Now;
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime HireDate { get; set; }
 
-        [Required(ErrorMessage = "Salary is required")]
-        [Range(0, 1000000, ErrorMessage = "Salary must be a positive value")]
-        [DataType(DataType.Currency)]
+        [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number")]
         public decimal Salary { get; set; }
 
-        [Required(ErrorMessage = "Status is required")]
-        public string Status { get; set; } = "Active";
-
-        // Dropdown options สำหรับ Department
-        public List<SelectListItem> Departments { get; set; } = new List<SelectListItem>();
-
-     
-
-        // Role ที่คงที่สำหรับ Teacher
-        public string Role { get; set; } = "Teacher";
+        public string Status { get; set; }
+        public string? Role { get; set; }
     }
 }

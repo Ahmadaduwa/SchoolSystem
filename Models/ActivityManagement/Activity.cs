@@ -20,14 +20,13 @@ namespace SchoolSystem.Models.ActivityManagement
         [RegularExpression("Daily|Special", ErrorMessage = "ประเภทกิจกรรมไม่ถูกต้อง ค่าที่อนุญาตคือ 'Daily' หรือ 'Special'")]
         public string ActivityType { get; set; } = "Special";
 
-        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
-
-        public DateTime? UpdateAt { get; set; }
-
         [Required(ErrorMessage = "กรุณากรอกสถานะ")]
         [StringLength(20, ErrorMessage = "สถานะต้องไม่เกิน 20 ตัวอักษร")]
         [RegularExpression("Active|Inactive", ErrorMessage = "สถานะกิจกรรมไม่ถูกต้อง ค่าที่อนุญาตคือ 'Active' หรือ 'Inactive'")]
         public string Status { get; set; } = "Active";
+
+        public DateTime UpdateAt { get; set; }
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
         public virtual ICollection<ExtracurricularActivity> ExtracurricularActivities { get; set; } = new List<ExtracurricularActivity>();
         public virtual ICollection<ActivityManagement> ActivityManagement { get; set; } = new List<ActivityManagement>();

@@ -11,7 +11,7 @@ using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
 {
-    [Authorize(Policy = "AcademicPolicy")]
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class CurriculumController : Controller
     {
         private readonly AppDbContext _db;

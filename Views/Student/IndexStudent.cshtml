@@ -1,6 +1,6 @@
 ﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.UserManagement.Student>
 @{
-    ViewData["Title"] = "Student Management";
+    ViewData["Title"] = "การจัดการนักเรียน";
     var classes = ViewData["Classes"] as List<SelectListItem>; // รายการห้อง (Class) จาก ViewData
     var currentClass = ViewData["CurrentClass"]?.ToString();
     var currentFilter = ViewData["CurrentFilter"]?.ToString();
@@ -8,14 +8,14 @@
 }
 <div class="container mx-auto md:px-4 py-6">
     <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Student Management</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">การจัดการนักเรียน</h2>
 
         <!-- Search and Filter Section -->
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
             <form asp-action="IndexStudent" method="get" class="flex flex-wrap gap-4">
                 <!-- Search by Name -->
                 <div class="flex-1 min-w-fit">
-                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by name or Student_Code..." />
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="ค้นหาด้วยชื่อหรือรหัสนักเรียน..." />
                 </div>
 
                 <!-- Class Filter Dropdown -->
@@ -31,10 +31,10 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-2">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
-                        <i class="fas fa-search mr-1"></i> Search
+                        <i class="fas fa-search mr-1"></i> ค้นหา
                     </button>
                     <a asp-action="IndexStudent" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
-                        Reset
+                        รีเซ็ต
                     </a>
                 </div>
             </form>
@@ -43,10 +43,10 @@
         <!-- Action Buttons -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-4">
             <a asp-action="CreateStudent" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
-                <i class="fas fa-plus-circle mr-2"></i> Add New Student
+                <i class="fas fa-plus-circle mr-2"></i> เพิ่มนักเรียนใหม่
             </a>
             <div class="text-gray-600">
-                Showing @Model.Count of @ViewData["TotalItems"] students | Page @Model.PageIndex of @Model.TotalPages
+                แสดง @Model.Count จาก @ViewData["TotalItems"] นักเรียน | หน้า @Model.PageIndex จาก @Model.TotalPages
             </div>
         </div>
 
@@ -61,7 +61,7 @@
                                asp-route-currentFilter="@currentFilter"
                                asp-route-classFilter="@currentClass"
                                class="flex items-center justify-between">
-                                Name
+                                ชื่อ
                                 @if (string.IsNullOrEmpty(currentSort) || currentSort == "name_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
@@ -74,14 +74,14 @@
                                asp-route-currentFilter="@currentFilter"
                                asp-route-classFilter="@currentClass"
                                class="flex items-center justify-between">
-                                Student Code
+                                รหัสนักเรียน
                                 @if (currentSort == "code" || currentSort == "code_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "code_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">Class</th>
+                        <th class="border px-4 py-2">ห้อง</th>
                         <th class="border px-4 py-2">
                             <a asp-action="IndexStudent"
                                asp-route-sortOrder="@ViewData["GpaSortParam"]"
@@ -95,8 +95,8 @@
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">Status</th>
-                        <th class="border px-4 py-2">Actions</th>
+                        <th class="border px-4 py-2">สถานะ</th>
+                        <th class="border px-4 py-2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,7 +109,7 @@
                                 <td class="border px-4 py-2">@student.Student_Code</td>
                                 <td class="border px-4 py-2">
                                     @{
-                                        var classInfo = classes?.FirstOrDefault(c => c.Value == student.ClassId.ToString())?.Text ?? "Unknown";
+                                        var classInfo = classes?.FirstOrDefault(c => c.Value == student.ClassId.ToString())?.Text ?? "ไม่ทราบ";
                                     }
                                     @classInfo
                                 </td>
@@ -117,16 +117,16 @@
                                 <td class="border px-4 py-2">@student.Status</td>
                                 <td class="border px-4 py-2">
                                     <div class="flex justify-center gap-1">
-                                        <a asp-action="DetailsStudent" asp-route-id="@student.StudentId" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="View Details">
+                                        <a asp-action="DetailsStudent" asp-route-id="@student.StudentId" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="ดูรายละเอียด">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="EditStudent" asp-route-id="@student.StudentId" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="Edit">
+                                        <a asp-action="EditStudent" asp-route-id="@student.StudentId" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="แก้ไข">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @if (User.IsInRole("Admin"))
                                         {
                                             <form asp-controller="Student" asp-action="DeleteStudent" asp-route-id="@student.StudentId" method="post"
-                                                  onsubmit="return confirm('Are you sure you want to delete this item?');"
+                                                  onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?');"
                                                   class="flex justify-between items-center">
                                                 <input type="hidden" asp-for="@student.StudentId" />
                                                 <button type="submit" class="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded text-sm">
@@ -145,7 +145,7 @@
                             <td colspan="6" class="text-center text-gray-500 p-6">
                                 <div class="flex flex-col items-center">
                                     <i class="fas fa-search text-4xl mb-2"></i>
-                                    <p>No students found matching your criteria.</p>
+                                    <p>ไม่พบนักเรียนที่ตรงกับเกณฑ์ของคุณ</p>
                                 </div>
                             </td>
                         </tr>
@@ -156,31 +156,31 @@
 
         <!-- Pagination Controls -->
         <div class="flex flex-col md:flex-row justify-between items-center mt-6">
-            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <span class="text-gray-600 mb-2 md:mb-0">หน้า @Model.PageIndex จาก @Model.TotalPages</span>
             <div class="flex space-x-2">
                 @if (Model.HasPreviousPage)
                 {
                     <a asp-action="IndexStudent" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-classFilter="@currentClass" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </span>
                 }
 
                 @if (Model.HasNextPage)
                 {
                     <a asp-action="IndexStudent" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-classFilter="@currentClass" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </span>
                 }
             </div>

@@ -4,6 +4,6 @@
     {
         public int ActivityManagementId { get; set; }
         public string ActivityName { get; set; } = string.Empty;
-        public IEnumerable<SchoolSystem.Models.ClassManagement.Class> Classes { get; set; } = new List<SchoolSystem.Models.ClassManagement.Class>();
+        public IEnumerable<ClassManagement.Class> Classes { get; set; } = new List<ClassManagement.Class>();
     }
 }

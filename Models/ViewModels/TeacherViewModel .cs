@@ -51,6 +51,7 @@ namespace SchoolSystem.ViewModels
 
         [Display(Name = "Profile Picture")]
         public string? ProfilePictureUrl { get; set; }
+        public IFormFile? ProfilePicture { get; set; }
 
         // Teacher Information
         [Display(Name = "Department")]

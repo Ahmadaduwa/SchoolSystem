@@ -1,49 +1,142 @@
-﻿@model List<SchoolSystem.Models.ClassManagement.Semester>
+﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.ClassManagement.Semester>
+@{
+    ViewData["Title"] = "Semester Management";
+    var currentFilter = ViewData["CurrentFilter"]?.ToString();
+    var currentSort = ViewData["CurrentSort"]?.ToString();
+}
 
-<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Semester List</h2>
+<div class="container mx-auto md:px-4 py-6">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Semester Management</h2>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-            @TempData["SuccessMessage"]
+        <!-- ส่วนค้นหา -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <form asp-action="IndexSemester" method="get" class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-fit">
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by Semester Year or Number..." />
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
+                        <i class="fas fa-search mr-1"></i> Search
+                    </button>
+                    <a asp-action="IndexSemester" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
+                        Reset
+                    </a>
+                </div>
+            </form>
         </div>
-    }
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-            @TempData["ErrorMessage"]
+        <!-- ปุ่มเพิ่มข้อมูลใหม่และแสดงข้อมูลการแบ่งหน้า -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+            <a asp-action="CreateSemester" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
+                <i class="fas fa-plus-circle mr-2"></i> Create Semester
+            </a>
+            <div class="text-gray-600">
+                Showing @Model.Count of @ViewData["TotalItems"] semesters | Page @Model.PageIndex of @Model.TotalPages
+            </div>
         </div>
-    }
 
-    <div class="flex justify-between mb-4">
-        <a asp-action="CreateSemester" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500">+ Add Semester</a>
+        <!-- ตารางแสดงข้อมูล Semester -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <!-- Semester Column (รวม SemesterYear และ SemesterNumber) -->
+                        <th class="border px-4 py-2">
+                            <a asp-action="IndexSemester" asp-route-sortOrder="@ViewData["SemesterSortParam"]" asp-route-currentFilter="@currentFilter" class="flex items-center justify-between">
+                                Semester
+                                @if (string.IsNullOrEmpty(currentSort) || currentSort == "Semester_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "Semester_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <!-- Start Date Column -->
+                        <th class="border px-4 py-2">Start Date</th>
+                        <!-- End Date Column -->
+                        <th class="border px-4 py-2">End Date</th>
+                        <!-- Status Column -->
+                        <th class="border px-4 py-2">Status</th>
+                        <!-- Actions Column -->
+                        <th class="border px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var semester in Model)
+                        {
+                            <tr class="hover:bg-gray-50">
+                                <!-- รวม SemesterYear และ SemesterNumber -->
+                                <td class="border px-4 py-2">@($"{semester.SemesterYear}/{semester.SemesterNumber}")</td>
+                                <td class="border px-4 py-2">@semester.StartTime.ToString("yyyy-MM-dd")</td>
+                                <td class="border px-4 py-2">@semester.EndTime.ToString("yyyy-MM-dd")</td>
+                                <td class="border px-4 py-2">@semester.Status</td>
+                                <td class="border px-4 py-2 flex justify-center gap-2">
+                                    <a asp-action="EditSemester" asp-route-id="@semester.SemesterID" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-gray-500 p-6">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-search text-4xl mb-2"></i>
+                                    <p>No semesters found matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-6">
+            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <div class="flex space-x-2">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="IndexSemester" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </span>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="IndexSemester" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </span>
+                }
+            </div>
+        </div>
     </div>
-
-    <table class="w-full text-center border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border px-4 py-2">Year</th>
-                <th class="border px-4 py-2">Number</th>
-                <th class="border px-4 py-2">Start Date</th>
-                <th class="border px-4 py-2">End Date</th>
-                <th class="border px-4 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var semester in Model)
-            {
-                <tr class="hover:bg-gray-50">
-                    <td class="border px-4 py-2">@semester.SemesterYear</td>
-                    <td class="border px-4 py-2">@semester.SemesterNumber</td>
-                    <td class="border px-4 py-2">@semester.StartTime.ToShortDateString()</td>
-                    <td class="border px-4 py-2">@semester.EndTime.ToShortDateString()</td>
-                    <td class="border px-4 py-2 flex gap-2 justify-center">
-                        <a asp-action="EditSemester" asp-route-id="@semester.SemesterID" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
+
+@section Scripts {
+    <script>
+        // ตรวจสอบและเพิ่ม FontAwesome หากยังไม่ได้โหลด
+        if (!document.getElementById('fontawesome-css')) {
+            var link = document.createElement('link');
+            link.id = 'fontawesome-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    </script>
+}

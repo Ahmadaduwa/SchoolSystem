@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
@@ -6,6 +7,7 @@ using SchoolSystem.Models.CourseManagement;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class CourseController : Controller
     {
         private readonly AppDbContext _db;

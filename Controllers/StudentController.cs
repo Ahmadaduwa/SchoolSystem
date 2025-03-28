@@ -64,8 +64,7 @@ namespace SchoolSystem.Controllers
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 studentsQuery = studentsQuery.Where(s =>
-                    s.Profile.FirstName.Contains(searchString) ||
-                    s.Profile.LastName.Contains(searchString) ||
+                    (s.Profile.FirstName + " " + s.Profile.LastName).Contains(searchString) ||
                     s.Student_Code.Contains(searchString));
             }
 
@@ -110,7 +109,7 @@ namespace SchoolSystem.Controllers
 
                 if (student == null)
                 {
-                    TempData["ErrorMessage"] = "Student not found.";
+                    TempData["ErrorMessage"] = "ไม่พบข้อมูลนักเรียน";
                     return RedirectToAction(nameof(IndexStudent));
                 }
 
@@ -140,7 +139,7 @@ namespace SchoolSystem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading student details: {ErrorMessage}", ex.Message);
-                TempData["ErrorMessage"] = $"Error loading student details: {ex.Message}";
+                TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการโหลดรายละเอียดนักเรียน: {ex.Message}";
                 return RedirectToAction(nameof(IndexStudent));
             }
         }
@@ -288,13 +287,14 @@ namespace SchoolSystem.Controllers
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["SuccessMessage"] = "Student created successfully!";
+                TempData["SuccessMessage"] = "สร้างนักเรียนสำเร็จ!";
                 return RedirectToAction(nameof(IndexStudent));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating student: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error creating student: {ex.Message}");
+                TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการสร้างนักเรียน: {ex.Message}";
                 return View(model);
             }
         }
@@ -312,7 +312,7 @@ namespace SchoolSystem.Controllers
 
                 if (student == null)
                 {
-                    TempData["ErrorMessage"] = "Student not found.";
+                    TempData["ErrorMessage"] = "ไม่พบข้อมูลนักเรียน";
                     return RedirectToAction(nameof(IndexStudent));
                 }
 
@@ -351,7 +351,7 @@ namespace SchoolSystem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading student with id {StudentId}", id);
-                TempData["ErrorMessage"] = $"Error loading student: {ex.Message}";
+                TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการโหลดรายละเอียดนักเรียน: {ex.Message}";
                 return RedirectToAction(nameof(IndexStudent));
             }
         }
@@ -383,7 +383,7 @@ namespace SchoolSystem.Controllers
 
             if (student == null)
             {
-                TempData["ErrorMessage"] = "Student not found.";
+                TempData["ErrorMessage"] = "ไม่พบข้อมูลนักเรียน";
                 return RedirectToAction(nameof(IndexStudent));
             }
 
@@ -461,13 +461,13 @@ namespace SchoolSystem.Controllers
                 student.UpdatedAt = DateTime.UtcNow;
 
                 await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Student updated successfully!";
+                TempData["SuccessMessage"] = "อัปเดตข้อมูลนักเรียนสำเร็จ!";
                 return RedirectToAction(nameof(IndexStudent));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating student with id {StudentId}", model.StudentId);
-                TempData["ErrorMessage"] = $"Error updating student: {ex.Message}";
+                TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการอัปเดตข้อมูลนักเรียน: {ex.Message}";
                 return View(model);
             }
         }
@@ -486,7 +486,7 @@ namespace SchoolSystem.Controllers
 
                 if (student == null)
                 {
-                    TempData["ErrorMessage"] = "Student not found.";
+                    TempData["ErrorMessage"] = "ไม่พบข้อมูลนักเรียน";
                     return RedirectToAction(nameof(IndexStudent));
                 }
 
@@ -514,17 +514,17 @@ namespace SchoolSystem.Controllers
                         var result = await _userManager.DeleteAsync(user);
                         if (!result.Succeeded)
                         {
-                            TempData["ErrorMessage"] = "User deletion failed.";
+                            TempData["ErrorMessage"] = "การลบผู้ใช้ล้มเหลว";
                             return RedirectToAction(nameof(IndexStudent));
                         }
                     }
                 }
 
-                TempData["SuccessMessage"] = "Student deleted successfully!";
+                TempData["SuccessMessage"] = "ลบนักเรียนสำเร็จ!";
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error deleting student: {ex.Message}";
+                TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการลบนักเรียน: {{ex.Message";
             }
 
             return RedirectToAction(nameof(IndexStudent));

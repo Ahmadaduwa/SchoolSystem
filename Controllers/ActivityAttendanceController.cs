@@ -11,10 +11,11 @@ using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using SchoolSystem.ViewModels;
 using SchoolSystem.Models.Alert;
+using SchoolSystem.Models.ViewModels;
 
 namespace SchoolSystem.Controllers
 {
-    [Authorize(Policy = "TeacherPolicy")]
+    [Authorize(Policy = "TeacherPolicyOrStudentCouncilPolicy")]
     public class ActivityAttendanceController : Controller
     {
         private readonly AppDbContext _db;
@@ -28,44 +29,130 @@ namespace SchoolSystem.Controllers
 
         [HttpGet]
         [Route("ActivityAttendance")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> CheckActivity()
         {
-            var today = DateTime.Now.DayOfWeek;
-            if (today == DayOfWeek.Saturday || today == DayOfWeek.Sunday)
+            // กำหนดวันที่ปัจจุบัน (เปรียบเทียบเฉพาะวันที่)
+            var today = DateTime.Today;
+
+            // ดึงเทอมที่ Active และวันที่ปัจจุบันอยู่ในช่วง StartTime - EndTime
+            var currentSemester = await _db.Semesters
+                .Where(s => s.Status == "Active" &&
+                            s.StartTime.Date <= today &&
+                            s.EndTime.Date >= today)
+                .FirstOrDefaultAsync();
+
+            if (currentSemester == null)
             {
-                _logger.LogInformation("วันนี้ไม่อยู่ในช่วงวันทำการ (จันทร์-ศุกร์)");
-                return View("NoActivity");
+                _logger.LogInformation("ไม่พบเทอมปัจจุบันที่ Active");
+                var view2Model = new ActivityAttendanceViewModel
+                {
+                    CurrentDate = today,
+                    CurrentDay = today.DayOfWeek.ToString(),
+
+                };
+                return View("CheckActivity", view2Model);
             }
 
+            // ดึงกิจกรรมที่เกี่ยวข้องกับเทอมปัจจุบันและกิจกรรมต้อง Active ด้วย
             var activities = await _db.ActivityManagement
                 .Include(am => am.Activity)
-                .Where(am => am.Activity.ActivityType == "Daily")
+                .Include(am => am.Semester)
+                .Where(am => am.SemesterId == currentSemester.SemesterID &&
+                             am.Activity != null && am.Status == "Active")
                 .ToListAsync();
 
-            _logger.LogInformation($"พบ {activities.Count} กิจกรรมที่มีประเภท Daily");
-            return View(activities);
+            _logger.LogInformation($"พบ {activities.Count} กิจกรรมในเทอมปัจจุบัน (Semester ID: {currentSemester.SemesterID})");
+
+            // ส่งข้อมูลไปที่ View โดยอาจใช้ ViewModel ที่สืบทอดจากสไตล์ของ Class Management
+            var viewModel = new ActivityAttendanceViewModel
+            {
+                CurrentDate = today,
+                CurrentDay = today.DayOfWeek.ToString(),
+                Schedules = activities.Select(a => new ScheduleViewModel
+                {
+                    Id = a.AM_id,
+                    Name = a.Activity?.ActivityName ?? "ไม่ระบุ",
+                }).ToList()
+            };
+
+            return View("CheckActivity", viewModel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> SelectClass(int activityManagementId)
+        [Route("ActivityAttendance/All")]
+        public async Task<IActionResult> CheckAllActivity()
+        {
+            // กำหนดวันที่ปัจจุบัน (เปรียบเทียบเฉพาะวันที่)
+            var today = DateTime.Today;
+
+            // ดึงเทอมที่ Active และวันที่ปัจจุบันอยู่ในช่วง StartTime - EndTime
+            var currentSemester = await _db.Semesters
+                .Where(s => s.Status == "Active" &&
+                            s.StartTime.Date <= today &&
+                            s.EndTime.Date >= today)
+                .FirstOrDefaultAsync();
+
+            if (currentSemester == null)
+            {
+                _logger.LogInformation("ไม่พบเทอมปัจจุบันที่ Active");
+                var view2Model = new ActivityAttendanceViewModel
+                {
+                    CurrentDate = today,
+                    CurrentDay = today.DayOfWeek.ToString(),
+
+                };
+                return View("CheckAllActivity", view2Model);
+            }
+
+            // ดึงกิจกรรมที่เกี่ยวข้องกับเทอมปัจจุบันและกิจกรรมต้อง Active ด้วย
+            var activities = await _db.ActivityManagement
+                .Include(am => am.Activity)
+                .Include(am => am.Semester)
+                .Where(am => am.SemesterId == currentSemester.SemesterID &&
+                             am.Activity != null && am.Status == "Active")
+                .ToListAsync();
+
+            _logger.LogInformation($"พบ {activities.Count} กิจกรรมในเทอมปัจจุบัน (Semester ID: {currentSemester.SemesterID})");
+
+            // ส่งข้อมูลไปที่ View โดยอาจใช้ ViewModel ที่สืบทอดจากสไตล์ของ Class Management
+            var viewModel = new ActivityAttendanceViewModel
+            {
+                CurrentDate = today,
+                CurrentDay = today.DayOfWeek.ToString(),
+                Schedules = activities.Select(a => new ScheduleViewModel
+                {
+                    Id = a.AM_id,
+                    Name = a.Activity?.ActivityName ?? "ไม่ระบุ",
+                }).ToList()
+            };
+
+            return View("CheckAllActivity", viewModel);
+        }
+
+
+        [HttpGet]
+        [Route("ActivityAttendance/Select/{amId}")]
+        public async Task<IActionResult> SelectClass(int amId)
         {
             var activityManagement = await _db.ActivityManagement
+                .Where(am => am.Status == "Active")
                 .Include(am => am.Activity)
-                .FirstOrDefaultAsync(am => am.AM_id == activityManagementId);
+                .FirstOrDefaultAsync(am => am.AM_id == amId);
 
             if (activityManagement == null)
             {
-                _logger.LogWarning($"ไม่พบ ActivityManagementId: {activityManagementId}");
+                _logger.LogWarning($"ไม่พบ ActivityManagementId: {amId}");
                 return NotFound();
             }
 
             var classes = await _db.Classes
+                .Where(c => c.Status == "Active")
                 .Include(c => c.GradeLevels)
                 .ToListAsync();
 
             var viewModel = new ActivityAttendanceSelectClassViewModel
             {
-                ActivityManagementId = activityManagementId,
+                ActivityManagementId = amId,
                 ActivityName = activityManagement.Activity.ActivityName,
                 Classes = classes
             };
@@ -74,50 +161,105 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MarkAttendance(int activityManagementId, int classId)
+        [Route("ActivityAttendance/SelectAll/{amId}")]
+        public async Task<IActionResult> SelectClassAll(int amId)
         {
-            var attendanceDate = DateTime.Now.Date;
-
             var activityManagement = await _db.ActivityManagement
+                .Where(am => am.Status == "Active")
                 .Include(am => am.Activity)
-                .FirstOrDefaultAsync(am => am.AM_id == activityManagementId);
+                .FirstOrDefaultAsync(am => am.AM_id == amId);
+
             if (activityManagement == null)
             {
-                _logger.LogWarning($"ActivityManagementId not found: {activityManagementId}");
+                _logger.LogWarning($"ไม่พบ ActivityManagementId: {amId}");
                 return NotFound();
             }
 
-            var students = await _db.Students
-                .Include(s => s.Profile)
-                .Where(s => s.ClassId == classId)
+            var classes = await _db.Classes
+                .Where(c => c.Status == "Active")
+                .Include(c => c.GradeLevels)
                 .ToListAsync();
 
-            var classInfo = await _db.Classes
-                .Include(c => c.GradeLevels)
-                .FirstOrDefaultAsync(c => c.ClassId == classId);
-
-            var existingAttendances = await _db.ActivityAttendances
-                .Where(a => a.AM_id == activityManagementId
-                         && a.TimeStamp == DateOnly.FromDateTime(attendanceDate)
-                         && students.Select(s => s.StudentId).Contains(a.Student_id))
-                .ToDictionaryAsync(a => a.Student_id, a => a.Status);
-
-            var viewModel = new ActivityAttendanceViewModel
+            var viewModel = new ActivityAttendanceSelectClassViewModel
             {
-                ActivityManagementId = activityManagementId,
-                ActivityName = activityManagement.Activity.ActivityName, // Set here
-                AttendanceDate = attendanceDate,
-                ClassId = classId,
-                Students = students.Select(s => new StudentAttendanceInputModel
-                {
-                    StudentId = s.StudentId,
-                    StudentName = $"{s.Profile?.FirstName} {s.Profile?.LastName}",
-                    Status = existingAttendances.TryGetValue(s.StudentId, out var status) ? status : "absent"
-                }).ToList()
+                ActivityManagementId = amId,
+                ActivityName = activityManagement.Activity.ActivityName,
+                Classes = classes
             };
 
-            ViewBag.ClassName = classInfo != null ? $"{classInfo.GradeLevels?.Name}/{classInfo.ClassNumber}" : "Unknown";
             return View(viewModel);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAttendance(int activityManagementId, int classId)
+        {
+            try
+            {
+                var attendanceDate = DateTime.Now.Date;
+
+                // Fetch activity management with validation
+                var activityManagement = await _db.ActivityManagement
+                    .Where(am => am.Status=="Active")
+                    .Include(am => am.Activity)
+                    .FirstOrDefaultAsync(am => am.AM_id == activityManagementId);
+
+                if (activityManagement == null)
+                {
+                    _logger.LogWarning($"ActivityManagementId not found: {activityManagementId}");
+                    return NotFound(new { message = "Activity management not found" });
+                }
+
+                // Fetch students with detailed profile information
+                var students = await _db.Students
+                    .Include(s => s.Profile)
+                    .Where(s => s.ClassId == classId)
+                    .OrderBy(s => s.Profile.LastName)
+                    .ToListAsync();
+
+                // Fetch class information
+                var classInfo = await _db.Classes
+                    .Include(c => c.GradeLevels)
+                    .FirstOrDefaultAsync(c => c.ClassId == classId);
+
+                // Retrieve existing attendances for the day
+                var existingAttendances = await _db.ActivityAttendances
+                    .Where(a => a.AM_id == activityManagementId
+                             && a.TimeStamp == DateOnly.FromDateTime(attendanceDate)
+                             && students.Select(s => s.StudentId).Contains(a.Student_id))
+                    .ToDictionaryAsync(a => a.Student_id, a => a.Status);
+
+                // Prepare view model
+                var viewModel = new ActivityAttendanceViewModel
+                {
+                    ActivityManagementId = activityManagementId,
+                    ActivityName = activityManagement.Activity.ActivityName,
+                    AttendanceDate = attendanceDate,
+                    ClassId = classId,
+                    Students = students.Select(s => new StudentAttendanceInputModel
+                    {
+                        StudentId = s.StudentId,
+                        StudentCode = s.Student_Code, // Added student code
+                        StudentName = $"{s.Profile?.FirstName} {s.Profile?.LastName}",
+                        Status = existingAttendances.TryGetValue(s.StudentId, out var status)
+                            ? status
+                            : "absent"
+                    }).ToList()
+                };
+
+                // Set class name in ViewBag
+                ViewBag.ClassName = classInfo != null
+                    ? $"{classInfo.GradeLevels?.Name}/{classInfo.ClassNumber}"
+                    : "Unknown";
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in MarkAttendance method");
+                return StatusCode(500, new { message = "An error occurred while processing the request" });
+            }
         }
 
         [HttpPost]
@@ -327,6 +469,54 @@ namespace SchoolSystem.Controllers
                     _logger.LogError(ex, "Error while marking/updating activity attendance");
                     return StatusCode(500, "An error occurred while saving attendance data");
                 }
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "TeacherPolicy")]
+        public async Task<IActionResult> SummaryAttendance(int activityManagementId, int classId)
+        {
+            try
+            {
+                var ActivityManagement = await _db.ActivityManagement
+                    .FirstOrDefaultAsync(c => c.AM_id == activityManagementId);
+                if (ActivityManagement == null)
+                {
+                    _logger.LogWarning($"Course with AM_id: {ActivityManagement} not found");
+                    return NotFound("ไม่พบข้อมูลวิชาที่ระบุ");
+                }
+
+                // ดึงข้อมูลการเข้าเรียนของนักเรียนในวิชานั้นๆ
+                var attendanceSummary = await _db.ActivityAttendanceSummary
+                    .Where(s => s.AM_id == activityManagementId)
+                    .Include(s => s.Student)
+                    .ThenInclude(s => s.Profile) // รวมข้อมูล Profile ของ Student
+                    .Where(s => s.Student.Class.ClassId == classId)
+                    .ToListAsync();
+
+                if (!attendanceSummary.Any())
+                {
+                    _logger.LogInformation($"No attendance records found for AM_id: {activityManagementId}");
+                }
+
+                // แปลงข้อมูลจาก ClassAttendanceSummary เป็น ViewModel
+                var viewModel = attendanceSummary.Select(s => new AttendanceSummaryViewModel
+                {
+                    StudentCode = s.Student?.Student_Code ?? "ไม่พบรหัสนักเรียน",
+                    Name = s.Student?.Profile?.FirstName +" "+ s.Student?.Profile?.LastName ?? "ไม่พบชื่อ",
+                    PresentCount = s.PresentCount ?? 0,
+                    AbsentCount = s.AbsentCount ?? 0,
+                    LateCount = s.LateCount ?? 0,
+                    ExcusedCount = s.ExcusedCount ?? 0,
+                }).ToList();
+
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving attendance for AM_id: {activityManagementId}");
+                return StatusCode(500, "เกิดข้อผิดพลาดในการดึงข้อมูลการเข้าเรียน");
             }
         }
     }

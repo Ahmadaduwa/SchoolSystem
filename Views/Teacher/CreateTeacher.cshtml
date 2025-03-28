@@ -8,7 +8,7 @@
 
     <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm mb-4"></div>
 
-    <form asp-action="CreateTeacher" method="post" class="space-y-6">
+    <form asp-action="CreateTeacher" method="post" enctype="multipart/form-data" class="space-y-6">
         <fieldset class="border p-4 rounded-lg">
             <legend class="text-lg font-bold px-2">Account Information</legend>
             <div class="space-y-4">
@@ -77,6 +77,13 @@
                     <input asp-for="DateOfBirth" type="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                     <span asp-validation-for="DateOfBirth" class="text-red-500 text-xs"></span>
                 </div>
+
+                <!-- เพิ่มส่วนอัพโหลดรูปโปรไฟล์ -->
+                <div>
+                    <label asp-for="ProfilePicture" class="block text-sm font-medium text-gray-700">Profile Picture:</label>
+                    <input asp-for="ProfilePicture" type="file" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="ProfilePicture" class="text-red-500 text-xs"></span>
+                </div>
             </div>
         </fieldset>
 
@@ -86,6 +93,7 @@
                 <div>
                     <label asp-for="DepartmentId" class="block text-sm font-medium text-gray-700">Department:</label>
                     <select asp-for="DepartmentId" asp-items="Model.Departments" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        <option value="">All Departments</option>
                     </select>
                     <span asp-validation-for="DepartmentId" class="text-red-500 text-xs"></span>
                     <p class="text-gray-500 text-xs mt-1">Department selection is optional</p>
@@ -121,4 +129,3 @@
         </div>
     </form>
 </div>
-

@@ -35,6 +35,10 @@ namespace SchoolSystem.Models.ClassManagement
         [Range(0, int.MaxValue, ErrorMessage = "CheckCount must be a non-negative integer.")]
         public int CheckCount { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 

@@ -16,7 +16,10 @@ namespace SchoolSystem.Models.UserManagement
         [ForeignKey("ProfileId")]
         public Profiles? Profile { get; set; }
 
+        [Required]
         public int? DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public virtual Department? Department { get; set; }
 
         [Required]
         public DateTime HireDate { get; set; }

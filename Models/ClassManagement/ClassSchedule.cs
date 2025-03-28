@@ -25,5 +25,8 @@ namespace SchoolSystem.Models.ClassManagement
         [Required]
         [StringLength(20)]
         public string Status { get; set; } = "Active"; // Status (e.g., Active/Inactive)
+
+        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

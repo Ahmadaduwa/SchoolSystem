@@ -5,6 +5,7 @@
         public int StudentId { get; set; }
         public string? StudentName { get; set; }
         public string? Status { get; set; }
+        public string? StudentCode { get; set; }
         public bool IsChecked { get; set; } // อาจใช้สำหรับ UI ในการเลือกนักเรียน
     }
 }   

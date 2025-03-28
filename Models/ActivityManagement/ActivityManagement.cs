@@ -25,7 +25,13 @@ namespace SchoolSystem.Models.ActivityManagement
         [Required]
         [StringLength(50)]
         public string? Type { get; set; }
-        public DateTime? UpdateAt { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
+        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public virtual ICollection<ActivityAttendance> ActivityAttendance { get; set; } = new List<ActivityAttendance>();
         public virtual ICollection<ActivitySchedule> ActivitySchedule { get; set; } = new List<ActivitySchedule>(); 

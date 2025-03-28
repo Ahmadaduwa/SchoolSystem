@@ -12,7 +12,7 @@
 
     // Combine FirstName and LastName to create Fullname
     ViewData["Fullname"] = profile != null ? $"{profile.FirstName} {profile.LastName}" : "ผู้ใช้ทั่วไป";
-    ViewData["UrlUserAvatar"] = profile?.ProfilePictureUrl ?? "/default-avatar.jpg";
+    ViewData["UrlUserAvatar"] = profile?.ProfilePictureUrl ?? "images/profiles/user.jpg";
 
     // You can also add more profile information if needed
     ViewData["Gender"] = profile?.Gender ?? "Not Specified";
@@ -99,7 +99,7 @@
     </header>
 
     <!-- Main Content Wrapper -->
-    <div class="flex-grow flex ">
+    <div class="md:flex-grow md:flex ">
         <!-- Sidebar -->
         <nav id="sidebar"
              class="fixed md:static top-0 left-0 h-full md:h-auto w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">

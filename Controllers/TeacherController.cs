@@ -9,9 +9,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using SchoolSystem.Helpers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class TeacherController : Controller
     {
         private readonly AppDbContext _db;
@@ -26,7 +28,9 @@ namespace SchoolSystem.Controllers
             _db = db;
             _logger = logger;
         }
-        // GET: Teacher
+
+        [HttpGet]
+        [Route("Teacher")]
         public async Task<IActionResult> IndexTeacher(int? pageNumber, string searchString, string sortOrder, int? departmentFilter)
         {
             ViewData["CurrentSort"] = sortOrder;
@@ -49,8 +53,7 @@ namespace SchoolSystem.Controllers
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 teachersQuery = teachersQuery.Where(t =>
-                    t.Profile.FirstName.Contains(searchString) ||
-                    t.Profile.LastName.Contains(searchString));
+                    (t.Profile.FirstName + " " + t.Profile.LastName).Contains(searchString));
             }
 
             // กรองตามแผนก
@@ -76,7 +79,8 @@ namespace SchoolSystem.Controllers
             return View(await PaginatedList<Teacher>.CreateAsync(teachersQuery, pageNumber ?? 1, pageSize));
         }
 
-
+        [HttpGet]
+        [Route("Teacher/Details")]
         public async Task<IActionResult> DetailsTeacher(int id)
         {
             try
@@ -127,31 +131,26 @@ namespace SchoolSystem.Controllers
 
 
 
-
+        [HttpGet]
+        [Route("Teacher/Create")]
         public IActionResult CreateTeacher()
         {
             var viewModel = new TeacherViewModel
             {
-                Departments = new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "", Text = "Select Department (Optional)" },
-                    new SelectListItem { Value = "1", Text = "Mathematics" },
-                    new SelectListItem { Value = "2", Text = "Science" },
-                    new SelectListItem { Value = "3", Text = "English" },
-                    new SelectListItem { Value = "4", Text = "History" },
-                    new SelectListItem { Value = "5", Text = "Computer Science" }
-                }
+                Departments = GetDepartmentListItems().Result
             };
 
             return View(viewModel);
         }
         [HttpPost]
+        [Route("Teacher/Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTeacher(TeacherViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 // Reload the departments dropdown when validation fails
+                TempData["ErrorMessage"] = "Please correct the highlighted errors and try again.";
                 model.Departments = await GetDepartmentListItems();
                 return View(model);
             }
@@ -180,6 +179,8 @@ namespace SchoolSystem.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
+                    var errorMessages = result.Errors.Select(e => e.Description).ToList();
+                    TempData["ErrorMessage"] = $"User creation failed: {string.Join(", ", errorMessages)}";
                     model.Departments = await GetDepartmentListItems();
                     return View(model);
                 }
@@ -188,7 +189,6 @@ namespace SchoolSystem.Controllers
                 await _userManager.AddToRoleAsync(user, "Teacher");
 
                 // 2. Create Profile
-                // สร้าง Profile
                 var profile = new Profiles
                 {
                     FirstName = model.FirstName,
@@ -196,16 +196,44 @@ namespace SchoolSystem.Controllers
                     Gender = model.Gender,
                     Address = model.Address,
                     DateOfBirth = DateOnly.FromDateTime(model.DateOfBirth),
-                    ProfilePictureUrl = string.IsNullOrEmpty(model.ProfilePictureUrl) ? "" : model.ProfilePictureUrl,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     UserId = user.Id
                 };
 
-                // บันทึก Profile และรับค่า ProfileId
+                // ถ้ามีการอัพโหลดรูปโปรไฟล์
+                if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+                {
+                    var validationResult = ValidateImageFile(model.ProfilePicture);
+                    if (!validationResult.IsValid)
+                    {
+                        ModelState.AddModelError("ProfilePicture", validationResult.ErrorMessage);
+                        model.Departments = await GetDepartmentListItems();
+                        return View(model);
+                    }
+
+                    // สร้างชื่อไฟล์แบบสุ่มโดยใช้ GUID
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfilePicture.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profiles", fileName);
+
+                    // บันทึกไฟล์ลงในโฟลเดอร์ /images/profiles/
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    // บันทึก path ของไฟล์ลงใน ProfilePictureUrl
+                    profile.ProfilePictureUrl = $"/images/profiles/{fileName}";
+                }
+                else
+                {
+                    profile.ProfilePictureUrl = ""; // หรือกำหนดค่า default ถ้าต้องการ
+                }
+
                 _db.Profiles.Add(profile);
                 await _db.SaveChangesAsync();
 
+                // 3. Create Teacher record
                 var teacher = new Teacher
                 {
                     ProfileId = profile.ProfileId, // ใช้ ProfileId ที่ได้จากการบันทึก Profile
@@ -217,7 +245,6 @@ namespace SchoolSystem.Controllers
                     UpdateAt = DateTime.UtcNow
                 };
 
-                // Add teacher record and save immediately
                 await _db.Teachers.AddAsync(teacher);
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -227,37 +254,34 @@ namespace SchoolSystem.Controllers
             }
             catch (Exception ex)
             {
-                // Roll back transaction in case of error
                 ModelState.AddModelError("", $"Error creating teacher: {ex.Message}");
                 _logger.LogError(ex, "Error creating teacher: {ErrorMessage}", ex.Message);
-
-                // Ensure dropdown data is reloaded
+                TempData["ErrorMessage"] = $"Teacher creation failed: {ex.Message}. Please try again or contact support.";
                 model.Departments = await GetDepartmentListItems();
                 return View(model);
             }
         }
 
+
         // Helper method to get department list items
         private async Task<List<SelectListItem>> GetDepartmentListItems()
         {
-            // Ideally, fetch from database
-            return new List<SelectListItem>
-            {
-                new SelectListItem { Value = "", Text = "Select Department (Optional)" },
-                new SelectListItem { Value = "1", Text = "Mathematics" },
-                new SelectListItem { Value = "2", Text = "Science" },
-                new SelectListItem { Value = "3", Text = "English" },
-                new SelectListItem { Value = "4", Text = "History" },
-                new SelectListItem { Value = "5", Text = "Computer Science" }
-            };
+            return await _db.Departments
+                .Where(d => d.Status == "Active")
+                .Select(d => new SelectListItem
+                {
+                    Value = d.DepartmentId.ToString(),
+                    Text = d.Name
+                })
+                .ToListAsync();
         }
 
         [HttpGet]
+        [Route("Teacher/Edit/{id}")]
         public async Task<IActionResult> EditTeacher(int id)
         {
             try
             {
-                // ดึงข้อมูล teacher พร้อมทั้ง Profile และ User (ถ้ามี)
                 var teacher = await _db.Teachers
                     .Include(t => t.Profile)
                         .ThenInclude(p => p.User)
@@ -265,93 +289,119 @@ namespace SchoolSystem.Controllers
 
                 if (teacher == null)
                 {
-                    TempData["ErrorMessage"] = "Teacher not found.";
-                    return RedirectToAction(nameof(IndexTeacher));
+                    return NotFound($"Teacher with ID {id} not found.");
                 }
 
-                var model = new SchoolSystem.ViewModels.TeacherViewEditModel
+                var model = new TeacherViewEditModel
                 {
                     TeacherId = teacher.TeacherId,
-                    ProfileId = teacher.ProfileId ?? 0, // ตรวจสอบ null หากมีความเป็นไปได้
-                    FirstName = teacher.Profile?.FirstName,
-                    LastName = teacher.Profile?.LastName,
-                    Gender = teacher.Profile?.Gender,
-                    Address = teacher.Profile?.Address,
-                    DateOfBirth = teacher.Profile != null
-                        ? teacher.Profile.DateOfBirth.ToDateTime(TimeOnly.MinValue)
-                        : DateTime.MinValue,
-                    ProfilePictureUrl = teacher.Profile?.ProfilePictureUrl,
+                    ProfileId = teacher.ProfileId ?? 0,
+                    FirstName = teacher.Profile?.FirstName ?? string.Empty,
+                    LastName = teacher.Profile?.LastName ?? string.Empty,
+                    Gender = teacher.Profile?.Gender ?? "Not Specified",
+                    Address = teacher.Profile?.Address ?? string.Empty,
+                    DateOfBirth = teacher.Profile?.DateOfBirth.ToDateTime(TimeOnly.MinValue) ?? DateTime.MinValue,
+                    ProfilePictureUrl = teacher.Profile?.ProfilePictureUrl ?? string.Empty,
                     DepartmentId = teacher.DepartmentId,
                     HireDate = teacher.HireDate,
                     Salary = teacher.Salary,
-                    Status = teacher.Status,
-                    Email = teacher.Profile?.User != null ? teacher.Profile.User.Email : string.Empty,
-                    Username = teacher.Profile?.User != null ? teacher.Profile.User.UserName : string.Empty,
+                    Status = teacher.Status ?? string.Empty,
+                    Email = teacher.Profile?.User?.Email ?? string.Empty,
+                    Username = teacher.Profile?.User?.UserName ?? string.Empty,
                     Role = "Teacher"
                 };
 
                 model.Departments = await GetDepartmentListItems();
-
                 return View(model);
             }
             catch (Exception ex)
             {
-                // บันทึก log เพื่อช่วยแก้ไขปัญหา
                 _logger.LogError(ex, "Error loading teacher with id {TeacherId}", id);
-                TempData["ErrorMessage"] = $"Error loading teacher: {ex.Message}";
-                return RedirectToAction(nameof(IndexTeacher));
+                return StatusCode(500, "An error occurred while loading the teacher's information.");
             }
         }
 
         [HttpPost]
+        [Route("Teacher/Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTeacher(SchoolSystem.ViewModels.TeacherViewEditModel model)
+        public async Task<IActionResult> EditTeacher(TeacherViewEditModel model, int id)
         {
             if (!ModelState.IsValid)
             {
-                // เมื่อเกิด validation error ให้ repopulate dropdown list
                 model.Departments = await GetDepartmentListItems();
+                TempData["ErrorMessage"] = "Please correct the highlighted errors and try again.";
                 return View(model);
             }
 
-            // ดึงข้อมูล teacher พร้อม Profile และ User ที่เกี่ยวข้อง
             var teacher = await _db.Teachers
                 .Include(t => t.Profile)
-                    .ThenInclude(p => p.User)
-                .FirstOrDefaultAsync(t => t.TeacherId == model.TeacherId);
+                .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(t => t.TeacherId == id);
 
             if (teacher == null)
             {
-                TempData["ErrorMessage"] = "Teacher not found.";
-                return RedirectToAction(nameof(IndexTeacher));
+                TempData["ErrorMessage"] = $"Teacher with ID {id} not found. Unable to update.";
+                return NotFound($"Teacher with ID {model.TeacherId} not found.");
             }
 
             try
             {
-                // ปรับปรุงข้อมูล Profile
+                // Update Profile
                 teacher.Profile.FirstName = model.FirstName;
                 teacher.Profile.LastName = model.LastName;
                 teacher.Profile.Gender = model.Gender;
                 teacher.Profile.Address = model.Address;
                 teacher.Profile.DateOfBirth = DateOnly.FromDateTime(model.DateOfBirth);
-                teacher.Profile.ProfilePictureUrl = model.ProfilePictureUrl;
 
-                // ปรับปรุง Account Info หากมีการเปลี่ยนแปลง
+                // Handle Profile Picture
+                if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+                {
+                    var validationResult = ValidateImageFile(model.ProfilePicture);
+                    if (!validationResult.IsValid)
+                    {
+                        ModelState.AddModelError("ProfilePicture", validationResult.ErrorMessage);
+                        model.Departments = await GetDepartmentListItems();
+                        return View(model);
+                    }
+
+                    // Delete old profile picture
+                    if (!string.IsNullOrEmpty(teacher.Profile.ProfilePictureUrl))
+                    {
+                        var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", teacher.Profile.ProfilePictureUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+
+                    // Save new profile picture
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.ProfilePicture.FileName)}";
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profiles", fileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    teacher.Profile.ProfilePictureUrl = $"/images/profiles/{fileName}";
+                }
+
+                // Update User Account
                 if (teacher.Profile.User != null)
                 {
                     teacher.Profile.User.Email = model.Email;
                     teacher.Profile.User.UserName = model.Username;
 
-                    // ถ้ามีการกรอกรหัสผ่านใหม่ (ไม่ใช่ค่าว่าง) ให้ update รหัสผ่าน
                     if (!string.IsNullOrWhiteSpace(model.Password))
                     {
-                        // ควรใช้ UserManager ในการจัดการการเปลี่ยนแปลงรหัสผ่านอย่างปลอดภัย
                         var passwordHasher = new PasswordHasher<Users>();
                         teacher.Profile.User.PasswordHash = passwordHasher.HashPassword(teacher.Profile.User, model.Password);
                     }
                 }
 
-                // ปรับปรุงข้อมูล Teacher
+                // Update Teacher Information
                 teacher.DepartmentId = (model.DepartmentId.HasValue && model.DepartmentId.Value > 0) ? model.DepartmentId : null;
                 teacher.HireDate = model.HireDate;
                 teacher.Salary = model.Salary;
@@ -359,14 +409,14 @@ namespace SchoolSystem.Controllers
                 teacher.UpdateAt = DateTime.UtcNow;
 
                 await _db.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Teacher updated successfully!";
+                TempData["SuccessMessage"] = $"Teacher {model.FirstName} {model.LastName} has been updated successfully!";
                 return RedirectToAction(nameof(IndexTeacher));
             }
             catch (Exception ex)
             {
+                TempData["ErrorMessage"] = $"Update failed: {ex.Message}. Please try again or contact support.";
                 _logger.LogError(ex, "Error updating teacher with id {TeacherId}", model.TeacherId);
-                TempData["ErrorMessage"] = $"Error updating teacher: {ex.Message}";
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred while updating the teacher.");
                 model.Departments = await GetDepartmentListItems();
                 return View(model);
             }
@@ -390,7 +440,17 @@ namespace SchoolSystem.Controllers
                     return RedirectToAction("IndexTeacher");
                 }
 
-                // ลบ Teacher และ Profile ที่เกี่ยวข้องก่อน
+                // ตรวจสอบและลบไฟล์ภาพโปรไฟล์ (ถ้ามี)
+                if (!string.IsNullOrEmpty(teacher.Profile?.ProfilePictureUrl))
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", teacher.Profile.ProfilePictureUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+
+                // ลบ Teacher และ Profile ที่เกี่ยวข้อง
                 _db.Teachers.Remove(teacher);
                 _db.Profiles.Remove(teacher.Profile);
                 await _db.SaveChangesAsync();
@@ -401,7 +461,6 @@ namespace SchoolSystem.Controllers
                     var user = await _userManager.FindByIdAsync(teacher.Profile.UserId);
                     if (user != null)
                     {
-                        // การลบ User ผ่าน _userManager จะทำการลบ Role ใน aspnetUserRoles อัตโนมัติ
                         var result = await _userManager.DeleteAsync(user);
                         if (!result.Succeeded)
                         {
@@ -419,6 +478,46 @@ namespace SchoolSystem.Controllers
             }
 
             return RedirectToAction("IndexTeacher");
+        }
+
+        private (bool IsValid, string ErrorMessage) ValidateImageFile(IFormFile file)
+        {
+            // ตรวจสอบขนาดไฟล์ (จำกัดที่ 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return (false, "ขนาดไฟล์เกิน 5MB");
+            }
+
+            // ตรวจสอบนามสกุลไฟล์
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                return (false, "ประเภทไฟล์ไม่ถูกต้อง ต้องเป็น .jpg, .jpeg, .png, .gif หรือ .bmp เท่านั้น");
+            }
+
+            // ตรวจสอบ MIME Type
+            var allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
+            if (!allowedMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                return (false, "ประเภทไฟล์ไม่ถูกต้อง ต้องเป็นภาพเท่านั้น");
+            }
+
+            // ตรวจสอบเนื้อหาของไฟล์ว่าเป็นภาพจริงหรือไม่
+            try
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var image = SixLabors.ImageSharp.Image.Load(stream);
+                    // ถ้าโหลดสำเร็จ แปลว่าเป็นภาพที่ถูกต้อง
+                }
+            }
+            catch
+            {
+                return (false, "ไฟล์นี้ไม่ใช่ภาพที่ถูกต้อง");
+            }
+
+            return (true, null);
         }
 
 
