@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class ClassScheduleController : Controller
     {
         private readonly AppDbContext _db;
@@ -18,6 +20,8 @@ namespace SchoolSystem.Controllers
         }
 
         // 📌 แสดงตารางเรียนเฉพาะ CM_ID
+        [HttpGet]
+        [Route("ClassScheduler/{cmId}")]
         public async Task<IActionResult> IndexClassSchedule(int cmId)
         {
             Console.WriteLine($"CM_ID received in IndexClassSchedule: {cmId}"); // Debugging
@@ -40,6 +44,8 @@ namespace SchoolSystem.Controllers
 
 
         // 📌 GET: Create Schedule
+        [HttpGet]
+        [Route("ClassScheduler/Create/{cmId}")]
         public IActionResult Create(int cmId)
         {
             if (cmId == 0)
@@ -54,6 +60,7 @@ namespace SchoolSystem.Controllers
 
         // 📌 POST: Create Schedule
         [HttpPost]
+        [Route("ClassScheduler/Create/{cmId}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClassSchedule model)
         {
@@ -77,6 +84,8 @@ namespace SchoolSystem.Controllers
         }
 
         // 📌 GET: Edit Schedule
+        [HttpGet]
+        [Route("ClassScheduler/Edit/{Id}")]
         public async Task<IActionResult> Edit(int id)
         {
             var schedule = await _db.ClassSchedules.FindAsync(id);
@@ -91,6 +100,7 @@ namespace SchoolSystem.Controllers
 
         // 📌 POST: Edit Schedule
         [HttpPost]
+        [Route("ClassScheduler/Edit/{Id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClassSchedule model)
         {

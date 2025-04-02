@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
 using SchoolSystem.Models.ClassManagement;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class ClassRegistrationController : Controller
     {
         private readonly AppDbContext _context;

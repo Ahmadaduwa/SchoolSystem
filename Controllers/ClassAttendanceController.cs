@@ -41,7 +41,6 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> ClassAttendance()
         {
             try
@@ -60,13 +59,13 @@ namespace SchoolSystem.Controllers
 
                 // ตรวจสอบตารางทั้งหมดของครู (สำหรับ Debug)
                 var allTeacherSchedulesCount = await _db.ClassSchedules
-                    .Where(cs => cs.ClassManagement.TeacherId == teacherId)
+                    .Where(cs => cs.ClassManagement.TeacherId == teacherId && cs.Status == "Active" && cs.ClassManagement.Status == "Active")
                     .CountAsync();
                 _logger.LogInformation($"Total schedules for teacher: {allTeacherSchedulesCount}");
 
                 // ดึงตารางเรียนของวันนี้โดยเรียงตามเวลาเริ่มต้น
                 var schedules = await _db.ClassSchedules
-                    .Where(cs => cs.ClassManagement.TeacherId == teacherId && cs.DayOfWeek == currentDay)
+                    .Where(cs => cs.ClassManagement.TeacherId == teacherId && cs.DayOfWeek == currentDay && cs.Status == "Active" && cs.ClassManagement.Status == "Active")
                     .OrderBy(cs => cs.StartTime)
                     .Select(cs => new ClassScheduleViewModel
                     {
@@ -105,7 +104,6 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> MarkAttendance(int cmId, DateTime? date)
         {
             // ถ้าไม่มีวันที่ระบุ ใช้วันที่ปัจจุบัน
@@ -113,6 +111,7 @@ namespace SchoolSystem.Controllers
 
             // ดึงข้อมูล Class Management พร้อม Course และ Class
             var classManagement = await _db.ClassManagements
+                .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
@@ -162,7 +161,6 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "TeacherPolicy")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAttendance(AttendanceViewModel model)
         {
@@ -176,6 +174,7 @@ namespace SchoolSystem.Controllers
                         _logger.LogWarning($"ModelState error on {key}: {error.ErrorMessage}");
                     }
                 }
+                TempData["ErrorMessage"] = "Model validation failed. Please correct the errors and try again.";
                 return View(model);
             }
 
@@ -183,6 +182,7 @@ namespace SchoolSystem.Controllers
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("Unauthorized access attempt with empty user ID");
+                TempData["ErrorMessage"] = "Unauthorized access. Please log in to access this information.";
                 return Unauthorized("กรุณาเข้าสู่ระบบเพื่อเข้าถึงข้อมูล");
             }
 
@@ -233,6 +233,7 @@ namespace SchoolSystem.Controllers
 
                     // Get class information for notifications
                     var classManagement = await _db.ClassManagements
+                        .Where(cs => cs.Status == "Active")
                         .Include(cm => cm.Course)
                         .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
 
@@ -297,24 +298,19 @@ namespace SchoolSystem.Controllers
                         {
                             var profileId = studentProfile.Profile.ProfileId;
 
-
                             var effectiveAbsenceCount = summary.AbsentCount + (Math.Floor((double)summary.LateCount / 3));
-                            var totalClasses = checkCount; 
+                            var totalClasses = checkCount;
                             var absenceRate = (totalClasses > 5) ? (effectiveAbsenceCount / totalClasses) * 100 : 0;
-
 
                             if (absenceRate > 30)
                             {
-
                                 string notificationType = $"{cmId}/AbsenceWarning";
 
-        
                                 var existingNotification = await _db.Notifications
                                     .FirstOrDefaultAsync(n => n.ProfileId == profileId && n.NotificationType == notificationType);
 
                                 if (existingNotification == null)
                                 {
-                    
                                     var notification = new Notification
                                     {
                                         NotificationType = notificationType,
@@ -328,7 +324,6 @@ namespace SchoolSystem.Controllers
                                 }
                                 else
                                 {
-                   
                                     existingNotification.NotificationTime = DateTime.UtcNow;
                                     existingNotification.Message = $"คำเตือน: คุณขาดเรียนในวิชา {courseName} เกิน 30% โดยมีอัตราการขาดเรียนที่ {absenceRate:F1}%";
                                     existingNotification.Status = "Pending";
@@ -337,17 +332,14 @@ namespace SchoolSystem.Controllers
 
                             if (summary.LateCount >= 3)
                             {
-                   
-                                int lateMilestone = (int)Math.Floor((double)summary.LateCount / 3) * 3; 
+                                int lateMilestone = (int)Math.Floor((double)summary.LateCount / 3) * 3;
                                 string notificationType = $"{cmId}/LateWarning/{lateMilestone}";
 
-                                // Check if a notification of this type already exists for this student
                                 var existingNotification = await _db.Notifications
                                     .FirstOrDefaultAsync(n => n.ProfileId == profileId && n.NotificationType == notificationType);
 
                                 if (existingNotification == null && summary.LateCount % 3 == 0)
                                 {
-                                    // Create new notification for late attendance
                                     var lateEquivalentToAbsence = summary.LateCount / 3;
                                     var notification = new Notification
                                     {
@@ -368,19 +360,20 @@ namespace SchoolSystem.Controllers
                     await transaction.CommitAsync();
 
                     _logger.LogInformation($"Attendance marked/updated successfully for CM_Id: {cmId} on date: {attendanceDate}");
+                    TempData["SuccessMessage"] = "Attendance marked/updated successfully!";
                     return RedirectToAction("ClassAttendance", "ClassAttendance");
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError(ex, "Error while marking/updating attendance");
+                    TempData["ErrorMessage"] = "An error occurred while marking/updating attendance. Please try again.";
                     return StatusCode(500, "เกิดข้อผิดพลาดในการบันทึกข้อมูลการเช็คชื่อ");
                 }
             }
         }
 
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> EditAttendanceSelectDate(int cmId)
         {
             // ตรวจสอบว่า cmId อยู่ในเทอมปัจจุบันหรือไม่
@@ -393,6 +386,7 @@ namespace SchoolSystem.Controllers
             }
 
             var classManagement = await _db.ClassManagements
+                .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
@@ -424,7 +418,6 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> EditAttendance(int cmId, DateOnly date)
         {
             var currentSemester = await _db.Semesters
@@ -436,6 +429,7 @@ namespace SchoolSystem.Controllers
             }
 
             var classManagement = await _db.ClassManagements
+                .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
@@ -497,7 +491,6 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "TeacherPolicy")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAttendance(AttendanceViewModel model)
         {
@@ -505,12 +498,14 @@ namespace SchoolSystem.Controllers
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ModelState ไม่ถูกต้อง: {@ModelState}", ModelState);
+                TempData["ErrorMessage"] = "Model validation failed. Please correct the errors and try again.";
                 return View(model);
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
+                TempData["ErrorMessage"] = "Unauthorized access. Please log in to access this information.";
                 return Unauthorized("กรุณาเข้าสู่ระบบ");
             }
 
@@ -518,7 +513,7 @@ namespace SchoolSystem.Controllers
             {
                 try
                 {
-                    var attendanceDate =model.date;
+                    var attendanceDate = model.date;
                     var cmId = model.cmId;
 
                     var existingAttendanceCheck = await _db.ClassAttendanceCheck
@@ -527,25 +522,22 @@ namespace SchoolSystem.Controllers
                     if (existingAttendanceCheck == null)
                     {
                         _logger.LogWarning("No CM_Id: {cmId}, Date: {attendanceDate}", cmId, attendanceDate);
+                        TempData["ErrorMessage"] = "Attendance record not found for the specified date.";
                         return RedirectToAction("TeacherCourses", "Attendance");
                     }
-
 
                     // บันทึกใหม่
                     foreach (var student in model.Students)
                     {
-                        // ค้นหาข้อมูลการเข้าชั้นเรียนที่มีอยู่แล้วสำหรับนักเรียนในวันนั้น
                         var existingAttendanceRecord = await _db.ClassAttendance
                             .FirstOrDefaultAsync(a => a.CM_Id == cmId && a.StudentId == student.StudentId && a.Date == attendanceDate);
 
                         if (existingAttendanceRecord != null)
                         {
-                            // ถ้ามีการบันทึกอยู่แล้ว ให้ทำการอัปเดตสถานะ
                             existingAttendanceRecord.Status = student.Status;
                         }
                         else
                         {
-                            // ถ้าไม่มีการบันทึก ให้เพิ่มข้อมูลใหม่
                             var attendanceRecord = new ClassAttendance
                             {
                                 CM_Id = cmId,
@@ -556,7 +548,6 @@ namespace SchoolSystem.Controllers
                             _db.ClassAttendance.Add(attendanceRecord);
                         }
 
-                        // อัปเดต Summary
                         var summary = await _db.ClassAttendanceSummary
                             .FirstOrDefaultAsync(s => s.CM_Id == cmId && s.StudentId == student.StudentId);
 
@@ -597,7 +588,6 @@ namespace SchoolSystem.Controllers
                             _db.ClassAttendanceSummary.Add(summary);
                         }
 
-                        // ดึงค่าที่อัปเดตแล้วจากฐานข้อมูล
                         summary.PresentCount = await _db.ClassAttendance
                             .CountAsync(a => a.CM_Id == cmId && a.StudentId == student.StudentId && a.Status.ToLower() == "present");
 
@@ -615,16 +605,17 @@ namespace SchoolSystem.Controllers
                         _db.ClassAttendanceSummary.Update(summary);
                     }
 
-                    // บันทึกข้อมูลอีกครั้งหลังจากอัปเดต Summary
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
 
+                    TempData["SuccessMessage"] = "Attendance updated successfully!";
                     return RedirectToAction("TeacherCourses", "ClassAttendance");
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError(ex, "เกิดข้อผิดพลาดระหว่างการแก้ไขการเช็คชื่อ");
+                    TempData["ErrorMessage"] = "An error occurred while updating attendance. Please try again.";
                     return View(model);
                 }
             }
@@ -632,7 +623,6 @@ namespace SchoolSystem.Controllers
 
 
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> TeacherCourses()
         {
             var teacherId = await GetLoggedInTeacherIdAsync();
@@ -653,6 +643,7 @@ namespace SchoolSystem.Controllers
 
             // ดึงข้อมูล ClassManagement ที่ครูสอนในเทอมปัจจุบัน
             var teacherCourses = await _db.ClassManagements
+                .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Course)
                 .Include(cm => cm.Class)
                 .Where(cm => cm.TeacherId == teacherId && cm.SemesterId == currentSemester.SemesterID)
@@ -670,12 +661,12 @@ namespace SchoolSystem.Controllers
             return View(teacherCourses);
         }
         [HttpGet]
-        [Authorize(Policy = "TeacherPolicy")]
         public async Task<IActionResult> ViewAttendanceByCourse(int cmId)
         {
             try
             {
                 var course = await _db.ClassManagements
+                    .Where(cs => cs.Status == "Active")
                     .FirstOrDefaultAsync(c => c.CM_Id == cmId);
                 if (course == null)
                 {
@@ -718,13 +709,13 @@ namespace SchoolSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "TeacherPolicy")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAttendanceSummary(int cmId)
         {
             try
             {
                 var course = await _db.ClassManagements
+                    .Where(cs => cs.Status == "Active")
                     .FirstOrDefaultAsync(c => c.CM_Id == cmId);
                 if (course == null)
                 {

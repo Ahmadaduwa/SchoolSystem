@@ -1,41 +1,101 @@
 ﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
 
-<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Create Class Management</h2>
+@{
+    ViewData["Title"] = "Create Class Management";
+}
 
-    <form asp-action="CreateManage" method="post">
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold mb-6">Create New Class Management</h2>
+    <form asp-action="CreateManage" method="post" class="bg-white shadow-md rounded-lg p-8 space-y-6">
         <div>
-            <label class="block">Class:</label>
-            <select asp-for="ClassId" class="border rounded w-full p-2 mb-4"
-                    asp-items="@(ViewBag.Classes ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Class" } })">
+            <label asp-for="ClassId" class="block text-sm font-semibold mb-2">
+                Class (Grade Level / Class Number)
+            </label>
+            <select asp-for="ClassId" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="">-- Select Class --</option>
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Classes"])
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
             </select>
-        </div>
-        <div>
-            <label class="block">Teacher:</label>
-            <select asp-for="TeacherId" class="border rounded w-full p-2 mb-4"
-                    asp-items="@(ViewBag.Teachers ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Teacher" } })">
-            </select>
-        </div>
-        <div>
-            <label class="block">Course:</label>
-            <select asp-for="CourseId" class="border rounded w-full p-2 mb-4"
-                    asp-items="@(ViewBag.Courses ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Course" } })">
-            </select>
-        </div>
-        <div>
-            <label class="block">Semester:</label>
-            <select asp-for="SemesterId" class="border rounded w-full p-2 mb-4"
-                    asp-items="@(ViewBag.Semesters ?? new List<SelectListItem> { new SelectListItem { Value = "", Text = "Select Semester" } })">
-            </select>
-        </div>
-        <div>
-            <label class="block">Scoring Criteria:</label>
-            <input asp-for="ScoringCriteria" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="ClassId" class="text-red-600 text-sm"></span>
         </div>
 
-        <div class="flex justify-between">
-            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Create</button>
-            <a asp-action="Index" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">Cancel</a>
+        <div>
+            <label asp-for="TeacherId" class="block text-sm font-semibold mb-2">
+                Teacher
+            </label>
+            <select asp-for="TeacherId" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="">-- Select Teacher --</option>
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Teachers"])
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <span asp-validation-for="TeacherId" class="text-red-600 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="CourseId" class="block text-sm font-semibold mb-2">
+                Course
+            </label>
+            <select asp-for="CourseId" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="">-- Select Course --</option>
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Courses"])
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <span asp-validation-for="CourseId" class="text-red-600 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="SemesterId" class="block text-sm font-semibold mb-2">
+                Semester
+            </label>
+            <select asp-for="SemesterId" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="">-- Select Semester --</option>
+                @foreach (var item in (IEnumerable<SelectListItem>)ViewData["Semesters"])
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <span asp-validation-for="SemesterId" class="text-red-600 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="ScoringCriteria" class="block text-sm font-semibold mb-2">
+                Scoring Criteria
+            </label>
+            <textarea asp-for="ScoringCriteria" class="w-full px-3 py-2 border border-gray-300 rounded-md h-32" placeholder="Enter scoring criteria (optional)"></textarea>
+            <span asp-validation-for="ScoringCriteria" class="text-red-600 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="CheckCount" class="block text-sm font-semibold mb-2">
+                Check Count
+            </label>
+            <input asp-for="CheckCount" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed" value="0" readonly />
+            <span asp-validation-for="CheckCount" class="text-red-600 text-sm"></span>
+        </div>
+
+
+        <div>
+            <label asp-for="Status" class="block text-sm font-semibold mb-2">
+                Status
+            </label>
+            <select asp-for="Status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-600 text-sm"></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md">
+                Create Class Management
+            </button>
+            <a asp-action="Index" class="text-gray-600 hover:text-gray-900 text-sm">Cancel</a>
         </div>
     </form>
 </div>

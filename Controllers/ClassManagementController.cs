@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
+using SchoolSystem.Helpers;
 using SchoolSystem.Models.ClassManagement;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,90 +20,271 @@ namespace SchoolSystem.Controllers
             _db = db;
         }
 
-        // 📌 แสดงรายการทั้งหมด
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        [Route("ClassManagement")]
+        public async Task<IActionResult> Index(int? pageNumber, string searchString, string sortOrder, string statusFilter, int? classFilter, int? teacherFilter, int? courseFilter, int? semesterFilter)
         {
-            var classManagements = await _db.ClassManagements
-                .Include(cm => cm.Class!).ThenInclude(c => c.GradeLevels!)
-                .Include(cm => cm.Teacher!).ThenInclude(t => t.Profile!)
-                .Include(cm => cm.Semester!)
-                .Include(cm => cm.Course!)
-                .AsNoTracking()
+            // เก็บข้อมูลสำหรับ sorting และ filtering ลง ViewData
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["ClassSortParam"] = sortOrder == "class" ? "class_desc" : "class";
+            ViewData["TeacherSortParam"] = sortOrder == "teacher" ? "teacher_desc" : "teacher";
+            ViewData["CourseSortParam"] = sortOrder == "course" ? "course_desc" : "course";
+            ViewData["SemesterSortParam"] = sortOrder == "semester" ? "semester_desc" : "semester";
+            ViewData["StatusSortParam"] = sortOrder == "status" ? "status_desc" : "status";
+
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStatus"] = statusFilter;
+            ViewData["CurrentClass"] = classFilter;
+            ViewData["CurrentTeacher"] = teacherFilter;
+            ViewData["CurrentCourse"] = courseFilter;
+            ViewData["CurrentSemester"] = semesterFilter;
+
+            // สร้างรายการสถานะเพื่อใช้เป็นตัวกรอง
+            var statuses = await _db.ClassManagements
+                .Select(c => c.Status)
+                .Distinct()
                 .ToListAsync();
+            ViewData["Statuses"] = statuses
+                .Select(s => new SelectListItem { Value = s, Text = s })
+                .ToList();
 
-            return View(classManagements);
-        }
-
-        public IActionResult CreateManage()
-        {
-            LoadDropdownData();
-            return View(new ClassManagement { CheckCount = 0 });
-        }
-
-        private void LoadDropdownData()
-        {
-            ViewData["Classes"] = _db.Classes
+            // เตรียมข้อมูลตัวกรอง
+            ViewData["Classes"] = await _db.Classes
+                .Where(c => c.Status == "Active")
                 .Include(c => c.GradeLevels)
                 .Select(c => new SelectListItem
                 {
                     Value = c.ClassId.ToString(),
-                    Text = c.GradeLevels!.Name + "/" + c.ClassNumber
-                }).ToList();
+                    Text = c.GradeLevels!.Name + "/" + c.ClassNumber,
+                    Selected = classFilter.HasValue && c.ClassId == classFilter.Value
+                }).ToListAsync();
 
-            ViewData["Teachers"] = _db.Teachers
+            ViewData["Teachers"] = await _db.Teachers
+                .Where(c => c.Status == "Active")
                 .Include(t => t.Profile)
                 .Select(t => new SelectListItem
                 {
                     Value = t.TeacherId.ToString(),
-                    Text = t.Profile.FirstName + " " + t.Profile.LastName
-                }).ToList();
+                    Text = t.Profile.FirstName + " " + t.Profile.LastName,
+                    Selected = teacherFilter.HasValue && t.TeacherId == teacherFilter.Value
+                }).ToListAsync();
 
-            ViewData["Courses"] = _db.Course
+            ViewData["Courses"] = await _db.Course
+                .Where(c => c.Status == "Active")
                 .Select(c => new SelectListItem
                 {
                     Value = c.CourseId.ToString(),
-                    Text = c.CourseName
-                }).ToList();
+                    Text = c.CourseName,
+                    Selected = courseFilter.HasValue && c.CourseId == courseFilter.Value
+                }).ToListAsync();
 
-            ViewData["Semesters"] = _db.Semesters
+            ViewData["Semesters"] = await _db.Semesters
+                .Where(c => c.Status == "Active")
                 .Select(s => new SelectListItem
                 {
                     Value = s.SemesterID.ToString(),
-                    Text = s.SemesterYear.ToString() + "/" + s.SemesterNumber.ToString()
-                }).ToList();
-        }
+                    Text = s.SemesterYear.ToString() + "/" + s.SemesterNumber.ToString(),
+                    Selected = semesterFilter.HasValue && s.SemesterID == semesterFilter.Value
+                }).ToListAsync();
 
-        private IActionResult ViewWithDropdowns(ClassManagement classManagement)
-        {
-            LoadDropdownData();
-            return View(classManagement);
-        }
+            // สร้าง query เริ่มต้น
+            var classManagementQuery = _db.ClassManagements
+                .Include(c => c.Class)
+                    .ThenInclude(c => c!.GradeLevels)
+                .Include(c => c.Teacher)
+                    .ThenInclude(t => t!.Profile)
+                .Include(c => c.Course)
+                .Include(c => c.Semester)
+                .AsNoTracking();
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateManage(ClassManagement classManagement)
-        {
-            if (ModelState.IsValid)
+            // ค้นหาตามคำ
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                classManagement.CheckCount = 0;
-                classManagement.CreateAt = DateTime.UtcNow;
-                classManagement.UpdateAt = DateTime.UtcNow;
-
-                if(classManagement.ScoringCriteria == null)
-                {
-                    classManagement.ScoringCriteria = "DefaultCriteria";
-                }
-                _db.ClassManagements.Add(classManagement);
-                await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Class management created successfully!";
-                return RedirectToAction(nameof(Index));
+                classManagementQuery = classManagementQuery.Where(c =>
+                    (c.Class != null && c.Class.GradeLevels != null && c.Class.GradeLevels.Name.Contains(searchString)) ||
+                    (c.Teacher != null && c.Teacher.Profile != null &&
+                     (c.Teacher.Profile.FirstName.Contains(searchString) || c.Teacher.Profile.LastName.Contains(searchString))) ||
+                    (c.Course != null && c.Course.CourseName.Contains(searchString)) ||
+                    (c.ScoringCriteria != null && c.ScoringCriteria.Contains(searchString)));
             }
 
-            return ViewWithDropdowns(classManagement);
+            // กรองตามสถานะ
+            if (!string.IsNullOrWhiteSpace(statusFilter))
+            {
+                classManagementQuery = classManagementQuery.Where(c => c.Status == statusFilter);
+            }
+
+            // กรองตามคลาส
+            if (classFilter.HasValue)
+            {
+                classManagementQuery = classManagementQuery.Where(c => c.ClassId == classFilter.Value);
+            }
+
+            // กรองตามครู
+            if (teacherFilter.HasValue)
+            {
+                classManagementQuery = classManagementQuery.Where(c => c.TeacherId == teacherFilter.Value);
+            }
+
+            // กรองตามวิชา
+            if (courseFilter.HasValue)
+            {
+                classManagementQuery = classManagementQuery.Where(c => c.CourseId == courseFilter.Value);
+            }
+
+            // กรองตามภาคเรียน
+            if (semesterFilter.HasValue)
+            {
+                classManagementQuery = classManagementQuery.Where(c => c.SemesterId == semesterFilter.Value);
+            }
+
+            // จัดเรียงข้อมูล
+            classManagementQuery = sortOrder switch
+            {
+                "class" => classManagementQuery.OrderBy(c => c.Class!.GradeLevels!.Name).ThenBy(c => c.Class!.ClassNumber),
+                "class_desc" => classManagementQuery.OrderByDescending(c => c.Class!.GradeLevels!.Name).ThenByDescending(c => c.Class!.ClassNumber),
+                "teacher" => classManagementQuery.OrderBy(c => c.Teacher!.Profile!.FirstName).ThenBy(c => c.Teacher!.Profile!.LastName),
+                "teacher_desc" => classManagementQuery.OrderByDescending(c => c.Teacher!.Profile!.FirstName).ThenByDescending(c => c.Teacher!.Profile!.LastName),
+                "course" => classManagementQuery.OrderBy(c => c.Course!.CourseName),
+                "course_desc" => classManagementQuery.OrderByDescending(c => c.Course!.CourseName),
+                "semester" => classManagementQuery.OrderBy(c => c.Semester!.SemesterYear).ThenBy(c => c.Semester!.SemesterNumber),
+                "semester_desc" => classManagementQuery.OrderByDescending(c => c.Semester!.SemesterYear).ThenByDescending(c => c.Semester!.SemesterNumber),
+                "status" => classManagementQuery.OrderBy(c => c.Status),
+                "status_desc" => classManagementQuery.OrderByDescending(c => c.Status),
+                _ => classManagementQuery.OrderBy(c => c.Class!.GradeLevels!.Name).ThenBy(c => c.Class!.ClassNumber),
+            };
+
+            // แบ่งหน้า
+            int pageSize = 10;
+            var totalItems = await classManagementQuery.CountAsync();
+            ViewData["TotalItems"] = totalItems;
+            var pagedClassManagement = await PaginatedList<ClassManagement>.CreateAsync(classManagementQuery, pageNumber ?? 1, pageSize);
+
+            return View(pagedClassManagement);
         }
 
 
-        // 📌 GET: Edit
+        // GET: ClassManagement/Create
+        [HttpGet]
+        [Route("ClassManagement/Create")]
+        public async Task<IActionResult> CreateManage(int? classFilter, int? teacherFilter, int? courseFilter, int? semesterFilter)
+        {
+            // เตรียมข้อมูลตัวกรอง
+            ViewData["Classes"] = await _db.Classes
+                .Where(c => c.Status == "Active")
+                .Include(c => c.GradeLevels)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.ClassId.ToString(),
+                    Text = c.GradeLevels!.Name + " / " + c.ClassNumber,
+                    Selected = classFilter.HasValue && c.ClassId == classFilter.Value
+                }).ToListAsync();
+
+            ViewData["Teachers"] = await _db.Teachers
+                .Where(t => t.Status == "Active")
+                .Include(t => t.Profile)
+                .Select(t => new SelectListItem
+                {
+                    Value = t.TeacherId.ToString(),
+                    Text = t.Profile.FirstName + " " + t.Profile.LastName,
+                    Selected = teacherFilter.HasValue && t.TeacherId == teacherFilter.Value
+                }).ToListAsync();
+
+            ViewData["Courses"] = await _db.Course
+                .Where(c => c.Status == "Active")
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CourseId.ToString(),
+                    Text = c.CourseName,
+                    Selected = courseFilter.HasValue && c.CourseId == courseFilter.Value
+                }).ToListAsync();
+
+            ViewData["Semesters"] = await _db.Semesters
+                .Where(s => s.Status == "Active")
+                .Select(s => new SelectListItem
+                {
+                    Value = s.SemesterID.ToString(),
+                    Text = s.SemesterYear.ToString() + " / " + s.SemesterNumber.ToString(),
+                    Selected = semesterFilter.HasValue && s.SemesterID == semesterFilter.Value
+                }).ToListAsync();
+
+            return View();
+        }
+
+        // POST: ClassManagement/Create
+        [HttpPost]
+        [Route("ClassManagement/Create")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateManage(ClassManagement newClassManagement)
+        {
+            if (!ModelState.IsValid)
+            {
+                // กรณี validation ไม่ผ่าน ให้ re-populate ViewData ด้วย
+                await PopulateDropdowns();
+                return View(newClassManagement);
+            }
+
+            try
+            {
+                _db.ClassManagements.Add(newClassManagement);
+                await _db.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Class management record created successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Database error: {ex.Message}");
+            }
+
+            // หากเกิดข้อผิดพลาด re-populate ViewData อีกครั้ง
+            await PopulateDropdowns();
+            return View(newClassManagement);
+        }
+
+        private async Task PopulateDropdowns(ClassManagement cm = null)
+        {
+            ViewData["Classes"] = await _db.Classes
+                .Where(c => c.Status == "Active")
+                .Include(c => c.GradeLevels)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.ClassId.ToString(),
+                    Text = c.GradeLevels!.Name + " / " + c.ClassNumber,
+                    Selected = cm != null && c.ClassId == cm.ClassId
+                }).ToListAsync();
+
+            ViewData["Teachers"] = await _db.Teachers
+                .Where(t => t.Status == "Active")
+                .Include(t => t.Profile)
+                .Select(t => new SelectListItem
+                {
+                    Value = t.TeacherId.ToString(),
+                    Text = t.Profile.FirstName + " " + t.Profile.LastName,
+                    Selected = cm != null && t.TeacherId == cm.TeacherId
+                }).ToListAsync();
+
+            ViewData["Courses"] = await _db.Course
+                .Where(c => c.Status == "Active")
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CourseId.ToString(),
+                    Text = c.CourseName,
+                    Selected = cm != null && c.CourseId == cm.CourseId
+                }).ToListAsync();
+
+            ViewData["Semesters"] = await _db.Semesters
+                .Where(s => s.Status == "Active")
+                .Select(s => new SelectListItem
+                {
+                    Value = s.SemesterID.ToString(),
+                    Text = s.SemesterYear.ToString() + " / " + s.SemesterNumber.ToString(),
+                    Selected = cm != null && s.SemesterID == cm.SemesterId
+                }).ToListAsync();
+        }
+
+        // GET: ClassManagement/Edit/{id}
+        [HttpGet]
+        [Route("ClassManagement/Edit/{id}")]
         public async Task<IActionResult> EditManage(int id)
         {
             var classManagement = await _db.ClassManagements.FindAsync(id);
@@ -110,71 +292,126 @@ namespace SchoolSystem.Controllers
             {
                 return NotFound();
             }
-
-            return ViewWithDropdowns(classManagement);
+            await PopulateDropdowns(classManagement);
+            return View(classManagement);
         }
 
         [HttpPost]
+        [Route("ClassManagement/Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditManage(ClassManagement classManagement)
+        public async Task<IActionResult> EditManage(ClassManagement updatedCM)
         {
-            if (ModelState.IsValid)
-            {
-                var existingClassManagement = await _db.ClassManagements.FindAsync(classManagement.CM_Id);
-                if (existingClassManagement == null)
-                {
-                    return NotFound();
-                }
-
-                // ✅ อัปเดตเฉพาะค่าที่สามารถแก้ไขได้
-                existingClassManagement.ClassId = classManagement.ClassId;
-                existingClassManagement.TeacherId = classManagement.TeacherId;
-                existingClassManagement.CourseId = classManagement.CourseId;
-                existingClassManagement.SemesterId = classManagement.SemesterId;
-                existingClassManagement.ScoringCriteria = classManagement.ScoringCriteria;
-
-                existingClassManagement.UpdateAt = DateTime.UtcNow; // ✅ อัปเดตเวลา
-
-                await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Class management updated successfully!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            return ViewWithDropdowns(classManagement);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteManage(int id)
-        {
-            var classManagement = await _db.ClassManagements.FindAsync(id);
-            if (classManagement == null)
-            {
-                TempData["ErrorMessage"] = "Record not found!";
-                return Json(new { success = false });
-            }
-
-            _db.ClassManagements.Remove(classManagement);
-            await _db.SaveChangesAsync();   
-
-            TempData["SuccessMessage"] = "Class management deleted successfully!";
-            return Json(new { success = true });
-        }
-        public async Task<IActionResult> ViewManage(int id)
-        {
-            var classManagement = await _db.ClassManagements
-                .Include(cm => cm.Class!).ThenInclude(c => c.GradeLevels)
-                .Include(cm => cm.Teacher!).ThenInclude(t => t.Profile)
-                .Include(cm => cm.Semester)
-                .Include(cm => cm.Course)
-                .FirstOrDefaultAsync(cm => cm.CM_Id == id);
-
-            if (classManagement == null)
+            var existingCM = await _db.ClassManagements.FindAsync(updatedCM.CM_Id);
+            if (existingCM == null)
             {
                 return NotFound();
             }
 
+            if (!ModelState.IsValid)
+            {
+                await PopulateDropdowns(updatedCM);
+                return View(updatedCM);
+            }
+
+            try
+            {
+                // รักษาค่า CreatedAt ไว้เหมือนเดิม และปรับปรุง UpdatedAt ให้เป็นเวลาปัจจุบัน
+                updatedCM.CreateAt = existingCM.CreateAt;
+                updatedCM.UpdateAt = DateTime.Now;
+
+                // Detach entity เดิมออกเพื่อหลีกเลี่ยงปัญหา tracking
+                _db.Entry(existingCM).State = EntityState.Detached;
+
+                _db.ClassManagements.Update(updatedCM);
+                await _db.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Class management updated successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error updating class management: {ex.Message}");
+                await PopulateDropdowns(updatedCM);
+                return View(updatedCM);
+            }
+        }
+
+        
+
+        [HttpGet]
+        [Route("ClassManagement/Details/{id}")]
+        public async Task<IActionResult> ViewManage(int id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var classManagement = await _db.ClassManagements
+                .Include(cm => cm.Class)
+                    .ThenInclude(c => c.GradeLevels)
+                .Include(cm => cm.Teacher)
+                    .ThenInclude(t => t.Profile)
+                .Include(cm => cm.Course)
+                .Include(cm => cm.Semester)
+                .Include(cm => cm.ClassSchedules)
+                .Include(cm => cm.ClassAttendanceSummary)
+                .Include(cm => cm.ClassAttendance)
+                .Include(cm => cm.ClassAttendanceCheck)
+                .FirstOrDefaultAsync(cm => cm.CM_Id == id);
+
+            if (classManagement == null)
+                return NotFound();
+
+            await PopulateDropdowns(classManagement);
             return View(classManagement);
         }
+
+        [HttpPost]
+        [Route("ClassManagement/Delete/{id}")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminPolicy")]
+        public async Task<IActionResult> DeleteManage(int id)
+        {
+            try
+            {
+                var classManagement = await _db.ClassManagements
+                    .FirstOrDefaultAsync(cm => cm.CM_Id == id);
+
+                if (classManagement == null)
+                {
+                    TempData["ErrorMessage"] = "Class management record not found.";
+                    return RedirectToAction("Index");
+                }
+
+                // Check for related records before deleting
+                bool hasRelatedRecords = await _db.ClassAttendance
+                    .AnyAsync(ca => ca.CM_Id == id) ||
+                    await _db.ClassAttendanceCheck
+                    .AnyAsync(cac => cac.CM_Id == id) ||
+                    await _db.ClassAttendanceSummary
+                    .AnyAsync(cas => cas.CM_Id == id) ||
+                    await _db.ClassSchedules
+                    .AnyAsync(cs => cs.CM_ID == id);
+
+                if (hasRelatedRecords)
+                {
+                    TempData["ErrorMessage"] = "Cannot delete class management record with existing related records.";
+                    return RedirectToAction("Index");
+                }
+
+                _db.ClassManagements.Remove(classManagement);
+                await _db.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Class management record deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                TempData["ErrorMessage"] = $"Error deleting class management record: {ex.Message}";
+            }
+
+            return RedirectToAction("Index");
+        }
+
 
     }
 }

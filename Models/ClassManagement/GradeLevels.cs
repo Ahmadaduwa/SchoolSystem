@@ -16,7 +16,7 @@ namespace SchoolSystem.Models.ClassManagement
         public string? Description { get; set; }
 
         [Required]
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string? Status { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

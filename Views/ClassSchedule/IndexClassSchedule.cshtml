@@ -3,42 +3,69 @@
     ViewData["Title"] = "Class Schedule";
     int cmId = (int)ViewData["CM_ID"];
 }
-
-<div class="container mx-auto p-6">
-    <h2 class="text-2xl font-bold mb-4">Class Schedule for CM_ID: @cmId</h2>
-
-    <a asp-action="Create" asp-controller="ClassSchedule" asp-route-cmId="@ViewData["CM_ID"]" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-        + Add Schedule
-    </a>
-
-    <table class="w-full mt-4 border border-gray-200 rounded-lg shadow-md">
-        <thead class="bg-gray-100">
-            <tr class="text-left">
-                <th class="p-2">Day</th>
-                <th class="p-2">Start Time</th>
-                <th class="p-2">End Time</th>
-                <th class="p-2">Status</th>
-                <th class="p-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr class="border-b">
-                    <td class="p-2">@item.DayOfWeek</td>
-                    <td class="p-2">@item.StartTime</td>
-                    <td class="p-2">@item.EndTime</td>
-                    <td class="p-2">@item.Status</td>
-                    <td class="p-2">
-                        <a asp-action="Edit" asp-route-id="@item.ScheduleID" class="text-blue-500 hover:underline">Edit</a>
-                        <button class="text-red-500 hover:underline ml-2 delete-btn" data-id="@item.ScheduleID">Delete</button>
-                    </td>
+<div class="container mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-4 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3 md:mb-0">Class Schedule for CM_ID: @cmId</h2>
+        <a asp-controller="ClassManagement" asp-action="Index" class="bg-blue-600 text-white px-5 py-2.5 rounded-md hover:bg-blue-700 flex items-center transition-all duration-200 shadow-sm w-fit">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Class Management
+        </a>
+    </div>
+    <div class="flex justify-between items-center mb-6">
+        <div class="text-sm text-gray-600">
+            Showing all schedules for class #@cmId
+        </div>
+        <a asp-action="Create" asp-controller="ClassSchedule" asp-route-cmId="@ViewData["CM_ID"]" class="bg-green-500 text-white px-5 py-2.5 rounded-md hover:bg-green-600 transition-all duration-200 flex items-center gap-2 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Schedule
+        </a>
+    </div>
+    <div class="overflow-x-auto bg-white rounded-lg">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50 text-left text-gray-700 uppercase text-xs tracking-wider">
+                    <th class="py-3.5 px-4 font-medium border-b">Day</th>
+                    <th class="py-3.5 px-4 font-medium border-b">Start Time</th>
+                    <th class="py-3.5 px-4 font-medium border-b">End Time</th>
+                    <th class="py-3.5 px-4 font-medium border-b">Status</th>
+                    <th class="py-3.5 px-4 font-medium border-b">Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="py-4 px-4 text-gray-900">@item.DayOfWeek</td>
+                            <td class="py-4 px-4 text-gray-900">@item.StartTime</td>
+                            <td class="py-4 px-4 text-gray-900">@item.EndTime</td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium @(item.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 flex space-x-3">
+                                <a asp-action="Edit" asp-route-id="@item.ScheduleID" class="text-blue-600 hover:text-blue-800 font-medium hover:underline">Edit</a>
+                                <button class="text-red-600 hover:text-red-800 font-medium hover:underline delete-btn" data-id="@item.ScheduleID">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="py-8 px-4 text-center text-gray-500">No schedules found. Click "Add Schedule" to create one.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
-
 <script>
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function () {
