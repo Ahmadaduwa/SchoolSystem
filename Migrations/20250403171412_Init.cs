@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SchoolSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Init1 : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,9 +20,9 @@ namespace SchoolSystem.Migrations
                     ActivityName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     ActivityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +78,10 @@ namespace SchoolSystem.Migrations
                     CourseCategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -104,13 +107,33 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.DepartmentId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GradeLevels",
                 columns: table => new
                 {
                     GradeLevelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -126,7 +149,10 @@ namespace SchoolSystem.Migrations
                     SemesterYear = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     SemesterNumber = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,8 +356,10 @@ namespace SchoolSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClassNumber = table.Column<int>(type: "int", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
+                    GradeLevelId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    GradeLevelId = table.Column<int>(type: "int", nullable: false)
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -354,7 +382,9 @@ namespace SchoolSystem.Migrations
                     CheckCount = table.Column<int>(type: "int", nullable: false),
                     SemesterId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -403,7 +433,7 @@ namespace SchoolSystem.Migrations
                     TeacherId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProfileId = table.Column<int>(type: "int", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: true),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
                     HireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -413,6 +443,12 @@ namespace SchoolSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teachers", x => x.TeacherId);
+                    table.ForeignKey(
+                        name: "FK_Teachers_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Teachers_Profiles_ProfileId",
                         column: x => x.ProfileId,
@@ -530,7 +566,7 @@ namespace SchoolSystem.Migrations
                     ProfileId = table.Column<int>(type: "int", nullable: true),
                     ClassId = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    GPA = table.Column<float>(type: "real", nullable: false),
+                    GPA = table.Column<float>(type: "real", nullable: false), // Remove precision and scale
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -551,7 +587,6 @@ namespace SchoolSystem.Migrations
                         principalColumn: "ProfileId",
                         onDelete: ReferentialAction.Cascade);
                 });
-
 
             migrationBuilder.CreateTable(
                 name: "ActivityAttendanceCheck",
@@ -606,6 +641,7 @@ namespace SchoolSystem.Migrations
                     SemesterId = table.Column<int>(type: "int", nullable: false),
                     ScoringCriteria = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     CheckCount = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -639,37 +675,6 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AcitivityAttendanceSummary",
-                columns: table => new
-                {
-                    AAM_Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AM_id = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    PresentCount = table.Column<int>(type: "int", nullable: true),
-                    AbsentCount = table.Column<int>(type: "int", nullable: true),
-                    LateCount = table.Column<int>(type: "int", nullable: true),
-                    ExcusedCount = table.Column<int>(type: "int", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AcitivityAttendanceSummary", x => x.AAM_Id);
-                    table.ForeignKey(
-                        name: "FK_AcitivityAttendanceSummary_ActivityManagement_AM_id",
-                        column: x => x.AM_id,
-                        principalTable: "ActivityManagement",
-                        principalColumn: "AM_id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AcitivityAttendanceSummary_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "StudentId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ActivityAttendances",
                 columns: table => new
                 {
@@ -677,7 +682,7 @@ namespace SchoolSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AM_id = table.Column<int>(type: "int", nullable: false),
                     Student_id = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", maxLength: 20, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     TimeStamp = table.Column<DateOnly>(type: "date", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>
@@ -698,7 +703,38 @@ namespace SchoolSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RegisteredCourse",
+                name: "ActivityAttendanceSummary",
+                columns: table => new
+                {
+                    AAM_Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AM_id = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    PresentCount = table.Column<int>(type: "int", nullable: true),
+                    AbsentCount = table.Column<int>(type: "int", nullable: true),
+                    LateCount = table.Column<int>(type: "int", nullable: true),
+                    ExcusedCount = table.Column<int>(type: "int", nullable: true),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActivityAttendanceSummary", x => x.AAM_Id);
+                    table.ForeignKey(
+                        name: "FK_ActivityAttendanceSummary_ActivityManagement_AM_id",
+                        column: x => x.AM_id,
+                        principalTable: "ActivityManagement",
+                        principalColumn: "AM_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ActivityAttendanceSummary_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RegisteredCourses",
                 columns: table => new
                 {
                     RC_id = table.Column<int>(type: "int", nullable: false)
@@ -712,21 +748,21 @@ namespace SchoolSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RegisteredCourse", x => x.RC_id);
+                    table.PrimaryKey("PK_RegisteredCourses", x => x.RC_id);
                     table.ForeignKey(
-                        name: "FK_RegisteredCourse_Course_CourseId",
+                        name: "FK_RegisteredCourses_Course_CourseId",
                         column: x => x.CourseId,
                         principalTable: "Course",
                         principalColumn: "CourseId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_RegisteredCourse_Semesters_SemesterId",
+                        name: "FK_RegisteredCourses_Semesters_SemesterId",
                         column: x => x.SemesterId,
                         principalTable: "Semesters",
                         principalColumn: "SemesterID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_RegisteredCourse_Students_StudentId",
+                        name: "FK_RegisteredCourses_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "StudentId",
@@ -760,7 +796,6 @@ namespace SchoolSystem.Migrations
                         principalColumn: "StudentId",
                         onDelete: ReferentialAction.Restrict);
                 });
-
 
             migrationBuilder.CreateTable(
                 name: "ClassAttendanceCheck",
@@ -823,7 +858,9 @@ namespace SchoolSystem.Migrations
                     DayOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -835,16 +872,6 @@ namespace SchoolSystem.Migrations
                         principalColumn: "CM_Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AcitivityAttendanceSummary_AM_id",
-                table: "AcitivityAttendanceSummary",
-                column: "AM_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AcitivityAttendanceSummary_StudentId",
-                table: "AcitivityAttendanceSummary",
-                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActivityAttendanceCheck_AM_Id",
@@ -860,6 +887,16 @@ namespace SchoolSystem.Migrations
                 name: "IX_ActivityAttendances_Student_id",
                 table: "ActivityAttendances",
                 column: "Student_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivityAttendanceSummary_AM_id",
+                table: "ActivityAttendanceSummary",
+                column: "AM_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivityAttendanceSummary_StudentId",
+                table: "ActivityAttendanceSummary",
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActivityManagement_ActivityId",
@@ -1043,18 +1080,18 @@ namespace SchoolSystem.Migrations
                 filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegisteredCourse_CourseId",
-                table: "RegisteredCourse",
+                name: "IX_RegisteredCourses_CourseId",
+                table: "RegisteredCourses",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegisteredCourse_SemesterId",
-                table: "RegisteredCourse",
+                name: "IX_RegisteredCourses_SemesterId",
+                table: "RegisteredCourses",
                 column: "SemesterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegisteredCourse_StudentId",
-                table: "RegisteredCourse",
+                name: "IX_RegisteredCourses_StudentId",
+                table: "RegisteredCourses",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
@@ -1070,6 +1107,11 @@ namespace SchoolSystem.Migrations
                 filter: "[ProfileId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Teachers_DepartmentId",
+                table: "Teachers",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Teachers_ProfileId",
                 table: "Teachers",
                 column: "ProfileId",
@@ -1080,13 +1122,13 @@ namespace SchoolSystem.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AcitivityAttendanceSummary");
-
-            migrationBuilder.DropTable(
                 name: "ActivityAttendanceCheck");
 
             migrationBuilder.DropTable(
                 name: "ActivityAttendances");
+
+            migrationBuilder.DropTable(
+                name: "ActivityAttendanceSummary");
 
             migrationBuilder.DropTable(
                 name: "ActivitySchedule");
@@ -1134,7 +1176,7 @@ namespace SchoolSystem.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "RegisteredCourse");
+                name: "RegisteredCourses");
 
             migrationBuilder.DropTable(
                 name: "ActivityManagement");
@@ -1168,6 +1210,9 @@ namespace SchoolSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "CourseCategories");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Profiles");

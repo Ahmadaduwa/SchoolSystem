@@ -7,9 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Shared\Layout\**" />
     <Compile Remove="Views\Teacher\**" />
+    <Content Remove="Views\Shared\Layout\**" />
     <Content Remove="Views\Teacher\**" />
+    <EmbeddedResource Remove="Views\Shared\Layout\**" />
     <EmbeddedResource Remove="Views\Teacher\**" />
+    <None Remove="Views\Shared\Layout\**" />
     <None Remove="Views\Teacher\**" />
   </ItemGroup>
 
@@ -51,7 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Shared\Layout\" />
+    <Folder Include="Migrations\" />
     <Folder Include="wwwroot\images\profiles\" />
   </ItemGroup>
 
