@@ -1,0 +1,147 @@
+﻿@using SchoolSystem.Models.RegistrationManagement;
+@using SchoolSystem.Models.ClassManagement;
+@{
+    ViewData["Title"] = "ดูรายวิชาที่ลงทะเบียน";
+    var student = ViewBag.Student;
+    var semesters = ViewBag.Semesters as List<Semester>;
+    var selectedSemesterId = (int)ViewBag.SelectedSemesterId;
+    var registrations = ViewBag.Registrations as List<RegisteredCourse>;
+}
+
+<div class="max-w-5xl mx-auto py-10 px-6 bg-gray-50 rounded-xl shadow-sm">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            รายวิชาที่ลงทะเบียน
+        </h2>
+        <div class="mt-2 flex items-center">
+            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
+                @(student.Profile?.FirstName?.Substring(0, 1))
+            </div>
+            <p class="text-lg text-gray-700">
+                @student.Profile?.FirstName @student.Profile?.LastName
+            </p>
+        </div>
+    </div>
+
+    <!-- Semester Selector -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <form method="get" asp-action="ViewRegistration" class="space-y-3">
+            <input type="hidden" name="id" value="@student.StudentId" />
+            <label for="semesterId" class="block text-gray-700 font-medium">เลือกภาคเรียน:</label>
+            <div class="flex items-center">
+                <div class="relative w-full">
+                    <select id="semesterId" name="semesterId" 
+                    class="appearance-none w-full pl-4 pr-10 py-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700" 
+                    onchange="this.form.submit()">
+                        @foreach (var semester in semesters)
+                        {
+                            <option value="@semester.SemesterID">
+                                @semester.SemesterYear - ภาคเรียนที่ @semester.SemesterNumber
+                            </option>
+                        }
+                    </select>
+
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                <button type="submit" class="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-5 rounded-lg transition duration-200 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                    แสดง
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Registration List -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600">
+            <h3 class="text-xl font-semibold text-white flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                </svg>
+                วิชาที่ลงทะเบียนในภาคเรียนนี้
+            </h3>
+        </div>
+
+        @if (registrations != null && registrations.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสวิชา</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อวิชา</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หน่วยกิต</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่ลงทะเบียน</th>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">การกระทำ</th>
+                            }
+                            
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach (var reg in registrations)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@reg.Course.Course_Code</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@reg.Course.CourseName</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        @reg.Course.Unit
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@reg.RegisteredDate.ToString("dd/MM/yyyy")</td>
+                                @if (User.IsInRole("Admin")){
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                        <!-- Form สำหรับลบการลงทะเบียน พร้อมการยืนยัน -->
+                                        <form asp-action="DeleteRegistration" method="post" onsubmit="return confirm('คุณแน่ใจว่าต้องการยกเลิกการลงทะเบียนนี้หรือไม่?');" class="inline">
+                                            <input type="hidden" name="registrationId" value="@reg.RC_id" />
+                                            <input type="hidden" name="studentId" value="@student.StudentId" />
+                                            <input type="hidden" name="selectedSemesterId" value="@selectedSemesterId" />
+                                            <button type="submit" class="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded text-sm" title="ยกเลิกการลงทะเบียน">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                }
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+                
+            <!-- Summary Section -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                <div class="flex justify-between items-center">
+                    <p class="text-sm text-gray-700">
+                        จำนวนรายวิชาทั้งหมด: <span class="font-medium">@registrations.Count</span>
+                    </p>
+                    <p class="text-sm text-gray-700">
+                        รวมหน่วยกิตทั้งหมด: <span class="font-medium">@registrations.Sum(r => r.Course.Unit)</span>
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="px-6 py-12 flex flex-col items-center justify-center text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="text-gray-600 text-lg">ยังไม่มีการลงทะเบียนในภาคเรียนนี้</p>
+                <p class="text-gray-500 mt-2">กรุณาเลือกภาคเรียนอื่น หรือดำเนินการลงทะเบียนก่อน</p>
+            </div>
+        }
+    </div>
+</div>

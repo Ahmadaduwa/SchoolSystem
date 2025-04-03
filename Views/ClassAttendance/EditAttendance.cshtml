@@ -1,0 +1,61 @@
+﻿@model SchoolSystem.ViewModels.AttendanceViewModel
+
+<div class="container mx-auto p-6 bg-white shadow-xl rounded-lg">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-8 text-center">
+        แก้ไขการเช็คชื่อ - @Model.ClassName - @Model.CourseName - @Model.date.ToShortDateString()
+    </h2>
+
+    <form method="post" asp-action="EditAttendance" asp-controller="ClassAttendance">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="cmId" />
+        <input type="hidden" name="date" value="@Model.date.ToString("yyyy-MM-dd")" />
+        <input type="hidden" asp-for="ClassName" />
+        <input type="hidden" asp-for="CourseName" />
+
+        <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-md mb-8">
+            <table class="table-auto w-full text-left text-sm">
+                <thead class="bg-green-600 text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-lg font-semibold">ชื่อนักเรียน</th>
+                        <th class="px-6 py-3 text-lg font-semibold">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Students.Count; i++)
+                    {
+                        <tr class="border-t border-gray-200 hover:bg-gray-100 transition-all">
+                            <td class="px-6 py-4">
+                                @Html.HiddenFor(m => m.Students[i].StudentId)
+                                <input type="hidden" asp-for="Students[@i].StudentName" value="@Model.Students[i].StudentName" />
+                                @Model.Students[i].StudentName
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap items-center space-x-4">
+                                    <div class="flex items-center">
+                                        <input asp-for="Students[i].Status" class="form-radio text-green-500" type="radio" value="present">
+                                        <label class="ml-2 text-gray-700">มา</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input asp-for="Students[i].Status" class="form-radio text-red-500" type="radio" value="absent">
+                                        <label class="ml-2 text-gray-700">ขาด</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input asp-for="Students[i].Status" class="form-radio text-yellow-500" type="radio" value="late">
+                                        <label class="ml-2 text-gray-700">สาย</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input asp-for="Students[i].Status" class="form-radio text-blue-500" type="radio" value="excused">
+                                        <label class="ml-2 text-gray-700">ลา</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <button type="submit" class="mt-6 w-full bg-green-600 text-white">Submit</button>
+    </form>
+</div>

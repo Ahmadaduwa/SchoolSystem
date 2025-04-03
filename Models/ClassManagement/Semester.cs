@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SchoolSystem.Models.ActivityManagement;
+using SchoolSystem.Models.RegistrationManagement;
 
 namespace SchoolSystem.Models.ClassManagement
 {
@@ -30,8 +32,17 @@ namespace SchoolSystem.Models.ClassManagement
         [Display(Name = "End Date")]
         public DateTime EndTime { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
+        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         // Navigation Properties
         public virtual ICollection<ClassManagement> ClassManagements { get; set; } = new HashSet<ClassManagement>();
+        public virtual ICollection<RegisteredCourse> RegisteredCourse { get; set; } = new List<RegisteredCourse>();
+        public virtual ICollection<ActivityManagement.ActivityManagement> ActivityManagement { get; set; } = new List<ActivityManagement.ActivityManagement>();
     }
 
     public class DateAfterAttribute : ValidationAttribute

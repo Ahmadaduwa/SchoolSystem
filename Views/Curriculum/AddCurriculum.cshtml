@@ -1,76 +1,51 @@
 ﻿@model SchoolSystem.Models.CurriculumManagement.Curriculum
 
-@{
-    ViewData["Title"] = "เพิ่มหลักสูตร";
-}
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Create New Curriculum</h2>
 
-<div class="container px-4 mx-auto sm:px-6 lg:px-8">
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-blue-600 text-white px-4 py-4 flex flex-wrap sm:flex-nowrap justify-between items-center">
-            <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">เพิ่มหลักสูตรใหม่</h1>
-            <a asp-action="CurriculumManagement"
-               class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition text-sm sm:text-base">
-                <i class="fas fa-arrow-left mr-2"></i> กลับ
-            </a>
+    <form asp-action="AddCurriculum" method="post" class="bg-white shadow-md rounded-lg p-8 space-y-6">
+        <div>
+            <label asp-for="Curriculum_Code" class="block text-sm font-semibold text-gray-700 mb-2">Curriculum Code</label>
+            <input asp-for="Curriculum_Code" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                   placeholder="e.g., CURR-001" required />
+            <span asp-validation-for="Curriculum_Code" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
-        <div class="p-4 sm:p-6">
-            <form asp-action="AddCurriculum" asp-controller="Curriculum" method="post">
-                @Html.AntiForgeryToken()
-                <div class="mb-4">
-                    <label asp-for="Curriculum_Code" class="block text-sm font-medium text-gray-700 mb-1">
-                        รหัสหลักสูตร
-                    </label>
-                    <input asp-for="Curriculum_Code"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
-                    <span asp-validation-for="Curriculum_Code" class="text-red-500 text-xs mt-1"></span>
-                </div>
-
-                <div class="mb-4">
-                    <label asp-for="CurriculumName" class="block text-sm font-medium text-gray-700 mb-1">
-                        ชื่อหลักสูตร
-                    </label>
-                    <input asp-for="CurriculumName"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
-                    <span asp-validation-for="CurriculumName" class="text-red-500 text-xs mt-1"></span>
-                </div>
-
-                <div class="mb-4">
-                    <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-1">
-                        คำอธิบาย
-                    </label>
-                    <textarea asp-for="Description"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[120px]"></textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label asp-for="Status" class="block text-sm font-medium text-gray-700 mb-1">
-                        สถานะ
-                    </label>
-                    <select asp-for="Status"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
-                        <option value="Active" selected>Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-4">
-                    <button type="submit"
-                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm">
-                        <i class="fas fa-save mr-2"></i>บันทึกหลักสูตร
-                    </button>
-                    <a asp-action="CurriculumManagement"
-                       class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm">
-                        <i class="fas fa-times mr-2"></i>ยกเลิก
-                    </a>
-                </div>
-            </form>
+        <div>
+            <label asp-for="CurriculumName" class="block text-sm font-semibold text-gray-700 mb-2">Curriculum Name</label>
+            <input asp-for="CurriculumName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                   placeholder="e.g., Science Curriculum 2025" required />
+            <span asp-validation-for="CurriculumName" class="text-red-600 text-sm mt-1 block"></span>
         </div>
-    </div>
+
+        <div>
+            <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-2">Description (Optional)</label>
+            <textarea asp-for="Description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Additional details about this curriculum"></textarea>
+            <span asp-validation-for="Description" class="text-red-600 text-sm mt-1 block"></span>
+        </div>
+
+        <div>
+            <label asp-for="Status" class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+            <select asp-for="Status" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-600 text-sm mt-1 block"></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md
+                transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                Create Curriculum
+            </button>
+            <a asp-action="CurriculumManagement" class="text-gray-600 hover:text-gray-900 text-sm">Cancel</a>
+        </div>
+    </form>
 </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
-}

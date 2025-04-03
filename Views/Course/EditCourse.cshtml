@@ -3,71 +3,104 @@
     ViewData["Title"] = "Edit Course";
 }
 
-<div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
-    <h2 class="text-2xl font-bold mb-4 text-center">Edit Course</h2>
-
-    <form asp-action="EditCourse" method="post">
-        <input asp-for="CourseId" type="hidden" />
-
-        <div>
-            <label asp-for="Course_Code" class="block text-sm font-medium text-gray-700">Course Code</label>
-            <input asp-for="Course_Code" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" required />
-            <span asp-validation-for="Course_Code" class="text-red-500 text-sm"></span>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-5 border-b border-gray-200">
+            <h2 class="text-3xl font-extrabold text-gray-900">Edit Course</h2>
         </div>
 
-        <div>
-            <label asp-for="CourseName" class="block text-sm font-medium text-gray-700">Course Name</label>
-            <input asp-for="CourseName" type="text" class="border border-gray-300 rounded px-2 py-1 w-full" required />
-            <span asp-validation-for="CourseName" class="text-red-500 text-sm"></span>
-        </div>
+        <form asp-action="EditCourse" method="post" class="p-6 space-y-6">
+            <input type="hidden" asp-for="CourseId" />
 
-        <div>
-            <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description</label>
-            <textarea asp-for="Description" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
-            <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
-        </div>
+            <div>
+                <label asp-for="Course_Code" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Course Code <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Course_Code" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., CS101" required />
+                <span asp-validation-for="Course_Code" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-        <div>
-            <label asp-for="Objective" class="block text-sm font-medium text-gray-700">Objective</label>
-            <textarea asp-for="Objective" class="border border-gray-300 rounded px-2 py-1 w-full"></textarea>
-            <span asp-validation-for="Objective" class="text-red-500 text-sm"></span>
-        </div>
+            <div>
+                <label asp-for="CourseName" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Course Name <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="CourseName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Introduction to Computer Science" required />
+                <span asp-validation-for="CourseName" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-        <div>
-            <label asp-for="Unit" class="block text-sm font-medium text-gray-700">Units</label>
-            <input asp-for="Unit" type="number" step="0.5" class="border border-gray-300 rounded px-2 py-1 w-full" required />
-            <span asp-validation-for="Unit" class="text-red-500 text-sm"></span>
-        </div>
+            <div>
+                <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Description
+                </label>
+                <textarea asp-for="Description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Course description"></textarea>
+                <span asp-validation-for="Description" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-        <div>
-            <label asp-for="CourseCategoryId" class="block text-sm font-medium text-gray-700">Category</label>
-            <select asp-for="CourseCategoryId" class="border border-gray-300 rounded px-2 py-1 w-full" asp-items="ViewBag.CourseCategories" required>
-                <option value="">-- Select Category --</option>
-            </select>
-            <span asp-validation-for="CourseCategoryId" class="text-red-500 text-sm"></span>
-        </div>
+            <div>
+                <label asp-for="Objective" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Objective
+                </label>
+                <textarea asp-for="Objective" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Course objectives"></textarea>
+                <span asp-validation-for="Objective" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-        <div>
-            <label asp-for="Status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select asp-for="Status" class="border border-gray-300 rounded px-2 py-1 w-full">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-            <span asp-validation-for="Status" class="text-red-500 text-sm"></span>
-        </div>
+            <div>
+                <label asp-for="Unit" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Units <span class="text-red-500">*</span>
+                </label>
+                <input asp-for="Unit" type="number" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 3.0" required />
+                <span asp-validation-for="Unit" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-        <div class="flex justify-between gap-4 mt-4">
-            <a asp-action="IndexCourse" class="inline-block rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Back</a>
-            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500">Save Changes</button>
-        </div>
-    </form>
+            <div>
+                <label asp-for="Status" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Status <span class="text-red-500">*</span>
+                </label>
+                <select asp-for="Status" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <option value="">Select Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <span asp-validation-for="Status" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-    <!-- ปุ่ม Delete พร้อม Confirm -->
-    <form asp-action="DeleteCourse" asp-controller="Course" asp-route-id="@Model.CourseId" method="post" class="mt-4">
-        <input type="hidden" asp-for="CourseId" />
-        <button type="submit" class="w-full rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
-                onclick="return confirm('Are you sure you want to delete this course?');">
-            Delete Course
-        </button>
-    </form>
+            <div>
+                <label asp-for="CourseCategoryId" class="block text-sm font-semibold text-gray-700 mb-2">Course Category</label>
+                <select asp-for="CourseCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        asp-items="@(ViewBag.CourseCategories ?? new SelectList(Enumerable.Empty<SelectListItem>(), "CourseCategoryId", "Name"))" required>
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="CourseCategoryId" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-gray-600 block mb-1">Created At</span>
+                        <p class="font-medium text-gray-800">
+                            @(Model.CreatedAt.ToString("dd MMM yyyy HH:mm") ?? "N/A")
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 block mb-1">Last Updated</span>
+                        <p class="font-medium text-gray-800">
+                            @(Model.UpdatedAt?.ToString("dd MMM yyyy HH:mm") ?? "N/A")
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-6">
+                <div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Save Changes
+                    </button>
+                    <a asp-action="IndexCourse" class="ml-4 text-gray-600 hover:text-gray-900">Cancel</a>
+                </div>
+                <a asp-action="Details" asp-route-id="@Model.CourseId" class="text-indigo-600 hover:text-indigo-800 hover:underline">
+                    View Details
+                </a>
+            </div>
+        </form>
+    </div>
 </div>

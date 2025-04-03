@@ -1,29 +1,35 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using SchoolSystem.Models.UserManagement
+@using Microsoft.EntityFrameworkCore
 @inject UserManager<Users> UserManager
 @inject SignInManager<Users> SignInManager
 @inject SchoolSystem.Data.AppDbContext DbContext
-@{
-    ViewData["UrlUserAvatar"] = "./images/profiles/user.jpg";
-    ViewData["Fullname"] = "ไม่ทราบชื่อ";
-    ViewData["Class"] = "ไร้ตัวตน";
-    // ดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
-    if (SignInManager.IsSignedIn(User))
-    {
-        var userId = UserManager.GetUserId(User);
-        var profile = DbContext.Profiles.FirstOrDefault(p => p.UserId == userId);
 
-        if (profile != null)
-        {
-            ViewData["UrlUserAvatar"] = string.IsNullOrEmpty(profile.ProfilePictureUrl) ? "/default-avatar.jpg" : profile.ProfilePictureUrl;
-            ViewData["Fullname"] = $"{profile.FirstName} {profile.LastName}";
-        }
-    }
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var userId = user != null ? user.Id : null;
+    var profile = userId != null ? await DbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId) : null;
+
+    // Combine FirstName and LastName to create Fullname
+    ViewData["Fullname"] = profile != null ? $"{profile.FirstName} {profile.LastName}" : "ผู้ใช้ทั่วไป";
+    ViewData["UrlUserAvatar"] = profile?.ProfilePictureUrl ?? "images/profiles/user.jpg";
+
+    // You can also add more profile information if needed
+    ViewData["Gender"] = profile?.Gender ?? "Not Specified";
+    ViewData["NotificationCount"] = 3; // ควรดึงค่าจากฐานข้อมูลจริง
+
+    // Set user class/role info
     if (User.IsInRole("Academic"))
     {
         ViewData["Class"] = "ฝ่ายวิชาการ";
-    } else {
-		ViewData["Class"] = "ชั้น ม.2/1";
+    }
+    else if (User.IsInRole("Teacher"))
+    {
+        ViewData["Class"] = "ครู";
+    }
+    else
+    {
+        ViewData["Class"] = "ชั้น ม.2/1"; // You might want to get this from the profile too
     }
 }
 <!DOCTYPE html>
@@ -38,56 +44,62 @@
 <body class="flex flex-col min-h-screen bg-gray-50">
     <!-- Header -->
     <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
-        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-            
-                <div class="flex items-center">
-                    <img src="/path/to/logo.png" alt="School Logo" class="h-10 w-10 rounded-full bg-white p-1 mr-3">
-                    <h1 class="text-lg md:text-2xl font-bold text-white">โรงเรียนมัธยมตัวอย่าง</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <!-- Notifications -->
-                    <div class="relative hidden md:block">
-                        <button class="text-white hover:bg-blue-700 p-2 rounded-full">
-                            <i class="fas fa-bell"></i>
-                            <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
-                        </button>
-                    </div>
+        <div class="container mx-auto px-4 py-1 flex justify-between items-center">
 
-                    <!-- User Profile Dropdown -->
-                    <div class="hidden md:block relative">
-                        <button onclick="toggleDropdown()" class="flex items-center space-x-3 text-white hover:bg-blue-700 p-2 rounded-lg">
-                            <img src="@ViewData["UrlUserAvatar"]" alt="User Avatar" class="h-8 w-8 rounded-full">
-                            <span>@ViewData["Fullname"]</span>
-                            <i class="fas fa-chevron-down text-sm"></i>
-                        </button>
+            <div class="flex items-center">
+                <img src="/images/logo.png" alt="School Logo" style="width: 75px" class="py-2">
+                <h1 class="text-xl md:text-3xl font-extrabold text-white ml-4">โรงเรียนลำไพลศานติวิทย์</h1>
 
-                        <!-- Dropdown Menu -->
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user mr-2"></i>โปรไฟล์
-                            </a>
-
-                            <hr class="my-2">
-                            <form asp-controller="Home" asp-action="Logout" method="post" class="block py-2 text-red-600 hover:bg-gray-100">
-                                @Html.AntiForgeryToken()
-                                    <button type="submit" class="w-full text-left px-4 ">
-                                        <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
-                                </button>
-                            </form>
-                        </div>  
-                    </div>
-
-                    <!-- Mobile Menu Button -->
-                    <button class="md:hidden text-white hover:bg-blue-700 p-2 rounded-lg" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
-                        ☰ Menu
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Notifications 
+                <div class="relative hidden md:block">
+                    <button class="text-white hover:bg-blue-700 p-2 rounded-full">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs flex items-center justify-center">@ViewData["NotificationCount"]</span>
                     </button>
                 </div>
-            
+                -->
+
+                <!-- User Profile Dropdown -->
+                <div class="hidden md:block relative">
+                    <button onclick="toggleDropdown()" class="flex items-center space-x-3 text-white hover:bg-blue-700 p-2 rounded-lg">
+                        <img src="@ViewData["UrlUserAvatar"]" alt="User Avatar" class="h-8 w-8 rounded-full">
+                        <span>@ViewData["Fullname"]</span>
+                        <i class="fas fa-chevron-down text-sm"></i>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                        <div class="px-4 py-2 text-gray-700 border-b border-gray-200">
+                            <div class="font-medium">@ViewData["Fullname"]</div>
+                            <div class="text-sm text-gray-500">@ViewData["Class"]</div>
+                        </div>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user mr-2"></i>โปรไฟล์
+                        </a>
+
+                        <hr class="my-2">
+                        <form asp-controller="Home" asp-action="Logout" method="post" class="block py-2 text-red-600 hover:bg-gray-100">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="w-full text-left px-4 ">
+                                <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white hover:bg-blue-700 p-2 rounded-lg" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+                    ☰ Menu
+                </button>
+            </div>
+
         </div>
     </header>
 
     <!-- Main Content Wrapper -->
-    <div class="flex-grow flex ">
+    <div class="md:flex-grow md:flex ">
         <!-- Sidebar -->
         <nav id="sidebar"
              class="fixed md:static top-0 left-0 h-full md:h-auto w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
@@ -102,11 +114,10 @@
                     </div>
                 </div>
                 <ul class="space-y-2">
-					<partial name="./Partial/_SidebarPartial" />
-           
+                    <partial name="./Partial/_SidebarPartial" />
                 </ul>
-             </div>
-             <div class="md:hidden mt-auto p-4 border-t">
+            </div>
+            <div class="md:hidden mt-auto p-4 border-t">
                 <form asp-controller="Home" asp-action="Logout" method="post">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="flex items-center space-x-3 px-4 py-3 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200">
@@ -116,8 +127,8 @@
             </div>
         </nav>
 
-                <!-- Main Content -->
-        <main class="flex-1 pt-5 sm:p-5 lg:px-8 bg-gray-50">
+        <!-- Main Content -->
+        <main class="flex-1 pt-5 md:p-5 lg:px-8 bg-gray-50">
             @if (TempData["SuccessMessage"] != null)
             {
                 <div id="flash-message" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
@@ -131,7 +142,7 @@
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div id="flash-message" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
+                <div id="flash-message" class="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-md">
                     @TempData["ErrorMessage"]
                 </div>
                 <script>
@@ -140,9 +151,9 @@
                     }, 3000);
                 </script>
             }
-                    @RenderBody()
-                </main>
-            </div>
+            @RenderBody()
+        </main>
+    </div>
 
 
     <!-- Footer -->
@@ -151,5 +162,17 @@
     <script src="/js/Layout.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 
+    <script>
+        function toggleDropdown() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('button[onclick="toggleDropdown()"]') && !document.getElementById('userDropdown').contains(e.target)) {
+                document.getElementById('userDropdown').classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

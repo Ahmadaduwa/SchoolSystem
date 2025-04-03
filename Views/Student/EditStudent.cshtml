@@ -1,0 +1,129 @@
+﻿@model SchoolSystem.ViewModels.StudentViewEditModel
+@{
+    ViewData["Title"] = "แก้ไขนักเรียน";
+}
+
+<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">แก้ไขนักเรียน</h2>
+
+    <form asp-action="EditStudent" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-red-500 text-sm mb-4"></div>
+
+        <!-- Hidden fields -->
+        <input type="hidden" asp-for="StudentId" />
+        <input type="hidden" asp-for="ProfileId" />
+
+        <!-- Account Information -->
+        <fieldset class="border p-4 rounded-lg mb-4">
+            <legend class="text-lg font-bold">ข้อมูลบัญชีผู้ใช้</legend>
+            <label asp-for="Email" class="block">อีเมล:</label>
+            <input asp-for="Email" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+
+            <label asp-for="Username" class="block">ชื่อผู้ใช้:</label>
+            <input asp-for="Username" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="Username" class="text-red-500 text-sm"></span>
+
+            <label asp-for="Password" class="block">รหัสผ่าน:</label>
+            <input asp-for="Password" type="password" class="border rounded w-full p-2 mb-4" placeholder="เว้นว่างไว้เพื่อใช้รหัสผ่านเดิม" />
+            <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+
+            <label asp-for="ConfirmPassword" class="block">ยืนยันรหัสผ่าน:</label>
+            <input asp-for="ConfirmPassword" type="password" class="border rounded w-full p-2 mb-4" placeholder="เว้นว่างไว้เพื่อใช้รหัสผ่านเดิม" />
+            <span asp-validation-for="ConfirmPassword" class="text-red-500 text-sm"></span>
+        </fieldset>
+
+        <!-- Profile Information -->
+        <fieldset class="border p-4 rounded-lg mb-4">
+            <legend class="text-lg font-bold">ข้อมูลโปรไฟล์</legend>
+            <label asp-for="FirstName" class="block">ชื่อ:</label>
+            <input asp-for="FirstName" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="FirstName" class="text-red-500 text-sm"></span>
+
+            <label asp-for="LastName" class="block">นามสกุล:</label>
+            <input asp-for="LastName" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="LastName" class="text-red-500 text-sm"></span>
+
+            <label asp-for="Gender" class="block">เพศ:</label>
+            <select asp-for="Gender" class="border rounded w-full p-2 mb-4">
+                <option value="Not Specified">ไม่ระบุ</option>
+                <option value="Male">ชาย</option>
+                <option value="Female">หญิง</option>
+                <option value="Other">อื่นๆ</option>
+            </select>
+            <span asp-validation-for="Gender" class="text-red-500 text-sm"></span>
+
+            <label asp-for="Address" class="block">ที่อยู่:</label>
+            <textarea asp-for="Address" class="border rounded w-full p-2 mb-4 h-32"></textarea>
+            <span asp-validation-for="Address" class="text-red-500 text-sm"></span>
+
+
+            <label asp-for="DateOfBirth" class="block">วันเกิด: (เดือน/วัน/ปี ค.ศ.)</label>
+            <input asp-for="DateOfBirth" type="date" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="DateOfBirth" class="text-red-500 text-sm"></span>
+
+            <label asp-for="ProfilePicture" class="block">รูปโปรไฟล์ (อัปโหลดรูปใหม่เพื่อแทนที่รูปปัจจุบัน):</label>
+            <input asp-for="ProfilePicture" type="file" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="ProfilePicture" class="text-red-500 text-sm"></span>
+
+            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+            {
+                <div class="mb-4">
+                    <label class="block">รูปโปรไฟล์ปัจจุบัน:</label>
+                    <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="w-32 h-32 object-cover rounded" />
+                </div>
+            }
+        </fieldset>
+
+        <!-- Student Information -->
+        <fieldset class="border p-4 rounded-lg mb-4">
+            <legend class="text-lg font-bold">ข้อมูลนักเรียน</legend>
+            <label asp-for="Student_Code" class="block">รหัสนักเรียน:</label>
+            <input asp-for="Student_Code" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="Student_Code" class="text-red-500 text-sm"></span>
+
+            <label asp-for="ClassId" class="block">ห้อง:</label>
+            <select asp-for="ClassId" class="border rounded w-full p-2 mb-4" asp-items="Model.Classes">
+                <option value="">เลือกห้อง</option>
+            </select>
+            <span asp-validation-for="ClassId" class="text-red-500 text-sm"></span>
+
+            <label asp-for="EnrollmentDate" class="block">วันที่ลงทะเบียน: (เดือน/วัน/ปี ค.ศ.)</label>
+            <input asp-for="EnrollmentDate" type="date" class="border rounded w-full p-2 mb-4" />
+            <span asp-validation-for="EnrollmentDate" class="text-red-500 text-sm"></span>
+
+            <label asp-for="GPA" class="block">GPA:</label>
+            <input asp-for="GPA" type="number" step="0.01" class="border rounded w-full p-2 mb-4" readonly />
+            <span asp-validation-for="GPA" class="text-red-500 text-sm"></span>
+
+            <label asp-for="Status" class="block text-sm font-medium text-gray-700">สถานะ:</label>
+            <select asp-for="Status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-500 text-xs"></span>
+
+        </fieldset>
+
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400">
+            บันทึกการเปลี่ยนแปลง
+        </button>
+    </form>
+
+    <!-- ปุ่มย้อนกลับและ Delete -->
+    <div class="mt-4 flex justify-between">
+        <a asp-action="IndexStudent" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">
+            ย้อนกลับ
+        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <form asp-action="DeleteStudent" method="post" onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบนักเรียนคนนี้?');" asp-route-id="@Model.StudentId">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="StudentId" />
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400">
+                    ลบ
+                </button>
+            </form>
+        }
+    </div>
+</div>

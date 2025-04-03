@@ -1,33 +1,160 @@
 ﻿@model SchoolSystem.Models.ClassManagement.ClassManagement
-@{
-    ViewData["Title"] = "View Class Management";
-}
 
-<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Class Management Details</h2>
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden max-w-5xl mx-auto">
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 text-center sm:text-left w-full sm:w-auto">
+                Class Management Details
+            </h2>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto text-center">
+                <a asp-action="EditManage" asp-route-id="@Model.CM_Id"
+                   class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a asp-action="Index"
+                   class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
 
-    <div class="mb-6 bg-gray-100 p-4 rounded-lg">
-        <p class="text-lg"><strong>Class:</strong> @($"{Model.Class.GradeLevels.Name}/{Model.Class.ClassNumber}")</p>
-        <p class="text-lg"><strong>Teacher:</strong> @Model.Teacher.Profile.FirstName @Model.Teacher.Profile.LastName</p>
-        <p class="text-lg"><strong>Course:</strong> @Model.Course.CourseName</p>
-        <p class="text-lg"><strong>Semester:</strong> @Model.Semester.SemesterYear / @Model.Semester.SemesterNumber</p>
-        <p class="text-lg"><strong>Scoring Criteria:</strong> @Model.ScoringCriteria</p>
-        <p class="text-lg"><strong>Check Count:</strong> @Model.CheckCount</p>
-    </div>
+        <div class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-school mr-2 text-indigo-500"></i>Class
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.Class?.GradeLevels?.Name / @Model.Class?.ClassNumber</p>
+                        </div>
+                    </div>
 
-    <div class="flex justify-between">
-        <a asp-action="EditManage" asp-route-id="@Model.CM_Id" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-400">
-            Edit
-        </a>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-chalkboard-teacher mr-2 text-indigo-500"></i>Teacher
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.Teacher?.Profile?.FirstName @Model.Teacher?.Profile?.LastName</p>
+                        </div>
+                    </div>
 
-        <a asp-action="IndexClassSchedule" asp-controller="ClassSchedule" asp-route-cmid="@Model.CM_Id" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400">
-            Manage Schedule
-        </a>
-    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-book mr-2 text-indigo-500"></i>Course
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.Course?.CourseName</p>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="mt-6">
-        <a asp-action="Index" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400">
-            Back to List
-        </a>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-calendar mr-2 text-indigo-500"></i>Semester
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.Semester?.SemesterYear / @Model.Semester?.SemesterNumber</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-check-circle mr-2 text-indigo-500"></i>Status23
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <span class="@(Model.Status == "Active" ? "text-green-600" : "text-red-600") font-semibold">
+                                @Model.Status
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-list-ol mr-2 text-indigo-500"></i>Check Count
+                        </h3>
+                        <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <p class="text-gray-900 font-medium">@Model.CheckCount</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                    <i class="fas fa-clipboard-list mr-2 text-indigo-500"></i>Scoring Criteria
+                </h3>
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm min-h-[100px]">
+                    @if (string.IsNullOrWhiteSpace(Model.ScoringCriteria))
+                    {
+                        <p class="text-gray-500 italic text-center pt-4">
+                            <i class="fas fa-info-circle mr-2"></i>No scoring criteria provided
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-gray-900 leading-relaxed">@Model.ScoringCriteria</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Related Collections -->
+            <div class="space-y-6 mt-6">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-calendar-week mr-2 text-indigo-500"></i>Class Schedules (@Model.ClassSchedules.Count)
+                    </h3>
+                    <p class="text-gray-600">Number of schedules: @Model.ClassSchedules.Count</p>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-users mr-2 text-indigo-500"></i>Attendance Summary (@Model.ClassAttendanceSummary.Count)
+                    </h3>
+                    <p class="text-gray-600">Number of summaries: @Model.ClassAttendanceSummary.Count</p>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user-check mr-2 text-indigo-500"></i>Attendance Records (@Model.ClassAttendance.Count)
+                    </h3>
+                    <p class="text-gray-600">Number of records: @Model.ClassAttendance.Count</p>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-clipboard-check mr-2 text-indigo-500"></i>Attendance Checks (@Model.ClassAttendanceCheck.Count)
+                    </h3>
+                    <p class="text-gray-600">Number of checks: @Model.ClassAttendanceCheck.Count</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-indigo-500"></i>Additional Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-gray-600 block mb-1">Created At</span>
+                        <p class="font-medium text-gray-800">
+                            <i class="fas fa-calendar-alt mr-2 text-indigo-500"></i>
+                            @Model.CreateAt.ToString("dd MMM yyyy HH:mm")
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 block mb-1">Last Updated</span>
+                        <p class="font-medium text-gray-800">
+                            <i class="fas fa-clock mr-2 text-indigo-500"></i>
+                            @Model.UpdateAt.ToString("dd MMM yyyy HH:mm")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@section Css {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+}

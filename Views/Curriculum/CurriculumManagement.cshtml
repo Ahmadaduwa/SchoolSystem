@@ -1,142 +1,221 @@
-﻿@model List<SchoolSystem.Models.CurriculumManagement.Curriculum>
-
+﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.CurriculumManagement.Curriculum>
 @{
     ViewData["Title"] = "Curriculum Management";
+    var statuses = ViewData["Statuses"] as List<SelectListItem>;
+    var currentStatus = ViewData["CurrentStatus"]?.ToString();
+    var currentFilter = ViewData["CurrentFilter"]?.ToString();
+    var currentSort = ViewData["CurrentSort"]?.ToString();
 }
-@section Css {
-    <link href="./css/CurriculumManagement.css" rel="stylesheet" />
-}
-<div class="container mx-auto sm:px-6 lg:px-8 py-6">
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-blue-600 text-white px-4 py-4 flex flex-wrap items-center justify-between">
-            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">จัดการหลักสูตร</h1>
-            <form method="get" asp-action="CurriculumManagement" class="flex flex-wrap items-center gap-4">
-                <!-- Filter by Status -->
-                <select name="filterStatus" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
-                    <option value="">แสดงทั้งหมด</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
+<div class="container mx-auto md:px-4 py-6">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Curriculum Management</h2>
 
-                <!-- Sort Order -->
-                <select name="sortOrder" class="border px-3 py-2 rounded-lg bg-white text-gray-700 w-full sm:w-auto">
-                    <option value="">เรียงลำดับ...</option>
-                    <option value="UpdateAtDesc">วันที่อัปเดต (ใหม่ -> เก่า)</option>
-                    <option value="UpdateAtAsc">วันที่อัปเดต (เก่า -> ใหม่)</option>
-                    <option value="CreateAtDesc">วันที่สร้าง (ใหม่ -> เก่า)</option>
-                    <option value="CreateAtAsc">วันที่สร้าง (เก่า -> ใหม่)</option>
-                    <option value="NameAsc">ชื่อหลักสูตร (A-Z)</option>
-                    <option value="NameDesc">ชื่อหลักสูตร (Z-A)</option>
-                </select>
+        <!-- Search and Filter Section -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <form asp-action="CurriculumManagement" method="get" class="flex flex-wrap gap-4">
+                <!-- Search by Code, Name, or Description -->
+                <div class="flex-1 min-w-fit">
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by code, name, or description..." />
+                </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto">
-                    ค้นหา
-                </button>
+                <!-- Status Filter Dropdown -->
+                <div class="flex-1 min-w-fit">
+                    <select name="statusFilter" class="w-full p-2 border rounded">
+                        <option value="">All Status</option>
+                        @foreach (var status in statuses)
+                        {
+                            <option value="@status.Value" selected="@(status.Value == currentStatus ? "selected" : null)">
+                                @status.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
+                        <i class="fas fa-search mr-1"></i> Search
+                    </button>
+                    <a asp-action="CurriculumManagement" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
+                        Reset
+                    </a>
+                </div>
             </form>
-            <a asp-action="AddCurriculum" asp-controller="Curriculum" class="bg-white text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 w-full sm:w-auto mt-4 sm:mt-0 transition">
-                <i class="fas fa-plus mr-2"></i> เพิ่มหลักสูตร
-            </a>
         </div>
 
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+            <a asp-action="AddCurriculum" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
+                <i class="fas fa-plus-circle mr-2"></i> Add New Curriculum
+            </a>
+            <div class="text-gray-600">
+                Showing @Model.Count of @ViewData["TotalItems"] curriculums | Page @Model.PageIndex of @Model.TotalPages
+            </div>
+        </div>
 
-        <!-- Desktop View (Original Table Layout) -->
-        <div class="hidden sm:block p-4 sm:p-6">
-            <div class="overflow-x-auto">
-                <table class="table-auto w-full text-left border-collapse border border-gray-300">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">รหัสหลักสูตร</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">ชื่อหลักสูตร</th>
-                            <th class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">คำอธิบาย</th>
-                            <th class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">วันที่สร้าง</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">สถานะ</th>
-                            <th class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">การดำเนินการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <!-- Curriculums Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <th class="border px-4 py-2">
+                            <a asp-action="CurriculumManagement"
+                               asp-route-sortOrder="@ViewData["CodeSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-statusFilter="@currentStatus"
+                               class="flex items-center justify-between">
+                                Code
+                                @if (string.IsNullOrEmpty(currentSort) || currentSort == "code_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "code_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="CurriculumManagement"
+                               asp-route-sortOrder="@ViewData["NameSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-statusFilter="@currentStatus"
+                               class="flex items-center justify-between">
+                                Name
+                                @if (currentSort == "name" || currentSort == "name_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">Description</th>
+                        <th class="border px-4 py-2">
+                            <a asp-action="CurriculumManagement"
+                               asp-route-sortOrder="@ViewData["StatusSortParam"]"
+                               asp-route-currentFilter="@currentFilter"
+                               asp-route-statusFilter="@currentStatus"
+                               class="flex items-center justify-between">
+                                Status
+                                @if (currentSort == "status" || currentSort == "status_desc")
+                                {
+                                    <i class="fas fa-sort-@(currentSort == "status_desc" ? "down" : "up") ml-1"></i>
+                                }
+                            </a>
+                        </th>
+                        <th class="border px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
                         @foreach (var curriculum in Model)
                         {
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@curriculum.Curriculum_Code</td>
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300">@curriculum.CurriculumName</td>
-                                <td class="p-2 sm:p-3 hidden md:table-cell text-xs sm:text-sm border border-gray-300">@curriculum.Description</td>
-                                <td class="p-2 sm:p-3 hidden lg:table-cell text-xs sm:text-sm border border-gray-300">@curriculum.CreateAt.ToString("yyyy-MM-dd")</td>
-                                <td class="p-2 sm:p-3 text-xs sm:text-sm border border-gray-300 @((curriculum.Status == "Inactive") ? "text-red-600" : "text-green-600")">
-                                    @curriculum.Status
-                                </td>
-                                <td class="p-2 sm:p-3 relative border border-gray-300">
-                                    <div class="relative">
-                                        <button class="table-dropdown-toggle bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition text-xs sm:text-sm w-full"
-                                                data-dropdown="dropdown-@curriculum.Curriculum_Code">
-                                            ดำเนินการ <i class="fas fa-chevron-down ml-1"></i>
-                                        </button>
-                                        <div id="dropdown-@curriculum.Curriculum_Code" class="table-dropdown-menu hidden bg-white shadow-lg rounded-lg text-xs sm:text-sm">
-                                            <a asp-action="ManageCourses" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
-                                                <i class="fas fa-cogs"></i> จัดการรายวิชา
-                                            </a>
-                                            <a asp-action="ManageCurriculumActivities" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
-                                                <i class="fas fa-tasks"></i> กิจกรรม
-                                            </a>
-                                            <a asp-action="EditCurriculum" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId" class="block w-full text-left px-3 py-2 hover:bg-gray-100">
-                                                <i class="fas fa-pencil-alt"></i> แก้ไข
-                                            </a>
-                                        </div>
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-4 py-2">@curriculum.Curriculum_Code</td>
+                                <td class="border px-4 py-2">@curriculum.CurriculumName</td>
+                                <td class="border px-4 py-2">@curriculum.Description</td>
+                                <td class="border px-4 py-2">@curriculum.Status</td>
+                                <td class="border px-4 py-2">
+                                    <div class="flex justify-center gap-1">
+                                        <!-- Details Button -->
+                                        <a asp-action="Details" asp-route-id="@curriculum.CurriculumId"
+                                           class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <!-- EditCurriculum Button -->
+                                        <a asp-action="EditCurriculum" asp-route-id="@curriculum.CurriculumId"
+                                           class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm"
+                                           title="Edit Curriculum">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <!-- ManageCurriculumActivities Button -->
+                                        <a asp-action="ManageCurriculumActivities"
+                                           asp-route-id="@curriculum.CurriculumId"
+                                           asp-route-sortOrder=""
+                                           class="bg-green-500 hover:bg-green-400 text-white px-2 py-1 rounded text-sm"
+                                           title="Manage Activities">
+                                            <i class="fas fa-tasks"></i>
+                                        </a>
+
+                                        <!-- ManageCourses Button -->
+                                        <a asp-action="ManageCourses" asp-route-id="@curriculum.CurriculumId"
+                                           class="bg-purple-500 hover:bg-purple-400 text-white px-2 py-1 rounded text-sm"
+                                           title="Manage Courses">
+                                            <i class="fas fa-book"></i>
+                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <form asp-controller="Curriculum" asp-action="DeleteCurriculum" asp-route-id="@curriculum.CurriculumId" method="post"
+                                                  onsubmit="return confirm('Are you sure you want to delete this item?');"
+                                                  class="flex justify-between items-center">
+                                                <input type="hidden" asp-for="@curriculum.CurriculumId" />
+                                                <button type="submit" class="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded text-sm">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        }
                                     </div>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-gray-500 p-6">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-search text-4xl mb-2"></i>
+                                    <p>No curriculums found matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
+        <!-- Pagination Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center mt-6">
+            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <div class="flex space-x-2">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="CurriculumManagement" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-statusFilter="@currentStatus" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </span>
+                }
 
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="CurriculumManagement" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-statusFilter="@currentStatus" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </span>
+                }
+            </div>
+        </div>
     </div>
 </div>
 
-
-<!-- Mobile View - แสดงในรูปแบบการ์ด -->
-<div class="block sm:hidden">
-    @foreach (var curriculum in Model)
-    {
-        <div class="bg-white border-b p-6 mb-6 rounded-lg shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">@curriculum.CurriculumName</h2>
-                <span class="text-sm @((curriculum.Status == "Inactive") ? "text-red-600" : "text-green-600")">
-                    @curriculum.Status
-                </span>
-            </div>
-            <p class="text-sm text-gray-600 mb-4">@curriculum.Description</p>
-            <div class="text-xs text-gray-500 mb-4">
-                <span>สร้างเมื่อ: @curriculum.CreateAt.ToString("yyyy-MM-dd")</span>
-            </div>
-            <div class="flex flex-col gap-4">
-                <div class="flex gap-4">
-                    <a asp-action="ManageCourses" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
-                        <button class="bg-blue-500 text-white text-xs px-6 py-3 rounded-lg hover:bg-blue-600 transition">
-                            จัดการรายวิชา
-                        </button>
-                    </a>
-                    <a asp-action="ManageCurriculumActivities" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
-                        <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                            กิจกรรม
-                        </button>
-                    </a>
-                    <a asp-action="EditCurriculum" asp-controller="Curriculum" asp-route-id="@curriculum.CurriculumId">
-                        <button class="bg-blue-500 text-white text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                            แก้ไข
-                        </button>
-                    </a>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
-
 @section Scripts {
-    <script src="./js/CurriculumManagement.js"></script>
+    <script>
+        // Dynamically include FontAwesome if not already loaded in the layout
+        if (!document.getElementById('fontawesome-css')) {
+            var link = document.createElement('link');
+            link.id = 'fontawesome-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    </script>
 }
-

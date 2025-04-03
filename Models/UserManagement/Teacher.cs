@@ -10,12 +10,16 @@ namespace SchoolSystem.Models.UserManagement
         [Key]
         public int TeacherId { get; set; }
 
+        [Required]
         public int? ProfileId { get; set; } // ✅ เปลี่ยนจาก int เป็น int?
 
         [ForeignKey("ProfileId")]
-        public Profiles Profile { get; set; } = new Profiles();
+        public Profiles? Profile { get; set; }
 
-        public int DepartmentId { get; set; }
+        [Required]
+        public int? DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public virtual Department? Department { get; set; }
 
         [Required]
         public DateTime HireDate { get; set; }

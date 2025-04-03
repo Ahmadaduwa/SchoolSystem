@@ -1,0 +1,133 @@
+﻿@model SchoolSystem.ViewModels.StudentViewModel
+@{
+    ViewData["Title"] = "สร้างนักเรียน";
+    // หากข้อมูล Classes ถูกส่งมาทาง ViewData
+    var classes = ViewData["Classes"] as List<SelectListItem>;
+}
+
+<div class="container mx-auto max-w-4xl p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">สร้างนักเรียน</h2>
+
+    <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm mb-4"></div>
+
+    <form asp-action="CreateStudent" method="post" enctype="multipart/form-data" class="space-y-6">
+        <!-- ข้อมูลบัญชีผู้ใช้ -->
+        <fieldset class="border p-4 rounded-lg">
+            <legend class="text-lg font-bold px-2">ข้อมูลบัญชีผู้ใช้</legend>
+            <div class="space-y-4">
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">อีเมล:</label>
+                    <input asp-for="Email" type="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="Email" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Username" class="block text-sm font-medium text-gray-700">ชื่อผู้ใช้:</label>
+                    <input asp-for="Username" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="Username" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">รหัสผ่าน:</label>
+                    <input asp-for="Password" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="Password" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmPassword" class="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่าน:</label>
+                    <input asp-for="ConfirmPassword" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs"></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- ข้อมูลโปรไฟล์ -->
+        <fieldset class="border p-4 rounded-lg">
+            <legend class="text-lg font-bold px-2">ข้อมูลโปรไฟล์</legend>
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="FirstName" class="block text-sm font-medium text-gray-700">ชื่อ:</label>
+                        <input asp-for="FirstName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                        <span asp-validation-for="FirstName" class="text-red-500 text-xs"></span>
+                    </div>
+                    <div>
+                        <label asp-for="LastName" class="block text-sm font-medium text-gray-700">นามสกุล:</label>
+                        <input asp-for="LastName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                        <span asp-validation-for="LastName" class="text-red-500 text-xs"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label asp-for="Gender" class="block text-sm font-medium text-gray-700">เพศ:</label>
+                    <select asp-for="Gender" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        <option value="Not Specified">ไม่ระบุ</option>
+                        <option value="Male">ชาย</option>
+                        <option value="Female">หญิง</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Address" class="block text-sm font-medium text-gray-700">ที่อยู่:</label>
+                    <textarea asp-for="Address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" rows="3"></textarea>
+                    <span asp-validation-for="Address" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="DateOfBirth" class="block text-sm font-medium text-gray-700">วันเกิด: (เดือน/วัน/ปี ค.ศ.)</label>
+                    <input asp-for="DateOfBirth" type="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="DateOfBirth" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ProfilePicture" class="block text-sm font-medium text-gray-700">รูปโปรไฟล์:</label>
+                    <input asp-for="ProfilePicture" type="file" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="ProfilePicture" class="text-red-500 text-xs"></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- ข้อมูลนักเรียน -->
+        <fieldset class="border p-4 rounded-lg">
+            <legend class="text-lg font-bold px-2">ข้อมูลนักเรียน</legend>
+            <div class="space-y-4">
+                <div>
+                    <label asp-for="Student_Code" class="block text-sm font-medium text-gray-700">รหัสนักเรียน:</label>
+                    <input asp-for="Student_Code" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="Student_Code" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ClassId" class="block text-sm font-medium text-gray-700">ห้อง:</label>
+                    <select asp-for="ClassId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" asp-items="Model.Classes">
+                        <option value="">เลือกห้อง</option>
+                    </select>
+                    <span asp-validation-for="ClassId" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label asp-for="EnrollmentDate" class="block text-sm font-medium text-gray-700">วันที่ลงทะเบียน: (เดือน/วัน/ปี ค.ศ.)</label>
+                    <input asp-for="EnrollmentDate" type="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <span asp-validation-for="EnrollmentDate" class="text-red-500 text-xs"></span>
+                </div>
+
+                @* ลบ GPA ออก เพราะจะคำนวณทีหลัง *@
+                <div>
+                    <label asp-for="Status" class="block text-sm font-medium text-gray-700">สถานะ:</label>
+                    <select asp-for="Status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-red-500 text-xs"></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="flex justify-between">
+            <a asp-action="IndexStudent" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">กลับไปที่รายการ</a>
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500">สร้างนักเรียน</button>
+        </div>
+    </form>
+</div>
+

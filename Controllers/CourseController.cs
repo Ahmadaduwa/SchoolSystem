@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Data;
+using SchoolSystem.Helpers;
 using SchoolSystem.Models.CourseManagement;
 
 namespace SchoolSystem.Controllers
 {
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class CourseController : Controller
     {
         private readonly AppDbContext _db;
@@ -15,52 +18,109 @@ namespace SchoolSystem.Controllers
             _db = db;
         }
 
-        // 📌 แสดงรายการคอร์สทั้งหมด
-        public IActionResult IndexCourse()
+        [HttpGet]
+        [Route("Courses")]
+        public async Task<IActionResult> IndexCourse(int? pageNumber, string searchString, string sortOrder, int? categoryFilter)
         {
-            try
+            // เก็บข้อมูลสำหรับ Sorting และ Filtering ลง ViewData
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParam"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["StatusSortParam"] = sortOrder == "status" ? "status_desc" : "status";
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentCategory"] = categoryFilter;
+
+            // ดึงรายการ Course Categories เพื่อใช้เป็นตัวกรอง
+            var categories = await _db.CourseCategories.Where(cc => cc.Status == "Active").ToListAsync();
+            ViewData["Categories"] = categories
+                .Select(c => new SelectListItem { Value = c.CourseCategoryId.ToString(), Text = c.Name })
+                .ToList();
+
+            // Query สำหรับ Courses (รวม CourseCategory เพื่อแสดงชื่อหมวดหมู่)
+            var coursesQuery = _db.Course
+                .Include(c => c.CourseCategory)
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                var courses = _db.Course.Include(c => c.CourseCategory).ToList(); // 🔄 แก้จาก _db.Course → _db.Courses
-                return View(courses);
+                coursesQuery = coursesQuery.Where(c =>
+                    c.CourseName.Contains(searchString) ||
+                    c.Course_Code.Contains(searchString) ||
+                    (c.Description != null && c.Description.Contains(searchString)));
             }
-            catch (Exception ex)
+
+            // กรองตาม Category Filter หากมีการเลือก
+            if (categoryFilter.HasValue)
             {
-                TempData["ErrorMessage"] = $"Error loading courses: {ex.Message}";
-                return RedirectToAction("IndexCourse");
+                coursesQuery = coursesQuery.Where(c => c.CourseCategoryId == categoryFilter.Value);
             }
+
+            coursesQuery = sortOrder switch
+            {
+                "name_desc" => coursesQuery.OrderByDescending(c => c.CourseName),
+                "status" => coursesQuery.OrderBy(c => c.Status),
+                "status_desc" => coursesQuery.OrderByDescending(c => c.Status),
+                _ => coursesQuery.OrderBy(c => c.CourseName)
+            };
+
+            int pageSize = 10;
+            var totalItems = await coursesQuery.CountAsync();
+            ViewData["TotalItems"] = totalItems;
+            var pagedCourses = await PaginatedList<Course>.CreateAsync(coursesQuery, pageNumber ?? 1, pageSize);
+
+            return View(pagedCourses);
         }
-        public IActionResult CreateCourse()
+
+
+        [HttpGet]
+        [Route("Courses/Details/{id}")]
+        public async Task<IActionResult> Details(int? id)
         {
-            ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
-            return View();
+            if (id == null)
+                return NotFound();
+
+            // ดึง Course พร้อมข้อมูล CourseCategory
+            var course = await _db.Course
+                .Include(c => c.CourseCategory)
+                .FirstOrDefaultAsync(c => c.CourseId == id);
+
+            if (course == null)
+                return NotFound();
+
+            return View(course);
+        }
+
+
+        [HttpGet]
+        [Route("Courses/Create")]
+        public async Task<IActionResult> CreateCourse()  // Make sure the method name matches your route
+        {
+            // Convert CourseCategories to IEnumerable<SelectListItem>
+            var courseCategories = await _db.CourseCategories
+                .Where(cc => cc.Status == "Active")
+                .ToListAsync();
+            ViewData["CourseCategories"] = courseCategories.Select(c => new SelectListItem
+            {
+                Value = c.CourseCategoryId.ToString(),
+                Text = c.Name
+            }).ToList();
+            return View("CreateCourse");  // Make sure to return the correct view
         }
 
         [HttpPost]
+        [Route("Courses/Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateCourse(Course newCourse)
+        public async Task<IActionResult> CreateCourse(Course newCourse)
         {
-            Console.WriteLine($"CourseCategoryId from Form: {Request.Form["CourseCategoryId"]}");
-            Console.WriteLine($"CourseCategoryId from Model: {newCourse.CourseCategoryId}");
-
             if (!ModelState.IsValid)
             {
-                foreach (var key in ModelState.Keys)
-                {
-                    var state = ModelState[key];
-                    foreach (var error in state.Errors)
-                    {
-                        Console.WriteLine($"Key: {key}, Error: {error.ErrorMessage}");
-                    }
-                }
-
-                ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
+                ViewData["CourseCategories"] = await _db.CourseCategories.ToListAsync();
                 return View(newCourse);
             }
 
             try
             {
-                _db.Course.Add(newCourse); // 🔹 ใช้ _db.Courses (ไม่ใช่ _db.Course)
-                _db.SaveChanges();
+                _db.Course.Add(newCourse);
+                await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Course created successfully!";
                 return RedirectToAction("IndexCourse");
             }
@@ -69,71 +129,66 @@ namespace SchoolSystem.Controllers
                 ModelState.AddModelError("", $"Database Error: {ex.Message}");
             }
 
-            ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name");
+            ViewData["CourseCategories"] = await _db.CourseCategories.ToListAsync();
             return View(newCourse);
         }
 
-
-
-
-        // 📌 แสดงฟอร์มแก้ไขคอร์ส
-        public IActionResult EditCourse(int id)
+        [HttpGet]
+        [Route("Courses/Edit/{id}")]
+        public async Task<IActionResult> EditCourse(int id)
         {
+            var course = await _db.Course.FindAsync(id);
+            if (course == null)
+            {
+                return NotFound();
+            }
 
-            try
-            {
-                var course = _db.Course.Find(id); // 🔄 แก้จาก _db.Course → _db.Courses
-                if (course == null)
-                {
-                    TempData["ErrorMessage"] = "Course not found.";
-                    return RedirectToAction("IndexCourse");
-                }
-                ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name", course.CourseCategoryId);
-                return View(course);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Error loading course: {ex.Message}";
-                return RedirectToAction("IndexCourse");
-            }
+            // Convert CourseCategories to SelectListItems
+            var categories = await _db.CourseCategories.Where(cc => cc.Status == "Active").ToListAsync();
+            ViewBag.CourseCategories = new SelectList(categories, "CourseCategoryId", "Name");
+
+            return View(course);
         }
 
         // 📌 บันทึกการแก้ไขคอร์ส
         [HttpPost]
+        [Route("Courses/Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditCourse(Course model)
+        public async Task<IActionResult> EditCourse(Course model)
         {
+            var existingCourse = await _db.Course.FindAsync(model.CourseId);
+            if (existingCourse == null)
+            {
+                return NotFound();
+            }
             if (!ModelState.IsValid)
             {
-                ViewBag.CourseCategories = new SelectList(_db.CourseCategories, "CourseCategoryId", "Name", model.CourseCategoryId);
+                var categories = await _db.CourseCategories.ToListAsync();
+                ViewBag.CourseCategories = new SelectList(categories, "CourseCategoryId", "Name");
                 return View(model);
             }
-
             try
             {
-                var course = _db.Course.Find(model.CourseId);
-                if (course == null)
-                {
-                    TempData["ErrorMessage"] = "Course not found.";
-                    return RedirectToAction("IndexCourse");
-                }
+                // คงค่า CreatedAt เดิมและอัปเดต UpdatedAt เป็นเวลาปัจจุบัน
+                model.CreatedAt = existingCourse.CreatedAt;
+                model.UpdatedAt = DateTime.Now;
 
-                course.Course_Code = model.Course_Code;
-                course.CourseName = model.CourseName;
-                course.Description = model.Description;
-                course.Objective = model.Objective;
-                course.Unit = model.Unit;
-                course.Status = model.Status;
-                course.CourseCategoryId = model.CourseCategoryId;
+                // ยกเลิกการ tracking ของ entity เดิมเพื่อหลีกเลี่ยงปัญหาการติดตาม
+                _db.Entry(existingCourse).State = EntityState.Detached;
 
-                _db.SaveChanges();
+                _db.Course.Update(model);
+                await _db.SaveChangesAsync();
+
                 TempData["SuccessMessage"] = "Course updated successfully!";
+                return RedirectToAction("IndexCourse");
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error updating course: {ex.Message}";
+                ModelState.AddModelError("", $"Error updating course: {ex.Message}");
+                var categories = await _db.CourseCategories.ToListAsync();
+                ViewBag.CourseCategories = new SelectList(categories, "CourseCategoryId", "Name");
+                return View(model);
             }
-            return RedirectToAction("IndexCourse");
         }
 
         [HttpPost]

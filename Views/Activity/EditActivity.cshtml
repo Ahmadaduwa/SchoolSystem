@@ -1,0 +1,144 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SchoolSystem.Models.UserManagement
+@inject UserManager<Users> UserManager
+@inject UserManager<Users> UserManager
+
+@model SchoolSystem.Models.ActivityManagement.Activity
+
+@{
+    ViewData["Title"] = "Edit Activity";
+}
+
+<div class="bg-gray-50 py-10 min-h-screen">
+    <div class="container mx-auto my-6 w-full max-w-3xl bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-500 py-6 px-8">
+            <h2 class="text-2xl font-bold text-white">Edit Activity</h2>
+            <p class="text-indigo-100 mt-1">Update the details of the activity</p>
+        </div>
+
+        <!-- Form Section -->
+        <div class="p-8">
+            <form asp-action="EditActivity" method="post" class="space-y-6">
+                <input asp-for="ActivityId" type="hidden" />
+
+                <!-- Activity Name Field -->
+                <div class="space-y-2">
+                    <label asp-for="ActivityName" class="block text-sm font-medium text-gray-700">
+                        ชื่อกิจกรรม <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input asp-for="ActivityName" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="กรอกชื่อกิจกรรม" />
+                    </div>
+                    <span asp-validation-for="ActivityName" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Description Field -->
+                <div class="space-y-2">
+                    <label asp-for="Description" class="block text-sm font-medium text-gray-700">
+                        รายละเอียด <span class="text-red-500">*</span>
+                    </label>
+                    <textarea asp-for="Description" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="กรอกรายละเอียดของกิจกรรม"></textarea>
+                    <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Two column layout for Activity Type and Status -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Activity Type Field -->
+                    <div class="space-y-2">
+                        <label asp-for="ActivityType" class="block text-sm font-medium text-gray-700">
+                            ประเภทกิจกรรม <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="ActivityType" class="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm bg-gray-100 cursor-not-allowed" readonly />
+                        <span asp-validation-for="ActivityType" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="space-y-2">
+                        <label asp-for="Status" class="block text-sm font-medium text-gray-700">
+                            สถานะ <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select asp-for="Status" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm appearance-none">
+                                <option value="Active" selected="@(Model.Status=="Active")">Active</option>
+                                <option value="Inactive" selected="@(Model.Status=="Inactive")">Inactive</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Status" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Help Text -->
+                <div class="bg-blue-50 px-4 py-3 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                กิจกรรมประจำวันจะเกิดขึ้นตามตารางเวลาปกติ ในขณะที่กิจกรรมพิเศษจะเป็นกิจกรรมที่เกิดขึ้นเพียงครั้งเดียว
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end items-center space-x-4 pt-4 border-t border-gray-200">
+                    <a asp-action="IndexActivity" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="mr-2 -ml-1 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        กลับ
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+
+            @if (UserManager.IsInRoleAsync(UserManager.GetUserAsync(User).Result, "Admin").Result)
+            {
+                <!-- ปุ่ม Delete พร้อมแจ้งเตือน -->
+                <form asp-action="DeleteActivity" asp-controller="Activity" asp-route-id="@Model.ActivityId" method="post" class="mt-4">
+                    <input type="hidden" asp-for="ActivityId" />
+                    <button type="submit" class="w-full rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
+                            onclick="return confirm('Are you sure you want to delete this activity?');">
+                        Delete Activity
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const activityTypeSelect = document.getElementById("activityTypeSelect");
+            const isDailyInput = document.getElementById("isDaily");
+            
+            // ถ้ามีการใช้งาน field isDaily (หากต้องการใช้งานใน Edit) สามารถเพิ่ม hidden field ได้ตามต้องการ
+            if(isDailyInput) {
+                isDailyInput.value = activityTypeSelect.value === "Daily" ? "true" : "false";
+                activityTypeSelect.addEventListener("change", function () {
+                    isDailyInput.value = this.value === "Daily" ? "true" : "false";
+                });
+            }
+        });
+    </script>
+}

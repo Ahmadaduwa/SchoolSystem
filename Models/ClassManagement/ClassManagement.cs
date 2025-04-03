@@ -35,6 +35,10 @@ namespace SchoolSystem.Models.ClassManagement
         [Range(0, int.MaxValue, ErrorMessage = "CheckCount must be a non-negative integer.")]
         public int CheckCount { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string Status { get; set; } = "Active";
+
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
@@ -44,5 +48,8 @@ namespace SchoolSystem.Models.ClassManagement
         public virtual Semester? Semester { get; set; }
 
         public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
+        public virtual ICollection<ClassAttendanceSummary> ClassAttendanceSummary { get; set; } = new List<ClassAttendanceSummary>();
+        public virtual ICollection<ClassAttendance> ClassAttendance { get; set; } = new List<ClassAttendance>();
+        public virtual ICollection<ClassAttendanceCheck> ClassAttendanceCheck { get; set; } = new List<ClassAttendanceCheck>();
     }
 }

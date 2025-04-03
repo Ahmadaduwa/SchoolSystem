@@ -2,56 +2,85 @@
 @using SchoolSystem.Models.UserManagement
 @inject SignInManager<Users> signInManager
 
-<!--
-     bg-blue-50 text-blue-600
-     text-gray-600 hover:bg-gray-50 transition-colors duration-200
--->
-
+<!-- เมนูหลักที่ทุกคนเห็น -->
 <li>
-    <a asp-controller="Home" asp-action="Home" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+    <a asp-controller="Home" asp-action="Home" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
         <i class="fas fa-home w-6"></i>
         <span class="font-medium">หน้าแรก</span>
     </a>
 </li>
-@if (User.IsInRole("StudentCouncil"))
+
+<!-- เมนูสำหรับ StudentCouncil และ Teacher -->
+@if (User.IsInRole("StudentCouncil") || User.IsInRole("Teacher"))
 {
     <li>
-        <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
-            <i class="fas fa-book w-6"></i>
-            <span class="font-medium">StudentCouncil</span>
+        <a asp-controller="ActivityAttendance" asp-action="CheckActivity" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-calendar-check w-6"></i>
+            <span class="font-medium">เช็คชื่อกิจกรรม</span>
         </a>
     </li>
 }
-@if (User.IsInRole("Student"))
-{
-    <li>
-        <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
-            <i class="fas fa-book w-6"></i>
-            <span class="font-medium">Student</span>
-        </a>
-    </li>
-}
+
+<!-- เมนูสำหรับ Teacher -->
 @if (User.IsInRole("Teacher"))
 {
     <li>
-        <a asp-controller="Attendance" asp-action="ClassAttendance" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
-            <i class="fas fa-book w-6"></i>
-            <span class="font-medium">เช็คชื่อ</span>
+        <a asp-controller="ClassAttendance" asp-action="ClassAttendance" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-chalkboard-teacher w-6"></i>
+            <span class="font-medium">เช็คชื่อเรียน</span>
         </a>
     </li>
 }
-@if (User.IsInRole("Academic"))
+
+<!-- เมนูสำหรับ Academic และ Admin -->
+@if (User.IsInRole("Academic") || User.IsInRole("Admin"))
 {
     <li>
-        <a asp-controller="Curriculum" asp-action="CurriculumManagement" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
-            <i class="fas fa-book w-6"></i>
-            <span class="font-medium">จัดการหลักสูตร</span>
+        <a asp-controller="Curriculum" asp-action="CurriculumManagement" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-book-open w-6"></i>
+            <span class="font-medium">หลักสูตร</span>
         </a>
     </li>
     <li>
-        <a asp-controller="Teacher" asp-action="IndexTeacher" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
+        <a asp-controller="Teacher" asp-action="IndexTeacher" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-user-tie w-6"></i>
+            <span class="font-medium">การจัดการครู</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Student" asp-action="IndexStudent" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-user-graduate w-6"></i>
+            <span class="font-medium">การจัดการนักเรียน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Class" asp-action="IndexClass" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-school w-6"></i>
+            <span class="font-medium">ห้องเรียน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="ClassManagement" asp-action="Index" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-chalkboard w-6"></i>
+            <span class="font-medium">จัดการเรียนการสอน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Course" asp-action="IndexCourse" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
             <i class="fas fa-book w-6"></i>
-            <span class="font-medium">จัดการครู</span>
+            <span class="font-medium">วิชา</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Activity" asp-action="IndexActivity" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-calendar-alt w-6"></i>
+            <span class="font-medium">กิจกรรม</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="ClassRegistration" asp-action="IndexStudent" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-user-plus w-6"></i>
+            <span class="font-medium">ลงทะเบียนเรียน</span>
         </a>
     </li>
     <li>
@@ -85,29 +114,43 @@
         </a>
     </li>
 }
+
+<!-- เมนูสำหรับ Director -->
 @if (User.IsInRole("Director"))
 {
     <li>
-        <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
-            <i class="fas fa-book w-6"></i>
+        <a href="#" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-user-cog w-6"></i>
             <span class="font-medium">Director</span>
         </a>
     </li>
 }
+
+<!-- เมนูสำหรับ Admin -->
 @if (User.IsInRole("Admin"))
 {
     <li>
-        <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors duration-200">
-            <i class="fas fa-book w-6"></i>
-            <span class="font-medium">Admin</span>
+        <a asp-controller="Semester" asp-action="IndexSemester" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-calendar w-6"></i>
+            <span class="font-medium">ภาคเรียน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Department" asp-action="Index" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-building w-6"></i>
+            <span class="font-medium">แผนก</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="GradeLevel" asp-action="Index" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-graduation-cap w-6"></i>
+            <span class="font-medium">ชั้นเรียน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Category" asp-action="IndexCategory" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-tags w-6"></i>
+            <span class="font-medium">หมวดวิชา</span>
         </a>
     </li>
 }
-
-
-<li>
-    <a href="#" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100">
-        <i class="fas fa-cog w-6"></i>
-        <span class="font-medium">ตั้งค่า</span>
-    </a>
-</li>

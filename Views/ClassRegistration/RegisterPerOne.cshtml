@@ -1,0 +1,134 @@
+﻿@using SchoolSystem.Models.CourseManagement;
+@using SchoolSystem.Models.CurriculumManagement;
+@using SchoolSystem.Models.ClassManagement;
+@{
+    ViewData["Title"] = "ลงทะเบียนรายวิชาให้นักเรียน";
+    var student = ViewBag.Student;
+    var courses = ViewBag.Courses as List<Course>;
+    var semesters = ViewBag.Semesters as List<Semester>;
+    var curriculums = ViewBag.Curriculums as List<Curriculum>;
+}
+
+<div class="max-w-4xl mx-auto py-8 px-4">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">ลงทะเบียนรายวิชาให้นักเรียน: @student.Profile?.FirstName @student.Profile?.LastName</h2>
+
+    @* ฟอร์มลงทะเบียนสำหรับนักเรียนแต่ละคน *@
+    <form method="post" asp-action="RegisterPerOne" class="bg-white shadow-md rounded-lg p-6">
+        <input type="hidden" name="id" value="@student.StudentId" />
+
+        <!-- กรองวิชาตามหลักสูตร (Curriculum) -->
+        <div class="mb-6">
+            <label for="curriculumId" class="block text-gray-700 text-sm font-medium mb-2">กรองวิชาตามหลักสูตร</label>
+            <select id="curriculumId" name="curriculumId" class="w-full p-2.5 border rounded-lg focus:ring-blue-500">
+                <option value="0">-- ทุกหลักสูตร --</option>
+                @foreach (var curriculum in curriculums)
+                {
+                    <option value="@curriculum.CurriculumId">@curriculum.CurriculumName</option>
+                }
+            </select>
+        </div>
+
+        <!-- เลือกวิชาที่จะลงทะเบียน -->
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-medium mb-2">เลือกวิชาที่จะลงทะเบียน</label>
+            <div id="courseList" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto">
+                @foreach (var course in courses)
+                {
+                    <div class="flex items-center mb-2 course-item">
+                        <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                               type="checkbox" name="courseIds" value="@course.CourseId" id="course_@course.CourseId">
+                        <label class="ml-2 text-sm text-gray-700" for="course_@course.CourseId">@course.CourseName</label>
+                    </div>
+                }
+            </div>
+            <p id="courseCount" class="mt-2 text-sm text-gray-500">จำนวนวิชาทั้งหมด: @courses.Count</p>
+        </div>
+
+        <!-- เลือกภาคเรียน -->
+        <div class="mb-6">
+            <label for="semesterId" class="block text-gray-700 text-sm font-medium mb-2">ภาคเรียน</label>
+            <select id="semesterId" name="semesterId" class="w-full p-2.5 border rounded-lg focus:ring-blue-500" required>
+                <option value="">-- กรุณาเลือกภาคเรียน --</option>
+                @foreach (var semester in semesters)
+                {
+                    <option value="@semester.SemesterID">@semester.SemesterYear - ภาคเรียนที่ @semester.SemesterNumber</option>
+                }
+            </select>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                ยืนยันการลงทะเบียน
+            </button>
+            <a href="@Url.Action("IndexStudent", "ClassRegistration")" class="text-blue-600 hover:text-blue-800 font-medium">
+                กลับหน้าหลัก
+            </a>
+        </div>
+    </form>
+
+    @* Loading Indicator สำหรับการกรองวิชา *@
+    <div id="loading" class="hidden text-center mt-4">
+        <span class="text-gray-600">กำลังโหลดข้อมูล...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const curriculumSelect = document.getElementById('curriculumId');
+            const courseList = document.getElementById('courseList');
+            const courseItems = document.querySelectorAll('.course-item');
+            const courseCountElement = document.getElementById('courseCount');
+            const loadingIndicator = document.getElementById('loading');
+            const originalCount = courseItems.length;
+
+            curriculumSelect.addEventListener('change', function () {
+                const selectedCurriculumId = parseInt(this.value);
+                loadingIndicator.classList.remove('hidden');
+
+                // หากเลือก "ทุกหลักสูตร" (0) ให้แสดงรายการวิชาทั้งหมด
+                if (selectedCurriculumId === 0) {
+                    courseItems.forEach(item => item.style.display = 'flex');
+                    updateCourseCount(originalCount);
+                    loadingIndicator.classList.add('hidden');
+                    return;
+                }
+
+                fetch(`/api/Courses/ByCurriculum?curriculumId=${selectedCurriculumId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('ไม่สามารถดึงข้อมูลวิชาได้');
+                        }
+                        return response.json();
+                    })
+                    .then(courseIds => {
+                        let visibleCount = 0;
+                        courseItems.forEach(item => {
+                            const checkbox = item.querySelector('input[type="checkbox"]');
+                            const courseId = parseInt(checkbox.value);
+                            if (courseIds.includes(courseId)) {
+                                item.style.display = 'flex';
+                                visibleCount++;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                        updateCourseCount(visibleCount);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // หากเกิดข้อผิดพลาด ให้แสดงวิชาทั้งหมด
+                        courseItems.forEach(item => item.style.display = 'flex');
+                        updateCourseCount(originalCount);
+                    })
+                    .finally(() => {
+                        loadingIndicator.classList.add('hidden');
+                    });
+            });
+
+            function updateCourseCount(count) {
+                courseCountElement.textContent = `จำนวนวิชาที่แสดง: ${count}`;
+            }
+        });
+    </script>
+}

@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using SchoolSystem.Models.Alert;
+using SchoolSystem.Models.RegistrationManagement;
 
 namespace SchoolSystem.Models.UserManagement
 {
@@ -27,5 +29,7 @@ namespace SchoolSystem.Models.UserManagement
         [ForeignKey("UserId")]
         public Users? User { get; set; }
         public Teacher? Teacher { get; set; }
+        public Student? Student { get; set; }
+        public virtual ICollection<Notification> Notification { get; set; } = new List<Notification>();
     }
 }
