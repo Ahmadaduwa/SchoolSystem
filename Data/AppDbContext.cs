@@ -18,6 +18,10 @@ namespace SchoolSystem.Data
         }
 
         /// <summary>
+        /// Registered
+        /// </summary>
+        public DbSet<RegisteredCourse> RegisteredCourses { get; set; }
+        /// <summary>
         /// Notification
         /// </summary>
         public DbSet<Notification> Notifications { get; set; }
