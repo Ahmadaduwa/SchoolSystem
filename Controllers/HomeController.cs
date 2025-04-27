@@ -252,7 +252,112 @@ namespace SchoolSystem.Controllers
             TempData["ErrorMessage"] = "Registration failed. Please try again.";
             return View(model);
         }
+        [HttpGet]
+        [Route("/Teacher/TeachTable")]
+        public async Task<IActionResult> TeachTable()
+        {
+            var aspUserId = _userManager.GetUserId(User);
+            var user = await _userManager.Users
+                .Include(u => u.Profile!)
+                    .ThenInclude(p => p.Teacher!)
+                .FirstOrDefaultAsync(u => u.Id == aspUserId);
+
+            if (user is null || user.Profile?.Teacher is null)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var teacherId = user.Profile.Teacher.TeacherId;
+            var query = _db.ClassManagements
+                .AsNoTracking()
+                .Include(cm => cm.Course)
+                .Include(cm => cm.Class)
+                    .ThenInclude(c => c.GradeLevels)
+                .Include(cm => cm.Semester)
+                .Include(cm => cm.ClassSchedules)
+                .Where(cm => cm.TeacherId == teacherId);
+
+            var schedule = await query
+                .SelectMany(cm => cm.ClassSchedules.Select(cs => new TeachingScheduleViewModel
+                {
+                    CourseName = cm.Course.CourseName,
+                    ClassNumber = cm.Class.ClassNumber.ToString(),
+                    GradeLevel = cm.Class.GradeLevels!.Name!,
+                    DayOfWeek = cs.DayOfWeek,
+                    StartTime = cs.StartTime,
+                    EndTime = cs.EndTime,
+                    SemesterYear = int.Parse(cm.Semester!.SemesterYear),
+                    SemesterNumber = cm.Semester.SemesterNumber
+                }))
+                .OrderBy(vm => GetDayOfWeekOrder(vm.DayOfWeek))
+                .ThenBy(vm => vm.StartTime)
+                .ToListAsync();
+
+            return View(schedule);
+        }
+
+        // เพิ่มฟังก์ชัน Helper สำหรับเรียงลำดับวันในสัปดาห์ให้ถูกต้อง
+        private int GetDayOfWeekOrder(string day)
+        {
+            return day switch
+            {
+                "จันทร์" => 1,
+                "อังคาร" => 2,
+                "พุธ" => 3,
+                "พฤหัสบดี" => 4,
+                "ศุกร์" => 5,
+                "เสาร์" => 6,
+                "อาทิตย์" => 7,
+                _ => 8 // สำหรับวันที่ไม่รู้จัก
+            };
+        }
+
         */
+
+        // GET: /Teachers/TeachTable
+        [HttpGet]
+        [Route("/Teacher/TeachTable")]
+        public async Task<IActionResult> TeachTable()
+        {
+            var aspUserId = _userManager.GetUserId(User);
+            var user = await _userManager.Users
+                .Include(u => u.Profile!)
+                    .ThenInclude(p => p.Teacher!)
+                .FirstOrDefaultAsync(u => u.Id == aspUserId);
+
+            if (user is null || user.Profile?.Teacher is null)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var teacherId = user.Profile.Teacher.TeacherId;
+            var query = _db.ClassManagements
+                .AsNoTracking()
+                .Include(cm => cm.Course)
+                .Include(cm => cm.Class)
+                    .ThenInclude(c => c.GradeLevels)
+                .Include(cm => cm.Semester)
+                .Include(cm => cm.ClassSchedules)
+                .Where(cm => cm.TeacherId == teacherId);
+
+            var schedule = await query
+                .SelectMany(cm => cm.ClassSchedules.Select(cs => new TeachingScheduleViewModel
+                {
+                    CourseName = cm.Course.CourseName,
+                    ClassNumber = cm.Class!.ClassNumber,
+                    GradeLevel = cm.Class.GradeLevels!.Name!,
+                    DayOfWeek = cs.DayOfWeek,
+                    StartTime = cs.StartTime,
+                    EndTime = cs.EndTime,
+                    SemesterYear = cm.Semester!.SemesterYear,
+                    SemesterNumber = cm.Semester.SemesterNumber
+                }))
+                .OrderBy(vm => vm.DayOfWeek)
+                .ThenBy(vm => vm.StartTime)
+                .ToListAsync();
+
+            return View(schedule);
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -260,5 +365,7 @@ namespace SchoolSystem.Controllers
         }
 
         // Add function here
+
+
     }
 }
