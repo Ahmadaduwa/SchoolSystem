@@ -1,46 +1,57 @@
 ﻿@model SchoolSystem.Models.CourseManagement.Course
 @{
-    ViewData["Title"] = "Create Course";
+    ViewData["Title"] = "สร้างวิชา";
 }
 
 <div class="container mx-auto px-4 py-8">
-    <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Create New Course</h2>
+    <h2 class="text-3xl font-extrabold text-gray-900 mb-6">สร้างวิชาใหม่</h2>
 
     <form asp-action="CreateCourse" method="post" class="bg-white shadow-md rounded-lg p-8 space-y-6">
         <div>
-            <label asp-for="Course_Code" class="block text-sm font-semibold text-gray-700 mb-2">Course Code</label>
-            <input asp-for="Course_Code" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., CS101" required />
+            <label asp-for="Course_Code" class="block text-sm font-semibold text-gray-700 mb-2">
+                รหัสวิชา <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="Course_Code" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="เช่น CS101" required />
             <span asp-validation-for="Course_Code" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="CourseName" class="block text-sm font-semibold text-gray-700 mb-2">Course Name</label>
-            <input asp-for="CourseName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Introduction to Computer Science" required />
+            <label asp-for="CourseName" class="block text-sm font-semibold text-gray-700 mb-2">
+                ชื่อวิชา <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="CourseName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="เช่น พื้นฐานคอมพิวเตอร์" required />
             <span asp-validation-for="CourseName" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <textarea asp-for="Description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Course description"></textarea>
+            <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-2">
+                คำอธิบาย
+            </label>
+            <textarea asp-for="Description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="รายละเอียดวิชา"></textarea>
             <span asp-validation-for="Description" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Objective" class="block text-sm font-semibold text-gray-700 mb-2">Objective</label>
-            <textarea asp-for="Objective" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Course objectives"></textarea>
+            <label asp-for="Objective" class="block text-sm font-semibold text-gray-700 mb-2">
+                วัตถุประสงค์
+            </label>
+            <textarea asp-for="Objective" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="วัตถุประสงค์ของวิชา"></textarea>
             <span asp-validation-for="Objective" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Unit" class="block text-sm font-semibold text-gray-700 mb-2">Units</label>
-            <input asp-for="Unit" type="number" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 3.0" required />
+            <label asp-for="Unit" class="block text-sm font-semibold text-gray-700 mb-2">
+                หน่วยกิต <span class="text-red-500">*</span>
+            </label>
+            <input asp-for="Unit" type="number" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="เช่น 3.0" required />
             <span asp-validation-for="Unit" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div>
-            <label asp-for="Status" class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+            <label asp-for="Status" class="block text-sm font-semibold text-gray-700 mb-2">
+                สถานะ <span class="text-red-500">*</span>
+            </label>
             <select asp-for="Status" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                <option value="">Select Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
             </select>
@@ -48,19 +59,23 @@
         </div>
 
         <div>
-            <label asp-for="CourseCategoryId" class="block text-sm font-semibold text-gray-700 mb-2">Course Category</label>
+            <label asp-for="CourseCategoryId" class="block text-sm font-semibold text-gray-700 mb-2">
+                หมวดวิชา <span class="text-red-500">*</span>
+            </label>
             <select asp-for="CourseCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     asp-items="@(ViewBag.CourseCategories ?? new SelectList(Enumerable.Empty<SelectListItem>(), "CourseCategoryId", "Name"))" required>
-                <option value="">-- Select Category --</option>
+                <option value="">-- เลือกหมวดวิชา --</option>
             </select>
             <span asp-validation-for="CourseCategoryId" class="text-red-600 text-sm mt-1 block"></span>
         </div>
 
         <div class="flex items-center justify-between">
             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                Create Course
+                สร้างวิชา
             </button>
-            <a asp-action="IndexCourse" class="text-gray-600 hover:text-gray-900 text-sm">Cancel</a>
+            <a asp-action="IndexCourse" class="text-gray-600 hover:text-gray-900 text-sm">
+                ยกเลิก
+            </a>
         </div>
     </form>
 </div>

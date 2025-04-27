@@ -1,6 +1,6 @@
 ﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.CurriculumManagement.Curriculum>
 @{
-    ViewData["Title"] = "Curriculum Management";
+    ViewData["Title"] = "การจัดการหลักสูตร";
     var statuses = ViewData["Statuses"] as List<SelectListItem>;
     var currentStatus = ViewData["CurrentStatus"]?.ToString();
     var currentFilter = ViewData["CurrentFilter"]?.ToString();
@@ -8,14 +8,14 @@
 }
 <div class="container mx-auto md:px-4 py-6">
     <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Curriculum Management</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">การจัดการหลักสูตร</h2>
 
         <!-- Search and Filter Section -->
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
             <form asp-action="CurriculumManagement" method="get" class="flex flex-wrap gap-4">
                 <!-- Search by Code, Name, or Description -->
                 <div class="flex-1 min-w-fit">
-                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by code, name, or description..." />
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="ค้นหาด้วยรหัส ชื่อ หรือคำอธิบาย..." />
                 </div>
 
                 <!-- Status Filter Dropdown -->
@@ -34,10 +34,10 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-2">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
-                        <i class="fas fa-search mr-1"></i> Search
+                        <i class="fas fa-search mr-1"></i> ค้นหา
                     </button>
                     <a asp-action="CurriculumManagement" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
-                        Reset
+                        รีเซ็ต
                     </a>
                 </div>
             </form>
@@ -46,10 +46,10 @@
         <!-- Action Buttons -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-4">
             <a asp-action="AddCurriculum" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
-                <i class="fas fa-plus-circle mr-2"></i> Add New Curriculum
+                <i class="fas fa-plus-circle mr-2"></i> เพิ่มหลักสูตรใหม่
             </a>
             <div class="text-gray-600">
-                Showing @Model.Count of @ViewData["TotalItems"] curriculums | Page @Model.PageIndex of @Model.TotalPages
+                แสดง @Model.Count จาก @ViewData["TotalItems"] หลักสูตร | หน้า @Model.PageIndex จาก @Model.TotalPages
             </div>
         </div>
 
@@ -64,7 +64,7 @@
                                asp-route-currentFilter="@currentFilter"
                                asp-route-statusFilter="@currentStatus"
                                class="flex items-center justify-between">
-                                Code
+                                รหัสหลักสูตร
                                 @if (string.IsNullOrEmpty(currentSort) || currentSort == "code_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "code_desc" ? "down" : "up") ml-1"></i>
@@ -77,14 +77,14 @@
                                asp-route-currentFilter="@currentFilter"
                                asp-route-statusFilter="@currentStatus"
                                class="flex items-center justify-between">
-                                Name
+                                ชื่อหลักสูตร
                                 @if (currentSort == "name" || currentSort == "name_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">Description</th>
+                        <th class="border px-4 py-2">คำอธิบาย</th>
                         <th class="border px-4 py-2">
                             <a asp-action="CurriculumManagement"
                                asp-route-sortOrder="@ViewData["StatusSortParam"]"
@@ -175,31 +175,31 @@
 
         <!-- Pagination Controls -->
         <div class="flex flex-col md:flex-row justify-between items-center mt-6">
-            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <span class="text-gray-600 mb-2 md:mb-0">หน้า @Model.PageIndex จาก @Model.TotalPages</span>
             <div class="flex space-x-2">
                 @if (Model.HasPreviousPage)
                 {
                     <a asp-action="CurriculumManagement" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-statusFilter="@currentStatus" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </span>
                 }
 
                 @if (Model.HasNextPage)
                 {
                     <a asp-action="CurriculumManagement" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-statusFilter="@currentStatus" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ต่อไป <i class="fas fa-chevron-right ml-1"></i>
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ต่อไป <i class="fas fa-chevron-right ml-1"></i>
                     </span>
                 }
             </div>

@@ -1,0 +1,159 @@
+﻿@model SchoolSystem.Models.Assignment.Assignment
+@{
+    ViewData["Title"] = "รายละเอียดงาน";
+    var cmId = ViewBag.CM_Id;
+    var Course = ViewBag.Course;
+}
+
+<div class="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
+            <h2 class="text-3xl font-bold text-white text-center">รายละเอียดงาน</h2>
+            <p class="text-blue-100 text-center mt-2">Assignment Details</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 md:p-8">
+            <!-- Assignment Info Card -->
+            <div class="mb-10 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+                        <div class="flex items-center mb-4 md:mb-0">
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="ml-4 text-2xl font-semibold text-gray-800">@Model.Title</h3>
+                        </div>
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">วิชา: @Course</span>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">คำอธิบาย</h4>
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                            <p class="text-gray-700">@Model.Description</p>
+                        </div>
+                    </div>
+
+                    <!-- Scores and Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Scores -->
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">คะแนน</h4>
+                            <div class="flex justify-between items-center">
+                                <div class="text-center">
+                                    <span class="block text-3xl font-bold text-blue-600">@Model.RealScore</span>
+                                    <span class="text-sm text-gray-500">คะแนนจริง</span>
+                                </div>
+                                <div class="text-gray-300 font-bold">／</div>
+                                <div class="text-center">
+                                    <span class="block text-3xl font-bold text-gray-600">@Model.FullScore</span>
+                                    <span class="text-sm text-gray-500">คะแนนเต็ม</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">กำหนดการ</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-600">วันที่มอบหมาย:</span>
+                                    </div>
+                                    <span class="font-medium text-gray-800">@Model.AssignedDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-600">วันครบกำหนด:</span>
+                                    </div>
+                                    <span class="font-medium text-gray-800">@Model.DueDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment Scores -->
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">รายการคะแนน</h3>
+                    @if (Model.AssignmentScores != null && Model.AssignmentScores.Any())
+                    {
+                        <span class="ml-3 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">@Model.AssignmentScores.Count() รายการ</span>
+                    }
+                </div>
+
+                @if (Model.AssignmentScores != null && Model.AssignmentScores.Any())
+                {
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสนักเรียน</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">คะแนน</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่ส่งงาน</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach (var score in Model.AssignmentScores)
+                                {
+                                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@score.Student.Student_Code</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@score.Student.Profile.FirstName @score.Student.Profile.LastName</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                @score.Score
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@score.SubmittedDate.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    ยังไม่มีข้อมูลคะแนนสำหรับงานนี้
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-8">
+                <a href="@Url.Action("Index", "Assignment", new { cmId = cmId })" class="inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    กลับไปที่รายการงาน
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

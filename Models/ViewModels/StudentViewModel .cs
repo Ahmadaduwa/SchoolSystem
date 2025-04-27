@@ -40,7 +40,7 @@ namespace SchoolSystem.ViewModels
         public string Gender { get; set; } = "Not Specified";
 
         [Display(Name = "Address")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [Required]
         [Display(Name = "Date of Birth")]
@@ -51,9 +51,8 @@ namespace SchoolSystem.ViewModels
         public IFormFile? ProfilePicture { get; set; }
 
         // ข้อมูลบัญชีผู้ใช้ (Account)
-        [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
         public string Username { get; set; }

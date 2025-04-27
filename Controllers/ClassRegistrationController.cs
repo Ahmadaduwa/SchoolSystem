@@ -11,11 +11,11 @@ using SchoolSystem.Models.UserManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SchoolSystem.Controllers
 {
-    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class ClassRegistrationController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,6 +27,7 @@ namespace SchoolSystem.Controllers
 
         [HttpGet]
         [Route("ClassRegistration/")]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> IndexStudent(int? pageNumber, string searchString, string sortOrder, int? classFilter)
         {
             ViewData["CurrentSort"] = sortOrder;
@@ -87,6 +88,7 @@ namespace SchoolSystem.Controllers
         // GET: api/Courses/ByCurriculum
         [HttpGet]
         [Route("api/Courses/ByCurriculum")]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> GetCoursesByCurriculum(int curriculumId)
         {
             try
@@ -125,6 +127,7 @@ namespace SchoolSystem.Controllers
         // GET: ClassRegistration/Class
         [HttpGet]
         [Route("ClassRegistration/Class")]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> Register()
         {
             try
@@ -170,6 +173,7 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [Route("ClassRegistration/Class")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> Register(int classId, List<int> courseIds, int semesterId, int? curriculumId)
         {
             if (courseIds == null || !courseIds.Any())
@@ -274,6 +278,7 @@ namespace SchoolSystem.Controllers
         // GET: ClassRegistration/RegisterPerOne?studentId=123
         [HttpGet]
         [Route("ClassRegistration/std")]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> RegisterPerOne(int id)
         {
             var student = await _context.Students
@@ -317,6 +322,7 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [Route("ClassRegistration/std")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
         public async Task<IActionResult> RegisterPerOne(int id, List<int> courseIds, int semesterId, int? curriculumId)
         {
             if (courseIds == null || !courseIds.Any())
@@ -382,14 +388,29 @@ namespace SchoolSystem.Controllers
             return RedirectToAction("IndexStudent");
         }
 
-        // GET: ClassRegistration/ViewRegistration? id={studentId}&semesterId={optionalSemesterId}
         [HttpGet]
         [Route("ClassRegistration/ViewRegistration")]
+        [Authorize(Policy = "AcademicPolicyOrAdminPolicyOrStudentPolicy")]
         public async Task<IActionResult> ViewRegistration(int id, int? semesterId)
         {
-            // id คือ studentId
 
-            // ดึงรายการ Semester ที่นักเรียนได้ลงทะเบียนไปแล้ว
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            var isStudent = User.IsInRole("Student");
+
+            if (isStudent)
+            {
+
+                var profile = await _context.Profiles
+                    .Include(p => p.Student) 
+                    .FirstOrDefaultAsync(p => p.UserId == userId);
+
+                if (profile == null || profile.Student == null || profile.Student.StudentId != id)
+                {
+                    TempData["ErrorMessage"] = "คุณไม่มีสิทธิ์ดูข้อมูลการลงทะเบียนของนักเรียนคนอื่น";
+                    return RedirectToAction("Home", "Home");
+                }
+            }
+
             var registeredSemesterIds = await _context.RegisteredCourses
                 .Where(r => r.StudentId == id)
                 .Select(r => r.SemesterId)
@@ -402,14 +423,12 @@ namespace SchoolSystem.Controllers
                 return RedirectToAction("IndexStudent");
             }
 
-            // ดึงข้อมูล Semester ตามที่นักเรียนลงทะเบียน และเรียงจากล่าสุด (descending)
             var semesters = await _context.Semesters
-               .Where(s => registeredSemesterIds.Contains(s.SemesterID))
-               .OrderByDescending(s => s.SemesterYear)
-               .ThenByDescending(s => s.SemesterNumber)
-               .ToListAsync();
+                .Where(s => registeredSemesterIds.Contains(s.SemesterID))
+                .OrderByDescending(s => s.SemesterYear)
+                .ThenByDescending(s => s.SemesterNumber)
+                .ToListAsync();
 
-            // หากไม่ระบุ semesterId ให้เลือกเทอมล่าสุด
             int selectedSemesterId = semesterId.HasValue && registeredSemesterIds.Contains(semesterId.Value)
                 ? semesterId.Value
                 : semesters.First().SemesterID;
@@ -422,20 +441,44 @@ namespace SchoolSystem.Controllers
             // ดึงการลงทะเบียนของนักเรียนในภาคเรียนที่เลือก พร้อมข้อมูลวิชา
             var registrations = await _context.RegisteredCourses
                 .Where(r => r.StudentId == id && r.SemesterId == selectedSemesterId)
-                .Include(r => r.Course)  // ตรวจสอบให้แน่ใจว่ามี navigation property ชื่อ Course
+                .Include(r => r.Course)
                 .ToListAsync();
 
+            // คำนวณ GPA
+            float totalGradePoints = 0;
+            float totalCredits = 0;
+            float gpa = 0;
+
+            if (registrations.Any())
+            {
+                foreach (var reg in registrations)
+                {
+                    totalGradePoints += reg.Grade * reg.Course.Unit;
+                    totalCredits += reg.Course.Unit;
+                }
+
+                gpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0;
+            }
+
             // ดึงข้อมูลนักเรียน (ถ้าต้องการแสดงชื่อ)
-            var student = await _context.Students
-                .Where(g => g.Status == "Active")
+            var studentData = await _context.Students
+                .Where(s => s.Status == "Active")
                 .Include(s => s.Profile)
                 .FirstOrDefaultAsync(s => s.StudentId == id);
 
+            if (studentData == null)
+            {
+                TempData["ErrorMessage"] = "ไม่พบข้อมูลนักเรียน";
+                return RedirectToAction("IndexStudent");
+            }
+
             // ส่งข้อมูลไปยัง View ผ่าน ViewBag
-            ViewBag.Student = student;
+            ViewBag.Student = studentData;
             ViewBag.Semesters = semesters;
             ViewBag.SelectedSemesterId = selectedSemesterId;
             ViewBag.Registrations = registrations;
+            ViewBag.GPA = gpa;
+            ViewBag.TotalCredits = totalCredits;
 
             return View();
         }
@@ -444,6 +487,7 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("ClassRegistration/DeleteRegistration")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> DeleteRegistration(int registrationId, int studentId, int selectedSemesterId)
         {
             try
@@ -466,6 +510,20 @@ namespace SchoolSystem.Controllers
             }
 
             return RedirectToAction("ViewRegistration", new { id = studentId, semesterId = selectedSemesterId });
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "StudentPolicy")]
+        public async Task<IActionResult> stdGet()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isStudent = User.IsInRole("Student");
+
+            var profile = await _context.Profiles
+                .Include(p => p.Student)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            return RedirectToAction("ViewRegistration", new { id = profile.Student.StudentId });
         }
 
     }

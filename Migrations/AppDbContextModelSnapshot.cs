@@ -17,7 +17,7 @@ namespace SchoolSystem.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -383,6 +383,72 @@ namespace SchoolSystem.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("SchoolSystem.Models.Assignment.Assignment", b =>
+                {
+                    b.Property<int>("AssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignmentId"));
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CM_Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("FullScore")
+                        .HasColumnType("real");
+
+                    b.Property<float>("RealScore")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AssignmentId");
+
+                    b.HasIndex("CM_Id");
+
+                    b.ToTable("Assignments");
+                });
+
+            modelBuilder.Entity("SchoolSystem.Models.Assignment.AssignmentScore", b =>
+                {
+                    b.Property<int>("ScoreId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScoreId"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Score")
+                        .HasColumnType("real");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ScoreId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("AssignmentScores");
                 });
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
@@ -987,7 +1053,6 @@ namespace SchoolSystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfileId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1329,6 +1394,36 @@ namespace SchoolSystem.Migrations
                     b.Navigation("Profile");
                 });
 
+            modelBuilder.Entity("SchoolSystem.Models.Assignment.Assignment", b =>
+                {
+                    b.HasOne("SchoolSystem.Models.ClassManagement.ClassManagement", "ClassManagement")
+                        .WithMany("Assignment")
+                        .HasForeignKey("CM_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassManagement");
+                });
+
+            modelBuilder.Entity("SchoolSystem.Models.Assignment.AssignmentScore", b =>
+                {
+                    b.HasOne("SchoolSystem.Models.Assignment.Assignment", "Assignment")
+                        .WithMany("AssignmentScores")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolSystem.Models.UserManagement.Student", "Student")
+                        .WithMany("AssignmentScores")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
                 {
                     b.HasOne("SchoolSystem.Models.ClassManagement.GradeLevels", "GradeLevels")
@@ -1638,6 +1733,11 @@ namespace SchoolSystem.Migrations
                     b.Navigation("ActivitySchedule");
                 });
 
+            modelBuilder.Entity("SchoolSystem.Models.Assignment.Assignment", b =>
+                {
+                    b.Navigation("AssignmentScores");
+                });
+
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.Class", b =>
                 {
                     b.Navigation("ClassManagement");
@@ -1647,6 +1747,8 @@ namespace SchoolSystem.Migrations
 
             modelBuilder.Entity("SchoolSystem.Models.ClassManagement.ClassManagement", b =>
                 {
+                    b.Navigation("Assignment");
+
                     b.Navigation("ClassAttendance");
 
                     b.Navigation("ClassAttendanceCheck");
@@ -1724,6 +1826,8 @@ namespace SchoolSystem.Migrations
                     b.Navigation("AcitivityAttendanceSummary");
 
                     b.Navigation("ActivityAttendance");
+
+                    b.Navigation("AssignmentScores");
 
                     b.Navigation("ClassAttendance");
 

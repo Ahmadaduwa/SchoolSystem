@@ -1,0 +1,81 @@
+﻿.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Animation for swipe indication */
+@keyframes swipeIndication {
+    0% {
+        box-shadow: 0 0 0 rgba(22, 163, 74, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(22, 163, 74, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(22, 163, 74, 0);
+    }
+}
+
+.swiped {
+    animation: swipeIndication 0.5s ease-in-out;
+}
+
+/* Make radio buttons more tap-friendly on mobile */
+@media (max-width: 640px) {
+    input [type="radio"] {
+        min-width: 18px;
+        min-height: 18px;
+    }
+
+    .flex.items-center {
+        margin: 4px 0;
+        min-height: 36px;
+    }
+
+    label {
+        padding: 8px 2px;
+    }
+}
+
+/* Ensure form radios have better contrast and are more visible */
+input[type="radio"] {
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* Style for checked radio buttons */
+input[value="present"]:checked + label {
+    color: rgb(22, 163, 74);
+    font-weight: 500;
+}
+
+input[value="absent"]:checked + label {
+    color: rgb(220, 38, 38);
+    font-weight: 500;
+}
+
+input[value="late"]:checked + label {
+    color: rgb(202, 138, 4);
+    font-weight: 500;
+}
+
+input[value="excused"]:checked + label {
+    color: rgb(37, 99, 235);
+    font-weight: 500;
+}

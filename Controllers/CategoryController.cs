@@ -178,6 +178,7 @@ namespace SchoolSystem.Controllers
         // 📌 ลบหมวดหมู่คอร์สจากหน้า Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteCategory(int id)
         {
             try

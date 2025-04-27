@@ -193,6 +193,7 @@ namespace SchoolSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteCourse(int id)
         {
             try

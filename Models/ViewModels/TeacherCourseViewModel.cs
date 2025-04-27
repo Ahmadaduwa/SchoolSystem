@@ -12,6 +12,7 @@ namespace SchoolSystem.ViewModels
         public string? CourseCode { get; set; } // รหัสวิชา
         public int ClassId { get; set; } // รหัสห้องเรียน
         public int ClassNumber { get; set; } // หมายเลขห้องเรียน
+        public string ClassName { get; set; }
         public int SemesterId { get; set; } // ภาคการศึกษา
         public string SemesterName { get; set; } // ชื่อภาคการศึกษา
         public List<ClassScheduleViewModel> Schedules { get; set; } = new(); // ตารางสอนของครูในรายวิชานี้

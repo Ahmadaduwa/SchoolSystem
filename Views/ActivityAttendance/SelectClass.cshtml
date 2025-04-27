@@ -1,38 +1,38 @@
 ﻿@model SchoolSystem.Models.ViewModels.ActivityAttendanceSelectClassViewModel
 @{
-    ViewData["Title"] = "Select Class for Attendance";
+    ViewData["Title"] = "เลือกชั้นเรียนสำหรับเช็คชื่อ";
 }
 
-<div class="bg-gray-100 flex items-center justify-center px-4 py-8">
-    <div class="w-full max-w-md">
+<div class="bg-gray-100 flex items-center justify-center px-4 py-4 sm:py-8">
+    <div class="w-full max-w-md mx-auto">
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
             <div class="bg-blue-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold text-center">
-                    Select Class for Activity
+                    เลือกชั้นเรียนสำหรับกิจกรรม
                 </h2>
             </div>
 
-            <form asp-action="MarkAttendance" asp-controller="ActivityAttendance" method="get" class="p-6 space-y-6">
+            <form asp-action="MarkAttendance" asp-controller="ActivityAttendance" method="get" class="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 <input type="hidden" name="activityManagementId" value="@Model.ActivityManagementId" />
 
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                        Activity: <span class="text-blue-600">@Model.ActivityName</span>
+                        กิจกรรม: <span class="text-blue-600">@Model.ActivityName</span>
                     </h3>
                 </div>
 
-                <div>
-                    <label for="classId" class="block text-gray-700 font-medium mb-2">Select Class</label>
+                <div style="">
+                    <label for="classId" class="block text-gray-700 font-medium mb-2">เลือกชั้นเรียน</label>
                     <select name="classId" id="classId" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg
                                    focus:outline-none focus:ring-2 focus:ring-blue-500
                                    focus:border-transparent
                                    transition duration-200 ease-in-out">
-                        <option value="">-- Please select a class --</option>
+                        <option value="">-- กรุณาเลือกชั้นเรียน --</option>
                         @foreach (var cls in Model.Classes)
                         {
                             <option value="@cls.ClassId">
-                                @(cls.GradeLevels?.Name ?? "Unknown Grade")/@cls.ClassNumber
+                                @(cls.GradeLevels?.Name ?? "ไม่ทราบระดับชั้น")/@cls.ClassNumber
                             </option>
                         }
                     </select>
@@ -40,23 +40,43 @@
 
                 <div class="text-center text-gray-600">
                     <p class="text-sm">
-                        Attendance will be recorded for
+                        การเช็คชื่อจะบันทึกสำหรับวันที่
                         <span class="font-semibold text-blue-600">
-                            @DateTime.Now.ToString("MMMM dd, yyyy")
+                            @DateTime.Now.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("th-TH"))
                         </span>
                     </p>
                 </div>
 
                 <button type="submit"
                         class="w-full bg-green-600 text-white font-semibold
-                               py-3 px-4 rounded-lg
+                               py-4 px-4 rounded-lg
                                hover:bg-green-700
                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
                                transition-all duration-200 ease-in-out
                                transform hover:scale-105 active:scale-95">
-                    Proceed to Attendance
+                    ดำเนินการเช็คชื่อ
                 </button>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#classId').select2({
+                placeholder: "-- กรุณาเลือกชั้นเรียน --",
+                allowClear: true,
+                language: {
+                    noResults: function () {
+                        return "ไม่พบชั้นเรียน";
+                    }
+                },
+                width: '100%' // Ensure dropdown width matches container
+            });
+        });
+    </script>
+}

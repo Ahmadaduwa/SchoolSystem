@@ -51,7 +51,7 @@ namespace SchoolSystem.ViewModels
 
         [Display(Name = "Address")]
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [Required(ErrorMessage = "Date of Birth is required.")]
         [DataType(DataType.Date)]
@@ -67,9 +67,8 @@ namespace SchoolSystem.ViewModels
         public IFormFile? ProfilePicture { get; set; }
 
         // ข้อมูลบัญชีผู้ใช้ (Account)
-        [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "Username is required.")]
         [StringLength(30, ErrorMessage = "Username cannot exceed 30 characters.")]
@@ -88,6 +87,8 @@ namespace SchoolSystem.ViewModels
 
         [Display(Name = "Class Name")]
         public string? ClassName { get; set; }
+
+        public bool? HasStudentCouncilRole { get; set; }
 
         // Dropdown List สำหรับข้อมูลเพิ่มเติม
         public List<SelectListItem> Classes { get; set; } = new List<SelectListItem>();

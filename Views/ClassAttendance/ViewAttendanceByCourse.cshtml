@@ -1,52 +1,287 @@
 ﻿@using SchoolSystem.Models.ClassManagement
 @model List<AttendanceSummaryViewModel>
-
 @{
     ViewData["Title"] = "ข้อมูลการเข้าเรียน";
+    var totalStudents = Model.Count;
+    var totalPresent = Model.Sum(s => s.PresentCount);
+    var totalAbsent = Model.Sum(s => s.AbsentCount);
+    var totalLate = Model.Sum(s => s.LateCount);
+    var totalExcused = Model.Sum(s => s.ExcusedCount);
+    var attendanceRate = totalStudents > 0 ? Math.Round((double)totalPresent / (totalPresent + totalAbsent + totalLate) * 100, 2) : 0;
 }
 
-<h2 class="text-2xl font-semibold mb-4">@ViewData["Title"]</h2>
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800">@ViewData["Title"]</h2>
+        <div class="flex space-x-2">
+            <a href="@Url.Action("EditAttendanceSelectDate", "ClassAttendance", new { cmId = ViewBag.CM_Id })" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                ย้อนกลับ
+            </a>
+            <button id="btnPrint" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                พิมพ์รายงาน
+            </button>
+        </div>
+    </div>
 
-@if (Model.Any())
-{
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสนักเรียน</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการเข้าเรียน</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการขาดเรียน</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการมาสาย</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการขาดเรียนที่ได้รับการยกเว้น</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @foreach (var summary in Model)
-                {
+    @if (Model.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow">
+                <p class="text-sm text-blue-600 font-medium">อัตราการเข้าเรียนเฉลี่ย</p>
+                <p class="text-2xl font-bold text-blue-800">@attendanceRate%</p>
+            </div>
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow">
+                <p class="text-sm text-green-600 font-medium">จำนวนการเข้าเรียนทั้งหมด</p>
+                <p class="text-2xl font-bold text-green-800">@totalPresent</p>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow">
+                <p class="text-sm text-red-600 font-medium">จำนวนการขาดเรียนทั้งหมด</p>
+                <p class="text-2xl font-bold text-red-800">@totalAbsent</p>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg shadow">
+                <p class="text-sm text-yellow-600 font-medium">จำนวนการมาสายทั้งหมด</p>
+                <p class="text-2xl font-bold text-yellow-800">@totalLate</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table id="attendanceTable" class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.StudentCode</td>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.Name</td>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.PresentCount</td>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.AbsentCount</td>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.LateCount</td>
-                        <td class="px-6 py-4 whitespace-nowrap">@summary.ExcusedCount</td>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(0)">
+                            รหัสนักเรียน
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(1)">
+                            ชื่อ
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(2)">
+                            เข้าเรียน
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(3)">
+                            ขาดเรียน
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(4)">
+                            มาสาย
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(5)">
+                            ขาดที่ยกเว้น
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach (var summary in Model)
+                    {
+                        var statusClass = summary.AbsentCount > 3 ? "bg-red-100" : (summary.AbsentCount == 0 && summary.LateCount == 0) ? "bg-green-50" : "";
+                        var statusText = summary.AbsentCount > 3 ? "เสี่ยง" : (summary.AbsentCount == 0 && summary.LateCount == 0) ? "ดีเยี่ยม" : "ปกติ";
+                        var statusBadgeClass = summary.AbsentCount > 3 ? "bg-red-100 text-red-800 border-red-300" :
+                        (summary.AbsentCount == 0 && summary.LateCount == 0) ? "bg-green-100 text-green-800 border-green-300" :
+                        "bg-blue-100 text-blue-800 border-blue-300";
 
-    <div class="mt-4">
-        <form method="post" asp-action="UpdateAttendanceSummary" asp-route-cmId="@ViewBag.CM_Id">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">อัปเดตข้อมูลการเข้าเรียน</button>
-        </form>
-    </div>
-}
-else
-{
-    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">ข้อมูล!</strong>
-        <span class="block sm:inline">ไม่พบข้อมูลการเข้าเรียนสำหรับวิชานี้</span>
-    </div>
+                        <tr class="@statusClass hover:bg-gray-50 transition-colors" data-student-code="@summary.StudentCode" data-name="@summary.Name" data-absent="@summary.AbsentCount">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@summary.StudentCode</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@summary.Name</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@summary.PresentCount</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                <span class="font-medium @(summary.AbsentCount > 0 ? "text-red-600" : "text-gray-700")">@summary.AbsentCount</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                <span class="font-medium @(summary.LateCount > 0 ? "text-yellow-600" : "text-gray-700")">@summary.LateCount</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@summary.ExcusedCount</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border @statusBadgeClass">
+                                    @statusText
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+                แสดง <span id="displayCount">@Model.Count</span> จาก <span>@Model.Count</span> รายการ
+            </div>
+            <form method="post" asp-action="UpdateAttendanceSummary" asp-route-cmId="@ViewBag.CM_Id">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    อัปเดตข้อมูลการเข้าเรียน
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg shadow mb-6" role="alert">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        <span class="font-medium">ข้อมูล!</span> ไม่พบข้อมูลการเข้าเรียนสำหรับวิชานี้
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+            <form method="post" asp-action="InitializeAttendanceData" asp-route-cmId="@ViewBag.CM_Id">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    สร้างข้อมูลการเข้าเรียนเริ่มต้น
+                </button>
+            </form>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const filterSelect = document.getElementById('filterSelect');
+            const displayCount = document.getElementById('displayCount');
+            const table = document.getElementById('attendanceTable');
+            const rows = table ? table.getElementsByTagName('tbody')[0].getElementsByTagName('tr') : [];
+
+            // Search and filter function
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filterValue = filterSelect.value;
+                let visibleCount = 0;
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const studentCode = row.getAttribute('data-student-code').toLowerCase();
+                    const name = row.getAttribute('data-name').toLowerCase();
+                    const absentCount = parseInt(row.getAttribute('data-absent'));
+
+                    const matchesSearch = studentCode.includes(searchTerm) || name.includes(searchTerm);
+                    let matchesFilter = true;
+
+                    if (filterValue === 'perfect') {
+                        matchesFilter = absentCount === 0;
+                    } else if (filterValue === 'risk') {
+                        matchesFilter = absentCount > 3;
+                    }
+
+                    if (matchesSearch && matchesFilter) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+
+                if (displayCount) {
+                    displayCount.textContent = visibleCount;
+                }
+            }
+
+            // Sort table function
+            window.sortTable = function(columnIndex) {
+                let switching = true;
+                let shouldSwitch, i;
+                let dir = "asc"; // Default sort direction
+                let switchcount = 0;
+
+                while (switching) {
+                    switching = false;
+
+                    for (i = 0; i < rows.length - 1; i++) {
+                        shouldSwitch = false;
+                        const x = rows[i].getElementsByTagName("td")[columnIndex];
+                        const y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+
+                        // Get the inner text, handling numeric values appropriately
+                        let xValue = x.textContent.trim();
+                        let yValue = y.textContent.trim();
+
+                        // Try to convert to numbers if possible
+                        if (!isNaN(xValue) && !isNaN(yValue)) {
+                            xValue = parseFloat(xValue);
+                            yValue = parseFloat(yValue);
+                        }
+
+                        if (dir === "asc") {
+                            if ((typeof xValue === "number" && typeof yValue === "number" && xValue > yValue) ||
+                                (typeof xValue === "string" && typeof yValue === "string" && xValue.localeCompare(yValue) > 0)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else {
+                            if ((typeof xValue === "number" && typeof yValue === "number" && xValue < yValue) ||
+                                (typeof xValue === "string" && typeof yValue === "string" && xValue.localeCompare(yValue) < 0)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        switchcount++;
+                    } else {
+                        if (switchcount === 0 && dir === "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+            }
+
+            // Print function
+            document.getElementById('btnPrint').addEventListener('click', function() {
+                window.print();
+            });
+
+            // Export to Excel function (mock - would need server-side implementation)
+            document.getElementById('btnExportExcel').addEventListener('click', function() {
+                window.location.href = '@Url.Action("ExportAttendanceToExcel", new { cmId = ViewBag.CM_Id })';
+            });
+
+            // Add event listeners
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+            }
+
+            if (filterSelect) {
+                filterSelect.addEventListener('change', filterTable);
+            }
+        });
+    </script>
 }

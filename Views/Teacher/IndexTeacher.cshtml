@@ -1,6 +1,6 @@
 ﻿@model SchoolSystem.Helpers.PaginatedList<SchoolSystem.Models.UserManagement.Teacher>
 @{
-    ViewData["Title"] = "Teacher Management";
+    ViewData["Title"] = "จัดการข้อมูลครู";
     var departments = ViewData["Departments"] as List<SelectListItem>;
     var currentFilter = ViewData["CurrentFilter"]?.ToString();
     var currentSort = ViewData["CurrentSort"]?.ToString();
@@ -9,94 +9,61 @@
 
 <div class="container mx-auto md:px-4 py-6">
     <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Teacher Management</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">จัดการข้อมูลครู</h2>
 
-        <!-- Search and Filter Section -->
+        <!-- ส่วนค้นหาและกรองข้อมูล -->
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
             <form asp-action="IndexTeacher" method="get" class="flex flex-wrap gap-4">
-                <!-- Search by Name -->
+                <!-- ค้นหาจากชื่อ -->
                 <div class="flex-1 min-w-fit">
-                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search by name..." />
+                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="ค้นหาจากชื่อ..." />
                 </div>
 
-                <!-- Department Filter Dropdown -->
+                <!-- กรองข้อมูลตามแผนก -->
                 <div class="flex-1 min-w-fit">
                     <select name="departmentFilter" class="w-full p-2 border rounded">
-                        <option value="">All Departments</option>
+                        <option value="">ทุกแผนก</option>
                         @foreach (var dept in departments)
                         {
-                            <option value="@dept.Value" selected="@(dept.Value == currentDepartment ? "selected" : null)">@dept.Text</option>
+                            <option value="@dept.Value" selected="@(dept.Value == currentDepartment ? "selected" : null)">
+                                @dept.Text
+                            </option>
                         }
                     </select>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- ปุ่มดำเนินการ -->
                 <div class="flex gap-2">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
-                        <i class="fas fa-search mr-1"></i> Search
+                        <i class="fas fa-search mr-1"></i> ค้นหา
                     </button>
                     <a asp-action="IndexTeacher" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
-                        Reset
+                        รีเซ็ต
                     </a>
                 </div>
             </form>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- ปุ่มเพิ่มครูใหม่และแสดงข้อมูลหน้าปัจจุบัน -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-4">
             <a asp-action="CreateTeacher" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
-                <i class="fas fa-plus-circle mr-2"></i> Add New Teacher
+                <i class="fas fa-plus-circle mr-2"></i> เพิ่มครูใหม่
             </a>
             <div class="text-gray-600">
-                Showing @Model.Count of @ViewData["TotalItems"] teachers | Page @Model.PageIndex of @Model.TotalPages
+                แสดง @Model.Count จาก @ViewData["TotalItems"] ครู | หน้า @Model.PageIndex จาก @Model.TotalPages
             </div>
         </div>
 
-        <!-- Teachers Table -->
+        <!-- ตารางแสดงข้อมูลครู -->
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-100 text-gray-700">
-                        <th class="border px-4 py-2">
-                            <a asp-action="IndexTeacher"
-                               asp-route-sortOrder="@ViewData["NameSortParam"]"
-                               asp-route-currentFilter="@currentFilter"
-                               asp-route-departmentFilter="@currentDepartment"
-                               class="flex items-center justify-between">
-                                Name
-                                @if (string.IsNullOrEmpty(currentSort) || currentSort == "name_desc")
-                                {
-                                    <i class="fas fa-sort-@(currentSort == "name_desc" ? "down" : "up") ml-1"></i>
-                                }
-                            </a>
-                        </th>
-                        <th class="border px-4 py-2">
-                            <a asp-action="IndexTeacher"
-                               asp-route-sortOrder="@ViewData["SalarySortParam"]"
-                               asp-route-currentFilter="@currentFilter"
-                               asp-route-departmentFilter="@currentDepartment"
-                               class="flex items-center justify-between">
-                                Salary
-                                @if (currentSort == "salary" || currentSort == "salary_desc")
-                                {
-                                    <i class="fas fa-sort-@(currentSort == "salary_desc" ? "down" : "up") ml-1"></i>
-                                }
-                            </a>
-                        </th>
-                        <th class="border px-4 py-2">
-                            <a asp-action="IndexTeacher"
-                               asp-route-sortOrder="@ViewData["DepartmentSortParam"]"
-                               asp-route-currentFilter="@currentFilter"
-                               asp-route-departmentFilter="@currentDepartment"
-                               class="flex items-center justify-between">
-                                Department
-                                @if (currentSort == "department" || currentSort == "department_desc")
-                                {
-                                    <i class="fas fa-sort-@(currentSort == "department_desc" ? "down" : "up") ml-1"></i>
-                                }
-                            </a>
-                        </th>
-                        <th class="border px-4 py-2">Actions</th>
+                        <th class="border px-4 py-2">ชื่อครู</th>
+                        <th class="border px-4 py-2">แผนก</th>
+                        <th class="border px-4 py-2">วันที่เริ่มงาน</th>
+                        <th class="border px-4 py-2">สถานะ</th>
+                        <th class="border px-4 py-2">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,20 +72,34 @@
                         @foreach (var teacher in Model)
                         {
                             <tr class="hover:bg-gray-50">
-                                <td class="border px-4 py-2">@($"{teacher.Profile.FirstName} {teacher.Profile.LastName}")</td>
-                                <td class="border px-4 py-2">@teacher.Salary.ToString("C")</td>
+                                <!-- ชื่อครู -->
+                                <td class="border px-4 py-2">
+                                    @($"{teacher.Profile.FirstName} {teacher.Profile.LastName}")
+                                </td>
+                                <!-- แผนก -->
                                 <td class="border px-4 py-2">
                                     @{
-                                        var deptInfo = departments?.FirstOrDefault(d => d.Value == teacher.DepartmentId.ToString())?.Text ?? "Unknown";
+                                        var deptInfo = departments?.FirstOrDefault(d => d.Value == teacher.DepartmentId.ToString())?.Text ?? "ไม่ระบุ";
                                     }
                                     @deptInfo
                                 </td>
+                                <!-- วันที่เริ่มงาน -->
+                                <td class="border px-4 py-2">
+                                    @teacher.HireDate.ToShortDateString()
+                                </td>
+                                <!-- สถานะ -->
+                                <td class="border px-4 py-2">
+                                    <span class="px-2 py-1 rounded-full text-sm @(teacher.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800")">
+                                        @teacher.Status
+                                    </span>
+                                </td>
+                                <!-- ปุ่มจัดการ -->
                                 <td class="border px-4 py-2">
                                     <div class="flex justify-center gap-1">
-                                        <a asp-action="DetailsTeacher" asp-route-id="@teacher.TeacherId" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="View Details">
+                                        <a asp-action="DetailsTeacher" asp-route-id="@teacher.TeacherId" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="ดูรายละเอียด">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="EditTeacher" asp-route-id="@teacher.TeacherId" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="Edit">
+                                        <a asp-action="EditTeacher" asp-route-id="@teacher.TeacherId" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="แก้ไข">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </div>
@@ -129,10 +110,10 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center text-gray-500 p-6">
+                            <td colspan="6" class="text-center text-gray-500 p-6">
                                 <div class="flex flex-col items-center">
                                     <i class="fas fa-search text-4xl mb-2"></i>
-                                    <p>No teachers found matching your criteria.</p>
+                                    <p>ไม่พบครูที่ตรงกับเงื่อนไขที่ค้นหา</p>
                                 </div>
                             </td>
                         </tr>
@@ -141,33 +122,33 @@
             </table>
         </div>
 
-        <!-- Pagination Controls -->
+        <!-- การแบ่งหน้า -->
         <div class="flex flex-col md:flex-row justify-between items-center mt-6">
-            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+            <span class="text-gray-600 mb-2 md:mb-0">หน้า @Model.PageIndex จาก @Model.TotalPages</span>
             <div class="flex space-x-2">
                 @if (Model.HasPreviousPage)
                 {
                     <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-departmentFilter="@currentDepartment" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </span>
                 }
 
                 @if (Model.HasNextPage)
                 {
                     <a asp-action="IndexTeacher" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-sortOrder="@currentSort" asp-route-currentFilter="@currentFilter" asp-route-departmentFilter="@currentDepartment" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </a>
                 }
                 else
                 {
                     <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </span>
                 }
             </div>

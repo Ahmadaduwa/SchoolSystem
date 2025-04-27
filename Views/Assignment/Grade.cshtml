@@ -1,0 +1,141 @@
+﻿@model SchoolSystem.Models.ViewModels.AssignmentGradingViewModel
+@{
+    ViewData["Title"] = "ให้คะแนนงาน: " + Model.AssignmentTitle;
+    var cmId = Model.CM_Id;
+}
+
+<div class="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-700 px-6 py-8">
+            <h2 class="text-3xl font-bold text-white text-center">ให้คะแนนงาน</h2>
+            <p class="text-indigo-100 text-center mt-2">@Model.AssignmentTitle</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 md:p-8">
+            <div class="mb-6 bg-indigo-50 rounded-lg p-4 border-l-4 border-indigo-500">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-indigo-700">
+                            กรุณาระบุคะแนนสำหรับแต่ละนักเรียน (คะแนนเต็ม: <span class="font-semibold">@Model.FullScore</span>)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Grade" method="post">
+                <input type="hidden" asp-for="AssignmentId" />
+                <input type="hidden" asp-for="CM_Id" />
+
+                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">รหัสนักเรียน</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">ชื่อ</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">คะแนน</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @for (int i = 0; i < Model.StudentScores.Count; i++)
+                            {
+                                <tr class="transition-colors hover:bg-indigo-50">
+                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                        <input type="hidden" asp-for="StudentScores[@i].StudentId" />
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                            @Model.StudentScores[i].Student_Code
+                                        </span>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
+                                        <div class="flex items-center">
+                                            <div class="ml-3">
+                                                @Model.StudentScores[i].StudentName
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
+                                        <div class="relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span class="text-gray-500 sm:text-sm">
+                                                    #
+                                                </span>
+                                            </div>
+                                            <input asp-for="StudentScores[@i].Score"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   max="@Model.FullScore"
+                                                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2"
+                                                   placeholder="0.00" />
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                <span class="text-gray-500 sm:text-sm">
+                                                    / @Model.FullScore
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="StudentScores[@i].Score" class="mt-1 text-red-600 text-xs"></span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="p-4 bg-white border rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-medium text-gray-500">จำนวนนักเรียน</h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                ทั้งหมด
+                            </span>
+                        </div>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900">@Model.StudentScores.Count คน</p>
+                    </div>
+
+                    <div class="p-4 bg-white border rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-medium text-gray-500">คะแนนเต็ม</h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                งานนี้
+                            </span>
+                        </div>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900">@Model.FullScore คะแนน</p>
+                    </div>
+
+                    <div class="p-4 bg-white border rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-medium text-gray-500">วันที่ครบกำหนด</h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                กำหนดส่ง
+                            </span>
+                        </div>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900">@(Model.DueDate.ToString("dd/MM/yyyy") ?? "-")</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        บันทึกคะแนน
+                    </button>
+                    <a href="@Url.Action("Index", "Assignment", new { cmId = cmId })" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        ยกเลิก
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

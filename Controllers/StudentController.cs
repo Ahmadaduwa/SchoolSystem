@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUglify.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using NuGet.DependencyResolver;
 
 namespace SchoolSystem.Controllers
 {
@@ -20,12 +21,14 @@ namespace SchoolSystem.Controllers
     {
         private readonly AppDbContext _db;
         private readonly UserManager<Users> _userManager;
-        private readonly ILogger<StudentController> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<TeacherController> _logger;
 
-        public StudentController(AppDbContext db, UserManager<Users> userManager, ILogger<StudentController> logger)
+        public StudentController(UserManager<Users> userManager, RoleManager<IdentityRole> roleManager, AppDbContext db, ILogger<TeacherController> logger)
         {
-            _db = db;
             _userManager = userManager;
+            _roleManager = roleManager;
+            _db = db;
             _logger = logger;
         }
 
@@ -52,7 +55,7 @@ namespace SchoolSystem.Controllers
                 })
                 .ToListAsync();
             // เพิ่มตัวเลือก "All Classes" ไว้ที่หัวรายการ
-            classList.Insert(0, new SelectListItem { Value = "", Text = "All Classes" });
+            classList.Insert(0, new SelectListItem { Value = "", Text = "ระดับชั้นเรียนทั้งหมด" });
             ViewData["Classes"] = classList;
 
             int pageSize = 10;
@@ -93,7 +96,7 @@ namespace SchoolSystem.Controllers
             return View(await PaginatedList<Student>.CreateAsync(studentsQuery, pageNumber ?? 1, pageSize));
         }
 
-
+        /*เพิ่มปุ่มให้ตำแหน่งสภานักเรียน*/
         [HttpGet]
         [Route("Student/Details")]
         public async Task<IActionResult> DetailsStudent(int id)
@@ -130,6 +133,8 @@ namespace SchoolSystem.Controllers
                     Email = student.Profile.User?.Email ?? string.Empty,
                     Username = student.Profile.User?.UserName ?? string.Empty,
                     ClassId = student.ClassId,
+                    HasStudentCouncilRole = await _db.UserRoles
+                        .AnyAsync(ur => ur.UserId == student.Profile.UserId && _roleManager.Roles.Any(r => r.Id == ur.RoleId && r.Name == "StudentCouncil")),
                     // Class display value
                     ClassName = student.Class != null ? $"{student.Class.GradeLevels.Name}/{student.Class.ClassNumber}" : "Not Assigned"
                 };
@@ -142,6 +147,69 @@ namespace SchoolSystem.Controllers
                 TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการโหลดรายละเอียดนักเรียน: {ex.Message}";
                 return RedirectToAction(nameof(IndexStudent));
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignStudentCouncilRole(int id)
+        {
+            var student = await _db.Students
+                .Include(t => t.Profile)
+                .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(t => t.StudentId == id);
+
+            if (student == null || student.Profile == null || student.Profile.User == null)
+            {
+                return NotFound("ไม่พบครูหรือผู้ใช้ที่เกี่ยวข้อง");
+            }
+
+            var user = student.Profile.User;
+            var roleName = "StudentCouncil";
+
+            if (!await _roleManager.RoleExistsAsync(roleName))
+            {
+                return BadRequest("ไม่พบบทบาทที่ระบุ");
+            }
+
+            var addResult = await _userManager.AddToRoleAsync(user, roleName);
+
+            if (!addResult.Succeeded)
+            {
+                return BadRequest("ไม่สามารถมอบหมายบทบาทได้");
+            }
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "มอบหมายบทบาทสำเร็จ";
+            return RedirectToAction("DetailsStudent", new { id });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
+        public async Task<IActionResult> RemoveStudentCouncilRole(int id)
+        {
+            var student = await _db.Students
+                .Include(t => t.Profile)
+                .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(t => t.StudentId == id);
+
+            if (student == null || student.Profile == null || student.Profile.User == null)
+            {
+                return NotFound("ไม่พบครูหรือผู้ใช้ที่เกี่ยวข้อง");
+            }
+
+            var user = student.Profile.User;
+            var roleName = "StudentCouncil";
+
+            var removeResult = await _userManager.RemoveFromRoleAsync(user, roleName);
+
+            if (!removeResult.Succeeded)
+            {
+                return BadRequest("ไม่สามารถยกเลิกบทบาทได้");
+            }
+
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "ยกเลิกบทบาทสำเร็จ";
+            return RedirectToAction("DetailsStudent", new { id });
         }
 
         [HttpGet]

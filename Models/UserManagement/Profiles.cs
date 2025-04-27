@@ -15,7 +15,7 @@ namespace SchoolSystem.Models.UserManagement
 
         public string Gender { get; set; } = "Not Specified";
 
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
         public DateOnly DateOfBirth { get; set; }
 

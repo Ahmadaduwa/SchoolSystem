@@ -31,10 +31,8 @@ namespace SchoolSystem.Controllers
         [Route("ActivityAttendance")]
         public async Task<IActionResult> CheckActivity()
         {
-            // กำหนดวันที่ปัจจุบัน (เปรียบเทียบเฉพาะวันที่)
             var today = DateTime.Today;
 
-            // ดึงเทอมที่ Active และวันที่ปัจจุบันอยู่ในช่วง StartTime - EndTime
             var currentSemester = await _db.Semesters
                 .Where(s => s.Status == "Active" &&
                             s.StartTime.Date <= today &&
@@ -48,12 +46,10 @@ namespace SchoolSystem.Controllers
                 {
                     CurrentDate = today,
                     CurrentDay = today.DayOfWeek.ToString(),
-
                 };
                 return View("CheckActivity", view2Model);
             }
 
-            // ดึงกิจกรรมที่เกี่ยวข้องกับเทอมปัจจุบันและกิจกรรมต้อง Active ด้วย
             var activities = await _db.ActivityManagement
                 .Include(am => am.Activity)
                 .Include(am => am.Semester)
@@ -63,12 +59,18 @@ namespace SchoolSystem.Controllers
 
             _logger.LogInformation($"พบ {activities.Count} กิจกรรมในเทอมปัจจุบัน (Semester ID: {currentSemester.SemesterID})");
 
-            // ส่งข้อมูลไปที่ View โดยอาจใช้ ViewModel ที่สืบทอดจากสไตล์ของ Class Management
+            // กรองข้อมูลเฉพาะกิจกรรมที่มีประเภท "daily" และในวันทำงาน (จันทร์-ศุกร์) เท่านั้น
+            var filteredActivities = activities.Where(a =>
+                a.Activity.ActivityType == "Daily" &&
+                (today.DayOfWeek != DayOfWeek.Saturday || today.DayOfWeek != DayOfWeek.Sunday))
+                .ToList();
+
+            // สร้าง ViewModel เพื่อส่งข้อมูลไปที่ View
             var viewModel = new ActivityAttendanceViewModel
             {
                 CurrentDate = today,
                 CurrentDay = today.DayOfWeek.ToString(),
-                Schedules = activities.Select(a => new ScheduleViewModel
+                Schedules = filteredActivities.Select(a => new ScheduleViewModel
                 {
                     Id = a.AM_id,
                     Name = a.Activity?.ActivityName ?? "ไม่ระบุ",
@@ -77,6 +79,8 @@ namespace SchoolSystem.Controllers
 
             return View("CheckActivity", viewModel);
         }
+
+
 
         [HttpGet]
         [Route("ActivityAttendance/All")]
@@ -199,9 +203,19 @@ namespace SchoolSystem.Controllers
             {
                 var attendanceDate = DateTime.Now.Date;
 
-                // Fetch activity management with validation
+                var activityType = await _db.ActivityManagement
+                       .Where(am => am.AM_id == activityManagementId)
+                       .Select(am => am.Activity.ActivityType)
+                       .FirstOrDefaultAsync() ?? "Type";
+
+                if (activityType == "Daily" && (attendanceDate.DayOfWeek == DayOfWeek.Saturday || attendanceDate.DayOfWeek == DayOfWeek.Sunday))
+                {
+                    TempData["ErrorMessage"] = "ไม่สามาระเช็คชื่อวันนี้ได้";
+                    return RedirectToAction("CheckActivity");
+                }
+
                 var activityManagement = await _db.ActivityManagement
-                    .Where(am => am.Status=="Active")
+                    .Where(am => am.Status == "Active")
                     .Include(am => am.Activity)
                     .FirstOrDefaultAsync(am => am.AM_id == activityManagementId);
 
@@ -292,6 +306,17 @@ namespace SchoolSystem.Controllers
                 {
                     var attendanceDate = DateOnly.FromDateTime(model.AttendanceDate);
                     var amId = model.ActivityManagementId;
+
+                    var activityType = await _db.ActivityManagement
+                        .Where(am => am.AM_id == amId)
+                        .Select(am => am.Activity.ActivityType)
+                        .FirstOrDefaultAsync() ?? "Type";
+
+                    if (activityType == "Daily" && (attendanceDate.DayOfWeek == DayOfWeek.Saturday || attendanceDate.DayOfWeek == DayOfWeek.Sunday))
+                    {
+                        TempData["ErrorMessage"] = "ไม่สามาระเช็คชื่อวันนี้ได้";
+                        return RedirectToAction("CheckActivity");
+                    }
 
                     var activityName = await _db.ActivityManagement
                         .Where(am => am.AM_id == amId)
@@ -456,10 +481,11 @@ namespace SchoolSystem.Controllers
                     {
                         activityManagement.CheckCount = checkCount;
                     }
+                    
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
-
+                    TempData["SuccessMessage"] = "เช็คชื่อสำเร็จ";
                     _logger.LogInformation($"Attendance marked/updated successfully for ActivityManagementId: {amId} on date: {attendanceDate}");
                     return RedirectToAction("Index");
                 }

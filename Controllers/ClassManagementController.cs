@@ -176,7 +176,7 @@ namespace SchoolSystem.Controllers
                 .Select(c => new SelectListItem
                 {
                     Value = c.ClassId.ToString(),
-                    Text = c.GradeLevels!.Name + " / " + c.ClassNumber,
+                    Text = c.GradeLevels!.Name + "/" + c.ClassNumber,
                     Selected = classFilter.HasValue && c.ClassId == classFilter.Value
                 }).ToListAsync();
 

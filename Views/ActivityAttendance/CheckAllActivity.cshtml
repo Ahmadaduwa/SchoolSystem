@@ -2,14 +2,31 @@
 @model ActivityAttendanceViewModel
 @{
     ViewData["Title"] = "กิจกรรมเทอมนี้";
+ 
 }
 
+@functions {
+    public string GetThaiDay(DateTime date)
+    {
+        switch (date.DayOfWeek)
+        {
+            case DayOfWeek.Sunday: return "อาทิตย์";
+            case DayOfWeek.Monday: return "จันทร์";
+            case DayOfWeek.Tuesday: return "อังคาร";
+            case DayOfWeek.Wednesday: return "พุธ";
+            case DayOfWeek.Thursday: return "พฤหัสบดี";
+            case DayOfWeek.Friday: return "ศุกร์";
+            case DayOfWeek.Saturday: return "เสาร์";
+            default: return "";
+        }
+    }
+}
 <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
     <div class="mb-4 bg-gray-100 p-4 rounded-lg">
         <div class="flex justify-between items-center">
             <div>
                 <p class="text-gray-500">วันที่ปัจจุบัน</p>
-                <h2 class="text-xl font-bold text-gray-800">วัน@(Model.CurrentDay) ที่ @(Model.CurrentDate.ToString("dd/MM/yyyy"))</h2>
+                <h2 class="text-xl font-bold text-gray-800">วัน@(GetThaiDay(Model.CurrentDate)) ที่ @(Model.CurrentDate.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("th-TH")))</h2>
             </div>
             <div class="text-right">
                 <p class="text-gray-500">ผู้ใช้งาน</p>
@@ -25,7 +42,7 @@
         <div class="flex space-x-3">
             <a href="@Url.Action("CheckActivity", "ActivityAttendance")"
                class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 shadow-md transition-all duration-300">
-                📅 กิจกรรมในวันนี้
+                📅 ดูกิจกรรมวันนี้
             </a>
         </div>
     </div>
@@ -44,7 +61,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
-                                แตะเพื่อเช็คชื่อกิจกรรม
+                                แตะเพื่อเช็คชื่อ
                             </p>
                         </div>
                     </div>
@@ -58,10 +75,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="text-xl font-semibold text-gray-700 mt-4">ไม่มีกิจกรรมเทอมนี้</h3>
-            <p class="text-gray-500 mt-2">คุณไม่มีกิจกรรมที่ต้องเช็คชื่อสำหรับเทอมนี้</p>
+            <h3 class="text-xl font-semibold text-gray-700 mt-4">ไม่มีกิจกรรมในเทอมนี้</h3>
+            <p class="text-gray-500 mt-2">คุณไม่มีกิจกรรมที่ต้องเช็คชื่อในเทอมนี้</p>
             <a href="@Url.Action("Home", "Home")" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300">
-                กลับไปหน้าหลัก
+                กลับสู่หน้าหลัก
             </a>
         </div>
     }
@@ -70,8 +87,8 @@
 @section Scripts {
     <script>
         // แสดงการโหลดเมื่อผู้ใช้กดที่กิจกรรม
-        document.querySelectorAll('a[href*="MarkActivityAttendance"]').forEach(link => {
-            link.addEventListener('click', function() {
+        document.querySelectorAll('a[href*="SelectClassAll"]').forEach(link => {
+            link.addEventListener('click', function () {
                 this.classList.add('opacity-75', 'pointer-events-none');
                 this.innerHTML += '<div class="flex justify-center mt-3"><div class="loader">กำลังโหลด...</div></div>';
             });

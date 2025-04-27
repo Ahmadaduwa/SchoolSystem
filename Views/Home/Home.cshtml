@@ -1,12 +1,12 @@
 ﻿@model List<SchoolSystem.Models.Alert.Notification>
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "หน้าแรก";
 }
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Your Notifications</h1>
-        <p class="text-gray-600 mt-2">Stay updated with your latest alerts and messages</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">การแจ้งเตือน</h1>
+        <p class="text-gray-600 mt-2">การแจ้งเตือนและข้อความล่าสุดของคุณ</p>
     </div>
 
     @if (Model.Count == 0)
@@ -16,7 +16,7 @@
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <p class="font-medium">No notifications found.</p>
+                <p class="font-medium">ไม่พบการแจ้งเตือน</p>
             </div>
         </div>
     }

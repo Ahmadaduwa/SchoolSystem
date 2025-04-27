@@ -8,9 +8,8 @@ namespace SchoolSystem.ViewModels
     public class TeacherViewModel
     {
         // Account Information
-        [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Please enter a valid email address")]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "Username is required")]
         [StringLength(50, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 50 characters")]
@@ -40,9 +39,7 @@ namespace SchoolSystem.ViewModels
 
         [Required(ErrorMessage = "Gender is required")]
         public string Gender { get; set; } = "Not Specified";
-
-        [Required(ErrorMessage = "Address is required")]
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
         [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date)]

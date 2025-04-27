@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using WebOptimizer;
 using SchoolSystem.Models.UserManagement;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 
 
@@ -18,7 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddLogging();
 builder.Services.AddControllers();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization() // Enable view localization
+    .AddDataAnnotationsLocalization();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -33,6 +37,14 @@ builder.Services.AddIdentity<Users, IdentityRole>(options =>
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("th-TH") };
+    options.DefaultRequestCulture = new RequestCulture("th-TH");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -83,6 +95,7 @@ builder.Services.AddAuthorization(Options =>
     Options.AddPolicy("DirectorPolicy", policy => policy.RequireRole("Director"));
     Options.AddPolicy("AcademicPolicyOrAdminPolicy", policy => policy.RequireRole("Academic", "Admin"));
     Options.AddPolicy("TeacherPolicyOrStudentCouncilPolicy", policy => policy.RequireRole("Teacher", "StudentCouncil"));
+    Options.AddPolicy("AcademicPolicyOrAdminPolicyOrStudentPolicy", policy => policy.RequireRole("Academic", "Admin", "Student"));
 
 });
 
@@ -126,6 +139,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebOptimizer();
+app.UseRequestLocalization();
 
 app.MapStaticAssets();
 app.MapControllerRoute(

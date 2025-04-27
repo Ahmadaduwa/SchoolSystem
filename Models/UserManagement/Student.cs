@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SchoolSystem.Models.ActivityManagement;
+using SchoolSystem.Models.Assignment;
 using SchoolSystem.Models.ClassManagement;
 using SchoolSystem.Models.RegistrationManagement;
 
@@ -39,5 +40,6 @@ namespace SchoolSystem.Models.UserManagement
         public virtual ICollection<ClassAttendanceSummary> ClassAttendanceSummary { get; set; } = new List<ClassAttendanceSummary>();
         public virtual ICollection<ActivityAttendanceSummary> AcitivityAttendanceSummary { get; set; } = new List<ActivityAttendanceSummary>();
         public virtual ICollection<RegisteredCourse> RegisteredCourse { get; set; } = new List<RegisteredCourse>();
+        public virtual ICollection<AssignmentScore> AssignmentScores { get; set; } = new List<AssignmentScore>();
     }
 }

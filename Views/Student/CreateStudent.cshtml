@@ -22,19 +22,19 @@
                 </div>
 
                 <div>
-                    <label asp-for="Username" class="block text-sm font-medium text-gray-700">ชื่อผู้ใช้:</label>
+                    <label asp-for="Username" class="block text-sm font-medium text-gray-700">ชื่อผู้ใช้:<span class="text-red-500">*</span></label>
                     <input asp-for="Username" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                     <span asp-validation-for="Username" class="text-red-500 text-xs"></span>
                 </div>
 
                 <div>
-                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">รหัสผ่าน:</label>
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">รหัสผ่าน:<span class="text-red-500">*</span></label>
                     <input asp-for="Password" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                     <span asp-validation-for="Password" class="text-red-500 text-xs"></span>
                 </div>
 
                 <div>
-                    <label asp-for="ConfirmPassword" class="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่าน:</label>
+                    <label asp-for="ConfirmPassword" class="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่าน:<span class="text-red-500">*</span></label>
                     <input asp-for="ConfirmPassword" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                     <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs"></span>
                 </div>
@@ -47,12 +47,12 @@
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label asp-for="FirstName" class="block text-sm font-medium text-gray-700">ชื่อ:</label>
+                        <label asp-for="FirstName" class="block text-sm font-medium text-gray-700">ชื่อ:<span class="text-red-500">*</span></label>
                         <input asp-for="FirstName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                         <span asp-validation-for="FirstName" class="text-red-500 text-xs"></span>
                     </div>
                     <div>
-                        <label asp-for="LastName" class="block text-sm font-medium text-gray-700">นามสกุล:</label>
+                        <label asp-for="LastName" class="block text-sm font-medium text-gray-700">นามสกุล:<span class="text-red-500">*</span></label>
                         <input asp-for="LastName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                         <span asp-validation-for="LastName" class="text-red-500 text-xs"></span>
                     </div>
@@ -93,13 +93,13 @@
             <legend class="text-lg font-bold px-2">ข้อมูลนักเรียน</legend>
             <div class="space-y-4">
                 <div>
-                    <label asp-for="Student_Code" class="block text-sm font-medium text-gray-700">รหัสนักเรียน:</label>
+                    <label asp-for="Student_Code" class="block text-sm font-medium text-gray-700">รหัสนักเรียน:<span class="text-red-500">*</span></label>
                     <input asp-for="Student_Code" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                     <span asp-validation-for="Student_Code" class="text-red-500 text-xs"></span>
                 </div>
 
                 <div>
-                    <label asp-for="ClassId" class="block text-sm font-medium text-gray-700">ห้อง:</label>
+                    <label asp-for="ClassId" class="block text-sm font-medium text-gray-700">ห้อง:<span class="text-red-500">*</span></label>
                     <select asp-for="ClassId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" asp-items="Model.Classes">
                         <option value="">เลือกห้อง</option>
                     </select>

@@ -26,8 +26,14 @@
 {
     <li>
         <a asp-controller="ClassAttendance" asp-action="ClassAttendance" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-chalkboard-teacher w-6"></i>
+            <i class="fas fa-clipboard-check w-6"></i>
             <span class="font-medium">เช็คชื่อเรียน</span>
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Assignment" asp-action="TeacherCourses" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-chalkboard-teacher w-6"></i>
+            <span class="font-medium">รายวิชาที่สอน</span>
         </a>
     </li>
 }
@@ -56,7 +62,7 @@
     <li>
         <a asp-controller="Class" asp-action="IndexClass" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
             <i class="fas fa-school w-6"></i>
-            <span class="font-medium">ห้องเรียน</span>
+            <span class="font-medium">ชั้นเรียน</span>
         </a>
     </li>
     <li>
@@ -114,13 +120,23 @@
     <li>
         <a asp-controller="GradeLevel" asp-action="Index" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
             <i class="fas fa-graduation-cap w-6"></i>
-            <span class="font-medium">ชั้นเรียน</span>
+            <span class="font-medium">ระดับชั้น</span>
         </a>
     </li>
     <li>
         <a asp-controller="Category" asp-action="IndexCategory" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
             <i class="fas fa-tags w-6"></i>
             <span class="font-medium">หมวดวิชา</span>
+        </a>
+    </li>
+}
+
+@if (User.IsInRole("Student"))
+{
+    <li>
+        <a asp-controller="ClassRegistration" asp-action="stdGet" class="block w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-clipboard-list w-6"></i>
+            <span class="font-medium">รายวิชาที่ลงทะเบียน</span>
         </a>
     </li>
 }

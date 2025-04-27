@@ -8,6 +8,7 @@ using SchoolSystem.Models.CourseManagement;
 using SchoolSystem.Models.CurriculumManagement;
 using SchoolSystem.Models.RegistrationManagement;
 using SchoolSystem.Models.UserManagement;
+using SchoolSystem.Models.Assignment;
 
 namespace SchoolSystem.Data
 {
@@ -16,6 +17,12 @@ namespace SchoolSystem.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
+        /// <summary>
+        /// Assignment
+        /// </summary>
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<AssignmentScore> AssignmentScores { get; set; }
 
         /// <summary>
         /// Registered
@@ -77,7 +84,31 @@ namespace SchoolSystem.Data
             ConfigureAttendanceManagement(modelBuilder);
             ConfigureRegistered(modelBuilder);
             ConfigureNotification(modelBuilder);
+            ConfigureAssignment(modelBuilder);
 
+        }
+        private void ConfigureAssignment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Assignment>(entity =>
+            {
+                entity.HasOne(a => a.ClassManagement)
+                    .WithMany(s => s.Assignment) 
+                    .HasForeignKey(a => a.CM_Id)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<AssignmentScore>(entity =>
+            {
+                entity.HasOne(a => a.Assignment)
+                    .WithMany(s => s.AssignmentScores)
+                    .HasForeignKey(a => a.AssignmentId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Student)
+                    .WithMany(s => s.AssignmentScores)
+                    .HasForeignKey(a => a.StudentId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
         private void ConfigureNotification(ModelBuilder modelBuilder)
         {

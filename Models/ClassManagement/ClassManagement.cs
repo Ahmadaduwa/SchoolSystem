@@ -51,5 +51,6 @@ namespace SchoolSystem.Models.ClassManagement
         public virtual ICollection<ClassAttendanceSummary> ClassAttendanceSummary { get; set; } = new List<ClassAttendanceSummary>();
         public virtual ICollection<ClassAttendance> ClassAttendance { get; set; } = new List<ClassAttendance>();
         public virtual ICollection<ClassAttendanceCheck> ClassAttendanceCheck { get; set; } = new List<ClassAttendanceCheck>();
+        public virtual ICollection<Assignment.Assignment> Assignment { get; set; } = new List<Assignment.Assignment>();
     }
 }

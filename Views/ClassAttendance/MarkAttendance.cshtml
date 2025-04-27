@@ -1,50 +1,78 @@
 ﻿@model SchoolSystem.ViewModels.AttendanceViewModel
 
-<div class="container mx-auto p-6 bg-white shadow-xl rounded-lg">
-    <h2 class="text-3xl font-semibold text-gray-800 mb-8 text-center">
+@section Css {
+    <link rel="stylesheet" href="./css/markatten.css">
+} 
+
+<div class="container mx-auto p-4 md:p-6 bg-white shadow-lg rounded-lg max-w-5xl">
+    <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-8 text-center">
         เช็คชื่อ - @Model.ClassName - @Model.CourseName - @Model.date.ToShortDateString()
     </h2>
 
-    <form method="post">
+    <form method="post" class="w-full">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="cmId" />
         <input type="hidden" asp-for="date" />
         <input type="hidden" asp-for="ClassName" />
         <input type="hidden" asp-for="CourseName" />
 
-        <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-md mb-8">
-            <table class="table-auto w-full text-left text-sm">
+        <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-md mb-6">
+            <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-600 text-white">
                     <tr>
-                        <th class="px-6 py-3 text-lg font-semibold">ชื่อนักเรียน</th>
-                        <th class="px-6 py-3 text-lg font-semibold">สถานะ</th>
+                        <th class="px-4 py-3 md:px-6 text-left text-base md:text-lg font-medium md:font-semibold tracking-wider">
+                            ชื่อนักเรียน
+                        </th>
+                        <th class="px-4 py-3 md:px-6 text-left text-base md:text-lg font-medium md:font-semibold tracking-wider">
+                            สถานะ
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="bg-white divide-y divide-gray-200">
                     @for (var i = 0; i < Model.Students.Count; i++)
                     {
-                        <tr class="border-t border-gray-200 hover:bg-gray-100 transition-all">
-                            <td class="px-6 py-4">
+                        <tr class="hover:bg-gray-50 transition-all">
+                            <td class="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap">
                                 @Html.HiddenFor(m => m.Students[i].StudentId)
-                                <span class="text-gray-700">@Model.Students[i].StudentName</span>
+                                <span class="text-sm md:text-base text-gray-700 font-medium">@Model.Students[i].StudentName</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex flex-wrap items-center space-x-4">
+                            <td class="px-4 py-3 md:px-6 md:py-4">
+                                <div class="flex flex-wrap items-center gap-2 md:gap-4">
                                     <div class="flex items-center">
-                                        <input class="form-radio text-green-500" type="radio" name="Students[@i].Status" id="present_@i" value="present" @(Model.Students[i].Status?.ToLower() == "present" ? "checked" : "")>
-                                        <label class="ml-2 text-gray-700" for="present_@i">มา</label>
+                                        <input class="w-4 h-4 form-radio text-green-500 focus:ring-green-400"
+                                               type="radio"
+                                               name="Students[@i].Status"
+                                               id="present_@i"
+                                               value="present"
+                                        @(Model.Students[i].Status?.ToLower() == "present" ? "checked" : "")>
+                                        <label class="ml-2 text-sm md:text-base text-gray-700" for="present_@i">มา</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <input class="form-radio text-red-500" type="radio" name="Students[@i].Status" id="absent_@i" value="absent" @(Model.Students[i].Status?.ToLower() == "absent" ? "checked" : "")>
-                                        <label class="ml-2 text-gray-700" for="absent_@i">ขาด</label>
+                                        <input class="w-4 h-4 form-radio text-red-500 focus:ring-red-400"
+                                               type="radio"
+                                               name="Students[@i].Status"
+                                               id="absent_@i"
+                                               value="absent"
+                                        @(Model.Students[i].Status?.ToLower() == "absent" ? "checked" : "")>
+                                        <label class="ml-2 text-sm md:text-base text-gray-700" for="absent_@i">ขาด</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <input class="form-radio text-yellow-500" type="radio" name="Students[@i].Status" id="late_@i" value="late" @(Model.Students[i].Status?.ToLower() == "late" ? "checked" : "")>
-                                        <label class="ml-2 text-gray-700" for="late_@i">สาย</label>
+                                        <input class="w-4 h-4 form-radio text-yellow-500 focus:ring-yellow-400"
+                                               type="radio"
+                                               name="Students[@i].Status"
+                                               id="late_@i"
+                                               value="late"
+                                        @(Model.Students[i].Status?.ToLower() == "late" ? "checked" : "")>
+                                        <label class="ml-2 text-sm md:text-base text-gray-700" for="late_@i">สาย</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <input class="form-radio text-blue-500" type="radio" name="Students[@i].Status" id="excused_@i" value="excused" @(Model.Students[i].Status?.ToLower() == "excused" ? "checked" : "")>
-                                        <label class="ml-2 text-gray-700" for="excused_@i">ลา</label>
+                                        <input class="w-4 h-4 form-radio text-blue-500 focus:ring-blue-400"
+                                               type="radio"
+                                               name="Students[@i].Status"
+                                               id="excused_@i"
+                                               value="excused"
+                                        @(Model.Students[i].Status?.ToLower() == "excused" ? "checked" : "")>
+                                        <label class="ml-2 text-sm md:text-base text-gray-700" for="excused_@i">ลา</label>
                                     </div>
                                 </div>
                                 @Html.HiddenFor(m => m.Students[i].StudentName)
@@ -55,8 +83,55 @@
             </table>
         </div>
 
-        <button type="submit" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            บันทึกการเช็คชื่อ
-        </button>
+        <div class="flex flex-col md:flex-row gap-4 mt-6">
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 md:py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm md:text-base font-medium">
+                บันทึกการเช็คชื่อ
+            </button>
+            <button type="button"
+                    onclick="selectAllPresent()"
+                    class="w-full bg-green-500 text-white py-2 md:py-3 px-4 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all text-sm md:text-base font-medium">
+                เลือกมาทั้งหมด
+            </button>
+        </div>
     </form>
 </div>
+@section Scripts{
+    <script>
+        // Function to select all students as present
+        function selectAllPresent() {
+            const studentCount = @Model.Students.Count;
+            for (let i = 0; i < studentCount; i++) {
+                document.getElementById(`present_${i}`).checked = true;
+            }
+        }
+
+        // Add swipe detection for mobile devices
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('table');
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            table.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+
+            table.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+
+            function handleSwipe() {
+                // Add a visual indicator for users to know the table is scrollable
+                if (Math.abs(touchEndX - touchStartX) > 50) {
+                    table.classList.add('swiped');
+                    setTimeout(() => {
+                        table.classList.remove('swiped');
+                    }, 500);
+                }
+            }
+        });
+    </script>
+
+
+}

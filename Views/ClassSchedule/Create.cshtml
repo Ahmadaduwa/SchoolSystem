@@ -1,15 +1,16 @@
 ﻿@model SchoolSystem.Models.ClassManagement.ClassSchedule
 @{
-    ViewData["Title"] = "Create Schedule";
+    ViewData["Title"] = "สร้างตารางเรียน";
     int cmId = (int)ViewData["CM_ID"];
 }
+
 <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-200">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 pb-3 border-b border-gray-200">
-        <h2 class="text-xl font-bold text-gray-800 mb-2 md:mb-0">Create Class Schedule</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-2 md:mb-0">สร้างตารางเรียน</h2>
     </div>
 
     <div class="text-sm text-gray-600 mb-4">
-        Creating schedule for Class ID: <span class="font-medium">@ViewData["CM_ID"]</span>
+        สำหรับรหัสชั้นเรียน: <span class="font-medium">@ViewData["CM_ID"]</span>
     </div>
 
     @if (!ViewData.ModelState.IsValid)
@@ -19,7 +20,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <strong>Please correct the following errors:</strong>
+                <strong>กรุณาแก้ไขข้อผิดพลาดต่อไปนี้:</strong>
             </div>
             <ul class="list-disc pl-5 space-y-1">
                 @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
@@ -35,19 +36,19 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label asp-for="DayOfWeek" class="block font-medium text-gray-700 mb-1">Day of Week</label>
+                <label asp-for="DayOfWeek" class="block font-medium text-gray-700 mb-1">วันในสัปดาห์</label>
                 <div class="relative">
                     <select asp-for="DayOfWeek" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors bg-white appearance-none pr-8">
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">จันทร์</option>
+                        <option value="Tuesday">อังคาร</option>
+                        <option value="Wednesday">พุธ</option>
+                        <option value="Thursday">พฤหัสบดี</option>
+                        <option value="Friday">ศุกร์</option>
+                        <option value="Saturday">เสาร์</option>
+                        <option value="Sunday">อาทิตย์</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </div>
@@ -55,14 +56,14 @@
             </div>
 
             <div>
-                <label asp-for="Status" class="block font-medium text-gray-700 mb-1">Status</label>
+                <label asp-for="Status" class="block font-medium text-gray-700 mb-1">สถานะ</label>
                 <div class="relative">
                     <select asp-for="Status" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors bg-white appearance-none pr-8">
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </div>
@@ -70,17 +71,13 @@
             </div>
 
             <div>
-                <label asp-for="StartTime" class="block font-medium text-gray-700 mb-1">Start Time</label>
-                <div class="relative">
-                    <input asp-for="StartTime" type="time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors" required />
-                </div>
+                <label asp-for="StartTime" class="block font-medium text-gray-700 mb-1">เวลาเริ่ม</label>
+                <input asp-for="StartTime" type="time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors" required />
             </div>
 
             <div>
-                <label asp-for="EndTime" class="block font-medium text-gray-700 mb-1">End Time</label>
-                <div class="relative">
-                    <input asp-for="EndTime" type="time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors" required />
-                </div>
+                <label asp-for="EndTime" class="block font-medium text-gray-700 mb-1">เวลาสิ้นสุด</label>
+                <input asp-for="EndTime" type="time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none transition-colors" required />
             </div>
         </div>
 
@@ -89,10 +86,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Save Schedule
+                บันทึกตารางเรียน
             </button>
             <a asp-controller="ClassSchedule" asp-action="IndexClassSchedule" asp-route-cmId="@ViewData["CM_ID"]" class="text-gray-600 hover:text-gray-800 transition-colors">
-                Cancel
+                ยกเลิก
             </a>
         </div>
     </form>

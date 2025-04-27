@@ -8,7 +8,7 @@ using SchoolSystem.Models.ActivityManagement;
 
 namespace SchoolSystem.Controllers
 {
-    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "AcademicPolicyOrAdminPolicy")]
     public class ActivityController : Controller
     {
         private readonly AppDbContext _db;
@@ -238,6 +238,7 @@ namespace SchoolSystem.Controllers
         [HttpPost]
         [Route("Activity/Delete/{id}")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteActivity(int id)
         {
             try

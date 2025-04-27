@@ -11,15 +11,15 @@ namespace SchoolSystem.ViewModels
         public int TeacherId { get; set; }
         public int ProfileId { get; set; }
 
-        [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "Username is required")]
-        public string Username { get; set; }
+        [StringLength(50, MinimumLength = 4, ErrorMessage = "Username must be between 4 and 50 characters")]
+        public string Username { get; set; } = string.Empty;
 
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
         [DataType(DataType.Password)]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         public string? Password { get; set; }
 
         [DataType(DataType.Password)]
@@ -27,13 +27,13 @@ namespace SchoolSystem.ViewModels
         public string? ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "First Name is required")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [Required(ErrorMessage = "Last Name is required")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         public string Gender { get; set; }
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -54,5 +54,7 @@ namespace SchoolSystem.ViewModels
 
         public string Status { get; set; }
         public string? Role { get; set; }
+
+        public bool? HasAcademicRole { get; set; }
     }
 }

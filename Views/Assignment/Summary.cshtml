@@ -1,0 +1,140 @@
+﻿@model SchoolSystem.Models.ViewModels.AssignmentSummaryViewModel
+
+@{
+    ViewData["Title"] = "สรุปคะแนน";
+}
+
+<div class="min-h-screen bg-gradient-to-b py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-8">
+                <div class="flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <h2 class="text-3xl font-bold text-white">สรุปคะแนน</h2>
+                </div>
+                <p class="text-blue-100 text-center mt-2">สำหรับวิชา: <span class="font-semibold">@Model.CourseName</span></p>
+            </div>
+
+            <div class="p-6 md:p-8">
+
+                <form asp-action="Summary" method="post" class="space-y-6" id="summaryForm">
+                    <input type="hidden" asp-for="CM_Id" />
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        รหัสนักเรียน
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ชื่อนักเรียน
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ลงทะเบียน
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        คะแนนรวม
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        เกรด
+                                    </th>
+                                </tr>ฟ
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @for (int i = 0; i < Model.StudentSummaries.Count; i++)
+                                {
+                                    <tr class="@(i % 2 == 0 ? "bg-white" : "bg-gray-50")">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <input type="hidden" asp-for="StudentSummaries[i].StudentId" />
+                                            @Model.StudentSummaries[i].StudentCode
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            @Model.StudentSummaries[i].StudentName
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="@(Model.StudentSummaries[i].IsRegistered ? "text-green-600" : "text-red-600")">
+                                                @(Model.StudentSummaries[i].IsRegistered ? "ลงทะเบียนแล้ว" : "ยังไม่ได้ลงทะเบียน")
+                                            </span>
+                                        </td>
+                                        <!--
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <input asp-for="StudentSummaries[i].TotalScore"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   max="100"
+                                                   class="block w-24 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                                   value="@Model.StudentSummaries[i].TotalScore.ToString("F2")" />
+                                            <span asp-validation-for="StudentSummaries[i].TotalScore" class="text-red-500 text-xs"></span>
+                                        </td>
+                                        -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <input asp-for="StudentSummaries[i].TotalScore"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   max="100"
+                                                   readonly
+                                                   class="block w-24 border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed sm:text-sm"
+                                                   value="@Model.StudentSummaries[i].TotalScore.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" />
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            @Model.StudentSummaries[i].Grade.ToString("F1")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                        <button type="submit" id="updateButton" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg id="spinner" class="hidden h-5 w-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 0116 0 8 8 0 01-16 0zm8-8v4m0 8v4m-8-8h4m8 0h4" />
+                            </svg>
+                            <svg id="checkIcon" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            อัพเดทคะแนน
+                        </button>
+                        <a href="@Url.Action("Index", "Assignment", new { cmId = Model.CM_Id })" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            กลับ
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('summaryForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'ยืนยันการอัพเดทคะแนน?',
+                text: 'คะแนนทั้งหมดจะถูกบันทึกลงในระบบการลงทะเบียนวิชา',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('updateButton').disabled = true;
+                    document.getElementById('spinner').classList.remove('hidden');
+                    document.getElementById('checkIcon').classList.add('hidden');
+                    this.submit();
+                }
+            });
+        });
+    </script>
+}

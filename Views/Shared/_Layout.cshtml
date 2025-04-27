@@ -19,7 +19,10 @@
     ViewData["NotificationCount"] = 3; // ควรดึงค่าจากฐานข้อมูลจริง
 
     // Set user class/role info
-    if (User.IsInRole("Academic"))
+    if (User.IsInRole("Admin"))
+    {
+        ViewData["Class"] = "Admin";
+    } else if (User.IsInRole("Academic"))
     {
         ViewData["Class"] = "ฝ่ายวิชาการ";
     }
@@ -27,9 +30,17 @@
     {
         ViewData["Class"] = "ครู";
     }
-    else
+    else if (User.IsInRole("StudentCouncil"))
+    {
+        ViewData["Class"] = "ชั้น ม.2/1 (สภานักเรียน)";
+    }
+    else if (User.IsInRole("Student"))
     {
         ViewData["Class"] = "ชั้น ม.2/1"; // You might want to get this from the profile too
+    }
+    else
+    {
+        ViewData["Class"] = "Guest"; 
     }
 }
 <!DOCTYPE html>
@@ -75,11 +86,12 @@
                             <div class="font-medium">@ViewData["Fullname"]</div>
                             <div class="text-sm text-gray-500">@ViewData["Class"]</div>
                         </div>
+                        <!--
                         <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-user mr-2"></i>โปรไฟล์
                         </a>
 
-                        <hr class="my-2">
+                        <hr class="my-2"> -->
                         <form asp-controller="Home" asp-action="Logout" method="post" class="block py-2 text-red-600 hover:bg-gray-100">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="w-full text-left px-4 ">
@@ -102,7 +114,7 @@
     <div class="md:flex-grow md:flex ">
         <!-- Sidebar -->
         <nav id="sidebar"
-             class="fixed md:static top-0 left-0 h-full md:h-auto w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+             class="fixed md:static top-0 left-0 h-full md:h-auto w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto z-50">
             <div class="p-4">
                 <div class="md:hidden mb-4 p-4 bg-blue-50 rounded-lg">
                     <div class="flex items-center space-x-3">
@@ -127,6 +139,7 @@
             </div>
         </nav>
 
+
         <!-- Main Content -->
         <main class="flex-1 pt-5 md:p-5 lg:px-8 bg-gray-50">
             @if (TempData["SuccessMessage"] != null)
@@ -143,6 +156,17 @@
             @if (TempData["ErrorMessage"] != null)
             {
                 <div id="flash-message" class="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-md">
+                    @TempData["ErrorMessage"]
+                </div>
+                <script>
+                    setTimeout(() => {
+                        document.getElementById('flash-message').style.display = 'none';
+                    }, 3000);
+                </script>
+            }
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div id="flash-message" class="fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md">
                     @TempData["ErrorMessage"]
                 </div>
                 <script>

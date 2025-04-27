@@ -1,0 +1,80 @@
+﻿/* Custom scrollbar for better UX */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Animation for swipe indication */
+@keyframes swipeIndication {
+    0% {
+        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+    }
+}
+
+.swiped {
+    animation: swipeIndication 0.5s ease-in-out;
+}
+
+/* Ensure form radios are more tap-friendly on mobile */
+input[type="radio"] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+    input[type="radio"]:checked {
+        border-width: 5px;
+    }
+
+input[value="present"]:checked {
+    border-color: #10B981;
+}
+
+input[value="absent"]:checked {
+    border-color: #EF4444;
+}
+
+input[value="late"]:checked {
+    border-color: #F59E0B;
+}
+
+input[value="excused"]:checked {
+    border-color: #3B82F6;
+}
+
+/* Improve tap areas on mobile */
+@media (max-width: 640px) {
+    label {
+        padding: 6px 0;
+    }
+
+    .flex.items-center {
+        margin: 4px 0;
+    }
+}

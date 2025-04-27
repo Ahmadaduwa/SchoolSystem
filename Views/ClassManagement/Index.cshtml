@@ -15,25 +15,34 @@
     var currentFilter = ViewData["CurrentFilter"]?.ToString();
     var currentSort = ViewData["CurrentSort"]?.ToString();
 }
-<div class="container mx-auto md:px-4 py-6">
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Class Management</h2>
+@section CSS {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+}
 
-        <!-- Search and Filter Section -->
-        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-            <form asp-action="Index" method="get" class="flex flex-wrap gap-4">
+<div class="container mx-auto px-2 md:px-4 py-4 md:py-6">
+    <div class="bg-white shadow-md rounded-lg p-3 md:p-6">
+        @* Header Section *@
+        <h2 class="text-xl md:text-2xl font-bold text-center text-gray-700 mb-4 md:mb-6">จัดการเรียนการสอน</h2>
+
+        @* Search and Filter Section *@
+        <div class="bg-gray-50 p-3 md:p-6 rounded-lg shadow mb-4 md:mb-6">
+            <form asp-action="Index" method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                 <!-- Search Input -->
-                <div class="flex-1 min-w-fit">
-                    <input type="text" name="searchString" value="@currentFilter" class="w-full p-2 border rounded" placeholder="Search..." />
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">ค้นหา</label>
+                    <input type="text" name="searchString" value="@currentFilter"
+                           class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm"
+                           placeholder="ค้นหา..." />
                 </div>
 
                 <!-- Status Filter Dropdown -->
-                <div class="flex-1 min-w-fit">
-                    <select name="statusFilter" class="w-full p-2 border rounded">
-                        <option value="">All Status</option>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">สถานะ</label>
+                    <select name="statusFilter" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm">
+                        <option value="">สถานะทั้งหมด</option>
                         @foreach (var status in statuses)
                         {
-                            <option value="@status.Value" selected="@(status.Value == currentStatus ? "selected" : null)">
+                            <option value="@status.Value" select=@(currentStatus == status.Value ? "selected" : "")>
                                 @status.Text
                             </option>
                         }
@@ -41,12 +50,13 @@
                 </div>
 
                 <!-- Class Filter Dropdown -->
-                <div class="flex-1 min-w-fit">
-                    <select name="classFilter" class="w-full p-2 border rounded">
-                        <option value="">All Classes</option>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">ชั้นเรียน</label>
+                    <select name="classFilter" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm">
+                        <option value="">ชั้นเรียนทั้งหมด</option>
                         @foreach (var cls in classes)
                         {
-                            <option value="@cls.Value" selected="@(cls.Value == currentClass ? "selected" : null)">
+                            <option value="@cls.Value" select=@(currentClass == cls.Value ? "selected" : "")>
                                 @cls.Text
                             </option>
                         }
@@ -54,12 +64,13 @@
                 </div>
 
                 <!-- Teacher Filter Dropdown -->
-                <div class="flex-1 min-w-fit">
-                    <select name="teacherFilter" class="w-full p-2 border rounded">
-                        <option value="">All Teachers</option>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">ครู</label>
+                    <select name="teacherFilter" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm">
+                        <option value="">ครูทั้งหมด</option>
                         @foreach (var teacher in teachers)
                         {
-                            <option value="@teacher.Value" selected="@(teacher.Value == currentTeacher ? "selected" : null)">
+                            <option value="@teacher.Value" select=@(currentTeacher == teacher.Value ? "selected" : "")>
                                 @teacher.Text
                             </option>
                         }
@@ -67,12 +78,13 @@
                 </div>
 
                 <!-- Course Filter Dropdown -->
-                <div class="flex-1 min-w-fit">
-                    <select name="courseFilter" class="w-full p-2 border rounded">
-                        <option value="">All Courses</option>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">วิชา</label>
+                    <select name="courseFilter" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm">
+                        <option value="">วิชาทั้งหมด</option>
                         @foreach (var course in courses)
                         {
-                            <option value="@course.Value" selected="@(course.Value == currentCourse ? "selected" : null)">
+                            <option value="@course.Value" select=@(currentCourse == course.Value ? "selected" : "")>
                                 @course.Text
                             </option>
                         }
@@ -80,46 +92,47 @@
                 </div>
 
                 <!-- Semester Filter Dropdown -->
-                <div class="flex-1 min-w-fit">
-                    <select name="semesterFilter" class="w-full p-2 border rounded">
-                        <option value="">All Semesters</option>
+                <div>
+                    <label class="block text-gray-600 text-sm mb-1">ภาคการเรียน</label>
+                    <select name="semesterFilter" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 text-sm">
+                        <option value="">ภาคการเรียนทั้งหมด</option>
                         @foreach (var semester in semesters)
                         {
-                            <option value="@semester.Value" selected="@(semester.Value == currentSemester ? "selected" : null)">
+                            <option value="@semester.Value" select=@(currentSemester == semester.Value ? "selected" : "")>
                                 @semester.Text
                             </option>
                         }
                     </select>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex gap-2">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded">
-                        <i class="fas fa-search mr-1"></i> Search
+                @* Action Buttons *@
+                <div class="flex items-end gap-2 col-span-full sm:col-span-2 lg:col-span-1">
+                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-400 text-white px-3 py-2 rounded text-sm flex items-center justify-center">
+                        <i class="fas fa-search mr-1"></i> ค้นหา
                     </button>
-                    <a asp-action="Index" class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded">
-                        Reset
+                    <a asp-action="Index" class="w-full bg-gray-500 hover:bg-gray-400 text-white px-3 py-2 rounded text-sm flex items-center justify-center">
+                        รีเซ็ต
                     </a>
                 </div>
             </form>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-            <a asp-action="CreateManage" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center mb-4 md:mb-0">
-                <i class="fas fa-plus-circle mr-2"></i> Add New Class Assignment
+        @* Action Buttons Header for List *@
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+            <a asp-action="CreateManage" class="bg-green-600 hover:bg-green-500 text-white px-3 py-2 rounded-md flex items-center mb-3 sm:mb-0 text-sm w-full sm:w-auto justify-center sm:justify-start">
+                <i class="fas fa-plus-circle mr-2"></i> จัดการสอน
             </a>
-            <div class="text-gray-600">
-                Showing @Model.Count of @ViewData["TotalItems"] class assignments | Page @Model.PageIndex of @Model.TotalPages
+            <div class="text-gray-600 text-sm text-center sm:text-right">
+                แสดง @Model.Count จาก @ViewData["TotalItems"] จัดการสอน | หน้า @Model.PageIndex จาก @Model.TotalPages
             </div>
         </div>
 
         <!-- Class Management Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full border-collapse border border-gray-300">
+        <div class="overflow-x-auto rounded-lg">
+            <table class="min-w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-gray-700">
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2 md:px-4">
                             <a asp-action="Index"
                                asp-route-sortOrder="@ViewData["ClassSortParam"]"
                                asp-route-currentFilter="@currentFilter"
@@ -129,14 +142,15 @@
                                asp-route-courseFilter="@currentCourse"
                                asp-route-semesterFilter="@currentSemester"
                                class="flex items-center justify-between">
-                                Class
+                                <span class="hidden md:inline">ชั้นเรียน</span>
+                                <span class="md:hidden">ชั้น</span>
                                 @if (currentSort == "class" || currentSort == "class_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "class_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2 md:px-4">
                             <a asp-action="Index"
                                asp-route-sortOrder="@ViewData["TeacherSortParam"]"
                                asp-route-currentFilter="@currentFilter"
@@ -146,14 +160,14 @@
                                asp-route-courseFilter="@currentCourse"
                                asp-route-semesterFilter="@currentSemester"
                                class="flex items-center justify-between">
-                                Teacher
+                                ครู
                                 @if (currentSort == "teacher" || currentSort == "teacher_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "teacher_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2 md:px-4">
                             <a asp-action="Index"
                                asp-route-sortOrder="@ViewData["CourseSortParam"]"
                                asp-route-currentFilter="@currentFilter"
@@ -163,14 +177,14 @@
                                asp-route-courseFilter="@currentCourse"
                                asp-route-semesterFilter="@currentSemester"
                                class="flex items-center justify-between">
-                                Course
+                                วิชา
                                 @if (currentSort == "course" || currentSort == "course_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "course_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2 md:px-4 hidden sm:table-cell">
                             <a asp-action="Index"
                                asp-route-sortOrder="@ViewData["SemesterSortParam"]"
                                asp-route-currentFilter="@currentFilter"
@@ -180,15 +194,15 @@
                                asp-route-courseFilter="@currentCourse"
                                asp-route-semesterFilter="@currentSemester"
                                class="flex items-center justify-between">
-                                Semester
+                                <span class="hidden lg:inline">ภาคการศึกษา</span>
+                                <span class="lg:hidden">ภาค</span>
                                 @if (currentSort == "semester" || currentSort == "semester_desc")
                                 {
                                     <i class="fas fa-sort-@(currentSort == "semester_desc" ? "down" : "up") ml-1"></i>
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">Scoring Criteria</th>
-                        <th class="border px-4 py-2">
+                        <th class="border px-2 py-2 md:px-4 hidden md:table-cell">
                             <a asp-action="Index"
                                asp-route-sortOrder="@ViewData["StatusSortParam"]"
                                asp-route-currentFilter="@currentFilter"
@@ -205,7 +219,7 @@
                                 }
                             </a>
                         </th>
-                        <th class="border px-4 py-2">Actions</th>
+                        <th class="border px-2 py-2 md:px-4">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -214,22 +228,25 @@
                         @foreach (var classManagement in Model)
                         {
                             <tr class="hover:bg-gray-50">
-                                <td class="border px-4 py-2">@(classManagement.Class?.GradeLevels?.Name + "/" + classManagement.Class?.ClassNumber)</td>
-                                <td class="border px-4 py-2">@(classManagement.Teacher?.Profile?.FirstName + " " + classManagement.Teacher?.Profile?.LastName)</td>
-                                <td class="border px-4 py-2">@classManagement.Course?.CourseName</td>
-                                <td class="border px-4 py-2">@(classManagement.Semester?.SemesterYear + "/" + classManagement.Semester?.SemesterNumber)</td>
-                                <td class="border px-4 py-2">@(classManagement.ScoringCriteria ?? "-")</td>
-                                <td class="border px-4 py-2">@classManagement.Status</td>
-                                <td class="border px-4 py-2">
+                                <td class="border px-2 py-2 md:px-4">@(classManagement.Class?.GradeLevels?.Name + "/" + classManagement.Class?.ClassNumber)</td>
+                                <td class="border px-2 py-2 md:px-4">@(classManagement.Teacher?.Profile?.FirstName + " " + classManagement.Teacher?.Profile?.LastName)</td>
+                                <td class="border px-2 py-2 md:px-4">@classManagement.Course?.CourseName</td>
+                                <td class="border px-2 py-2 md:px-4 hidden sm:table-cell">@(classManagement.Semester?.SemesterYear + "/" + classManagement.Semester?.SemesterNumber)</td>
+                                <td class="border px-2 py-2 md:px-4 hidden md:table-cell">
+                                    <span class="px-2 py-1 rounded text-xs @(classManagement.Status == "Active" ? "bg-green-100 text-green-800" : classManagement.Status == "Inactive" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800")">
+                                        @classManagement.Status
+                                    </span>
+                                </td>
+                                <td class="border px-2 py-2 md:px-4">
                                     <div class="flex justify-center gap-1">
-                                        <a asp-action="ViewManage" asp-route-id="@classManagement.CM_Id" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-sm" title="View Details">
+                                        <a asp-action="ViewManage" asp-route-id="@classManagement.CM_Id" class="bg-blue-500 hover:bg-blue-400 text-white px-2 py-1 rounded text-xs" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="EditManage" asp-route-id="@classManagement.CM_Id" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-sm" title="Edit">
+                                        <a asp-action="EditManage" asp-route-id="@classManagement.CM_Id" class="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded text-xs" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a asp-action="IndexClassSchedule" asp-controller="ClassSchedule" asp-route-cmId="@classManagement.CM_Id" class="bg-purple-500 hover:bg-purple-400 text-white px-2 py-1 rounded text-sm" title="Manage Schedule">
-                                            <i class="fas fa-calendar-alt"></i>
+                                        <a asp-action="IndexClassSchedule" asp-controller="ClassSchedule" asp-route-cmId="@classManagement.CM_Id" class="bg-purple-500 hover:bg-purple-400 text-white px-2 py-1 rounded text-xs hidden sm:block" title="Manage Schedule">
+                                            <i class="fas fa-calendar-alt"></i> 
                                         </a>
                                         @if (User.IsInRole("Admin"))
                                         {
@@ -237,7 +254,7 @@
                                                   onsubmit="return confirm('Are you sure you want to delete this class assignment?');"
                                                   class="flex justify-between items-center">
                                                 <input type="hidden" asp-for="@classManagement.CM_Id" />
-                                                <button type="submit" class="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded text-sm">
+                                                <button type="submit" class="bg-red-500 hover:bg-red-400 text-white px-2 py-1 rounded text-xs">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </form>
@@ -250,10 +267,10 @@
                     else
                     {
                         <tr>
-                            <td colspan="8" class="text-center text-gray-500 p-6">
+                            <td colspan="8" class="text-center text-gray-500 p-4 md:p-6">
                                 <div class="flex flex-col items-center">
-                                    <i class="fas fa-search text-4xl mb-2"></i>
-                                    <p>No class assignments found matching your criteria.</p>
+                                    <i class="fas fa-search text-3xl md:text-4xl mb-2"></i>
+                                    <p>ไม่พบการจัดการเรียนการสอน</p>
                                 </div>
                             </td>
                         </tr>
@@ -262,9 +279,40 @@
             </table>
         </div>
 
+        <!-- Expandable Mobile Details for Hidden Columns -->
+        @if (Model.Any())
+        {
+            <div class="block sm:hidden mt-2">
+                <details class="mb-2 bg-gray-50 rounded-lg p-2">
+                    <summary class="text-sm font-medium text-blue-600 cursor-pointer">แสดง/ซ่อนข้อมูลเพิ่มเติม</summary>
+                    <div class="mt-2 space-y-2">
+                        @foreach (var classManagement in Model)
+                        {
+                            <div class="border-b pb-2">
+                                <p class="text-sm"><span class="font-medium">ชั้นเรียน:</span> @(classManagement.Class?.GradeLevels?.Name + "/" + classManagement.Class?.ClassNumber)</p>
+                                <p class="text-sm"><span class="font-medium">ครู:</span> @(classManagement.Teacher?.Profile?.FirstName + " " + classManagement.Teacher?.Profile?.LastName)</p>
+                                <p class="text-sm"><span class="font-medium">วิชา:</span> @classManagement.Course?.CourseName</p>
+                                <p class="text-sm"><span class="font-medium">ภาคการศึกษา:</span> @(classManagement.Semester?.SemesterYear + "/" + classManagement.Semester?.SemesterNumber)</p>
+                                <p class="text-sm"><span class="font-medium">Status:</span> 
+                                    <span class="px-2 py-1 rounded text-xs @(classManagement.Status == "Active" ? "bg-green-100 text-green-800" : classManagement.Status == "Inactive" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800")">
+                                        @classManagement.Status
+                                    </span>
+                                </p>
+                                <div class="mt-2">
+                                    <a asp-action="IndexClassSchedule" asp-controller="ClassSchedule" asp-route-cmId="@classManagement.CM_Id" class="bg-purple-500 hover:bg-purple-400 text-white px-2 py-1 rounded text-xs inline-block" title="Manage Schedule">
+                                        <i class="fas fa-calendar-alt"></i> ตารางเรียน
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </details>
+            </div>
+        }
+
         <!-- Pagination Controls -->
-        <div class="flex flex-col md:flex-row justify-between items-center mt-6">
-            <span class="text-gray-600 mb-2 md:mb-0">Page @Model.PageIndex of @Model.TotalPages</span>
+        <div class="flex flex-col sm:flex-row justify-between items-center mt-4 md:mt-6">
+            <span class="text-gray-600 text-sm mb-2 sm:mb-0">หน้า @Model.PageIndex จาก @Model.TotalPages</span>
             <div class="flex space-x-2">
                 @if (Model.HasPreviousPage)
                 {
@@ -277,14 +325,14 @@
                        asp-route-teacherFilter="@currentTeacher"
                        asp-route-courseFilter="@currentCourse"
                        asp-route-semesterFilter="@currentSemester"
-                       class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                       class="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </a>
                 }
                 else
                 {
-                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded cursor-not-allowed text-sm">
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
                     </span>
                 }
 
@@ -299,14 +347,14 @@
                        asp-route-teacherFilter="@currentTeacher"
                        asp-route-courseFilter="@currentCourse"
                        asp-route-semesterFilter="@currentSemester"
-                       class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                       class="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </a>
                 }
                 else
                 {
-                    <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed">
-                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded cursor-not-allowed text-sm">
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
                     </span>
                 }
             </div>
@@ -315,6 +363,24 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 with responsive settings
+            $('select[name="statusFilter"], select[name="classFilter"], select[name="teacherFilter"], select[name="courseFilter"], select[name="semesterFilter"]').select2({
+                placeholder: "เลือก...",
+                allowClear: true,
+                width: '100%',
+                dropdownAutoWidth: true
+            });
+            
+            // Fix Select2 dropdown width issue on small screens
+            $(window).resize(function() {
+                $('.select2-container').css('width', '100%');
+            });
+        });
+    </script>
     <script>
         // Dynamically include FontAwesome if not already loaded in the layout
         if (!document.getElementById('fontawesome-css')) {

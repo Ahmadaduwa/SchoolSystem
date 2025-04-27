@@ -88,11 +88,39 @@
                         <dd class="text-gray-800">@Model.EnrollmentDate.ToShortDateString()</dd>
                     </div>
                     <div class="grid grid-cols-2">
-                        <dt class="font-medium text-gray-600">GPA</dt>
+                        <dt class="font-medium text-gray-600">GPAX</dt>
                         <dd class="text-gray-800">@Model.GPA.ToString("F2")</dd>
                     </div>
                 </dl>
             </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg md:col-span-2 mt-4">
+                    <h4 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Action</h4>
+                    <div class="flex items-center justify-between">
+                        <div class="flex gap-3">
+
+                            @if (Model.HasStudentCouncilRole == true)
+                            {
+                                <!-- ปุ่มลบตำแหน่งทางวิชาการ -->
+                                <form asp-action="RemoveStudentCouncilRole" asp-controller="Student" asp-route-id="@Model.StudentId" method="post" onsubmit="return confirm('คุณแน่ใจว่าต้องการลบตำแหน่งนี้หรือไม่?');">
+                                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200">
+                                        ลบตำแหน่งสภานักเรียน
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <!-- ปุ่มเพิ่มตำแหน่งทางวิชาการ -->
+                                <form asp-action="AssignStudentCouncilRole" asp-controller="Student" asp-route-id="@Model.StudentId" method="post" onsubmit="return confirm('คุณแน่ใจว่าต้องการเพิ่มตำแหน่งนี้หรือไม่?');">
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
+                                        เพิ่มตำแหน่งสภานักเรียน
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 
@@ -104,7 +132,7 @@
                 </svg>
                 กลับไปที่รายการนักเรียน
             </a>
-            <a href="@Url.Action("StudentGrades", new { id = Model.StudentId })" class="text-blue-600 hover:text-blue-800 flex items-center">
+            <a asp-action="ViewRegistration" asp-controller="ClassRegistration" asp-route-id="@Model.StudentId" class="text-blue-600 hover:text-blue-800 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>

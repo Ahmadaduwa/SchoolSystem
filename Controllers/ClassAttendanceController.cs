@@ -39,6 +39,20 @@ namespace SchoolSystem.Controllers
 
             return teacherInfo == 0 ? null : teacherInfo;
         }
+        private string GetThaiDay(DateTime date)
+        {
+            switch (date.DayOfWeek)
+            {
+                case DayOfWeek.Sunday: return "อาทิตย์";
+                case DayOfWeek.Monday: return "จันทร์";
+                case DayOfWeek.Tuesday: return "อังคาร";
+                case DayOfWeek.Wednesday: return "พุธ";
+                case DayOfWeek.Thursday: return "พฤหัสบดี";
+                case DayOfWeek.Friday: return "ศุกร์";
+                case DayOfWeek.Saturday: return "เสาร์";
+                default: return "";
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> ClassAttendance()
@@ -52,7 +66,6 @@ namespace SchoolSystem.Controllers
                 }
                 _logger.LogInformation($"Found teacher ID: {teacherId}");
 
-                // กำหนดรูปแบบวันที่ภาษาอังกฤษ
                 var culture = new System.Globalization.CultureInfo("en-US");
                 string currentDay = DateTime.Now.ToString("dddd", culture);
                 _logger.LogInformation($"Current day: {currentDay}");
@@ -88,8 +101,8 @@ namespace SchoolSystem.Controllers
                 var viewModel = new ClassAttendanceViewModel
                 {
                     Schedules = schedules,
-                    CurrentDay = culture.DateTimeFormat.GetDayName(DateTime.Now.DayOfWeek),
-                    CurrentDate = DateTime.Now.ToString("dd/MM/yyyy", culture),
+                    CurrentDay = GetThaiDay(DateTime.Now),
+                    CurrentDate = DateTime.Now.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("th-TH")),
                     TeacherId = teacherId.Value,
                     Debug_AllTeacherSchedulesCount = allTeacherSchedulesCount
                 };
@@ -113,6 +126,7 @@ namespace SchoolSystem.Controllers
             var classManagement = await _db.ClassManagements
                 .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
+                .ThenInclude(cm => cm.GradeLevels)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
             if (classManagement == null)
@@ -152,7 +166,7 @@ namespace SchoolSystem.Controllers
             {
                 cmId = cmId,
                 date = attendanceDate,
-                ClassName = classManagement.Class?.ClassNumber.ToString(),
+                ClassName = classManagement.Class?.GradeLevels.Name+"/"+classManagement.Class?.ClassNumber.ToString(),
                 CourseName = classManagement.Course?.CourseName,
                 Students = studentAttendanceList
             };
@@ -388,6 +402,7 @@ namespace SchoolSystem.Controllers
             var classManagement = await _db.ClassManagements
                 .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
+                .ThenInclude(cm => cm.GradeLevels)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
             if (classManagement == null)
@@ -409,7 +424,7 @@ namespace SchoolSystem.Controllers
             var model = new EditAttendanceSelectDateViewModel
             {
                 CM_Id = cmId,
-                ClassName = $"{classManagement.Class?.ClassNumber}/{classManagement.Class?.GradeLevels?.Name}",
+                ClassName = $"{classManagement.Class?.GradeLevels?.Name}/{classManagement.Class?.ClassNumber}",
                 CourseName = classManagement.Course?.CourseName,
                 CheckedDates = checkedDates
             };
@@ -431,6 +446,7 @@ namespace SchoolSystem.Controllers
             var classManagement = await _db.ClassManagements
                 .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Class)
+                .ThenInclude(c => c.GradeLevels)
                 .Include(cm => cm.Course)
                 .FirstOrDefaultAsync(cm => cm.CM_Id == cmId);
             if (classManagement == null)
@@ -481,7 +497,7 @@ namespace SchoolSystem.Controllers
             {
                 cmId = cmId,
                 date = date,
-                ClassName = $"{classManagement.Class?.ClassNumber}/{classManagement.Class?.GradeLevels?.Name}",
+                ClassName = $"{classManagement.Class?.GradeLevels?.Name}/{classManagement.Class?.ClassNumber}",
                 CourseName = classManagement.Course?.CourseName,
                 Students = studentAttendanceList
             };
@@ -646,6 +662,7 @@ namespace SchoolSystem.Controllers
                 .Where(cs => cs.Status == "Active")
                 .Include(cm => cm.Course)
                 .Include(cm => cm.Class)
+                .ThenInclude(c => c.GradeLevels)
                 .Where(cm => cm.TeacherId == teacherId && cm.SemesterId == currentSemester.SemesterID)
                 .Select(cm => new TeacherCourseViewModel
                 {
@@ -653,6 +670,7 @@ namespace SchoolSystem.Controllers
                     CourseName = cm.Course.CourseName,
                     CourseCode = cm.Course.Course_Code,
                     ClassNumber = cm.Class.ClassNumber,
+                    ClassName = cm.Class.GradeLevels.Name,
                     SemesterId = cm.SemesterId
                 })
                 .Distinct()
@@ -690,7 +708,7 @@ namespace SchoolSystem.Controllers
                 var viewModel = attendanceSummary.Select(s => new AttendanceSummaryViewModel
                 {
                     StudentCode = s.Student?.Student_Code ?? "ไม่พบรหัสนักเรียน",
-                    Name = s.Student?.Profile?.FirstName ?? "ไม่พบชื่อ",
+                    Name = s.Student?.Profile?.FirstName+" "+ s.Student?.Profile?.LastName ?? "ไม่พบชื่อ",
                     PresentCount = s.PresentCount ?? 0,
                     AbsentCount = s.AbsentCount ?? 0,
                     LateCount = s.LateCount ?? 0,
