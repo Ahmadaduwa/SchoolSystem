@@ -3,6 +3,7 @@
     public class TeachingSchedulePageViewModel
     {
         public int SemesterNumber { get; set; }
+        public string? Class { get; set; }
         public string SemesterYear { get; set; } = string.Empty;
 
         // Set วันที่สอน

@@ -12,6 +12,7 @@ using SchoolSystem.Models;
 using SchoolSystem.Models.UserManagement;
 using SchoolSystem.Models.ViewModels;
 using SchoolSystem.Models.Alert;
+using SchoolSystem.Models.ClassManagement;
 
 namespace SchoolSystem.Controllers
 {   
@@ -312,6 +313,71 @@ namespace SchoolSystem.Controllers
             return View(vm);
         }
 
+        [HttpGet]
+        [Route("/Student/Schedule")]
+        [Authorize(Policy = "StudentPolicy")]
+        public async Task<IActionResult> StudySchedule()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var studentUser = await _db.Users
+                .Include(u => u.Profile!).ThenInclude(p => p.Student!)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (studentUser?.Profile?.Student == null)
+                return RedirectToAction("Index", "Home");
+
+            int studentId = studentUser.Profile.Student.StudentId;
+            int classId = studentUser.Profile.Student.ClassId; // ดึง ClassId ของนักเรียน
+
+            // ดึงตารางจาก ClassManagements ที่ ClassId ตรงกับนักเรียน
+            var raw = await _db.ClassManagements
+                .AsNoTracking()
+                .Include(cm => cm.Course)
+                .Include(cm => cm.Class).ThenInclude(c => c.GradeLevels)
+                .Include(cm => cm.Semester)
+                .Include(cm => cm.ClassSchedules)
+                .Include(cm => cm.Teacher)
+                    .ThenInclude(cm => cm.Profile)
+                .Where(cm => cm.ClassId == classId) // เปลี่ยนจาก TeacherId เป็น ClassId
+                .SelectMany(cm => cm.ClassSchedules.Select(cs => new TeachingScheduleViewModel
+                {
+                    CourseCode = cm.Course.Course_Code,
+                    CourseName = cm.Course.CourseName,
+                    GradeLevel = cm.Class.GradeLevels.Name!,
+                    ClassNumber = cm.Class.ClassNumber,
+                    DayOfWeekEn = cs.DayOfWeek, // English key
+                    StartTime = cs.StartTime,
+                    EndTime = cs.EndTime,
+                    SemesterYear = cm.Semester.SemesterYear,
+                    SemesterNumber = cm.Semester.SemesterNumber,
+                    TeacherName = cm.Teacher.Profile.FirstName+" "+ cm.Teacher.Profile.LastName
+                }))
+                .ToListAsync();
+
+            var vm = new TeachingSchedulePageViewModel
+            {
+                SemesterNumber = raw.FirstOrDefault()?.SemesterNumber ?? 0,
+                SemesterYear = raw.FirstOrDefault()?.SemesterYear ?? "-",
+                Class = raw.FirstOrDefault()?.GradeLevel+"/"+ raw.FirstOrDefault()?.ClassNumber.ToString(),
+            };
+
+            // สร้าง Matrix โดยใช้ key เป็น English
+            foreach (var day in vm.Days)
+            {
+                vm.Matrix[day.English] = new Dictionary<string, List<TeachingScheduleViewModel>>();
+                foreach (var p in vm.Periods)
+                {
+                    vm.Matrix[day.English][p.Name] = raw
+                        .Where(s => s.DayOfWeekEn == day.English
+                                    && s.StartTime < p.End && s.EndTime > p.Start)
+                        .ToList();
+                }
+            }
+
+            return View(vm);
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -319,7 +385,7 @@ namespace SchoolSystem.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // Add function here
+       
 
 
     }
